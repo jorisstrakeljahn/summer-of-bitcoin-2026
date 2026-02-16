@@ -1,199 +1,35 @@
 /**
  * Bitcoin raw transaction parser.
  *
- * Parses a hex-encoded raw transaction into structured data.
- * Handles both legacy and SegWit (BIP141) serialization formats.
+ * Parses hex-encoded raw transactions into structured data.
+ * Supports both legacy and SegWit (BIP141) serialization formats.
+ *
+ * Wire format (legacy):
+ *   [version:4] [in_count:varint] [inputs] [out_count:varint] [outputs] [locktime:4]
+ *
+ * Wire format (SegWit):
+ *   [version:4] [marker:0x00] [flag:0x01] [in_count:varint] [inputs] [out_count:varint] [outputs] [witness] [locktime:4]
  */
 
+import { BufferReader, compactSizeLength } from "./buffer-reader.js";
 import type { ParsedTransaction, ParsedInput, ParsedOutput } from "./types.js";
 
 // ---------------------------------------------------------------------------
-// BufferReader — sequential byte reader
-// ---------------------------------------------------------------------------
-
-export class BufferReader {
-  private offset = 0;
-
-  constructor(private buffer: Buffer) {}
-
-  get position(): number {
-    return this.offset;
-  }
-
-  get remaining(): number {
-    return this.buffer.length - this.offset;
-  }
-
-  readUInt8(): number {
-    if (this.offset + 1 > this.buffer.length) {
-      throw new Error("BufferReader: read past end of buffer");
-    }
-    const val = this.buffer[this.offset];
-    this.offset += 1;
-    return val;
-  }
-
-  readUInt16LE(): number {
-    if (this.offset + 2 > this.buffer.length) {
-      throw new Error("BufferReader: read past end of buffer");
-    }
-    const val = this.buffer.readUInt16LE(this.offset);
-    this.offset += 2;
-    return val;
-  }
-
-  readUInt32LE(): number {
-    if (this.offset + 4 > this.buffer.length) {
-      throw new Error("BufferReader: read past end of buffer");
-    }
-    const val = this.buffer.readUInt32LE(this.offset);
-    this.offset += 4;
-    return val;
-  }
-
-  readUInt64LE(): bigint {
-    if (this.offset + 8 > this.buffer.length) {
-      throw new Error("BufferReader: read past end of buffer");
-    }
-    const val = this.buffer.readBigUInt64LE(this.offset);
-    this.offset += 8;
-    return val;
-  }
-
-  readSlice(length: number): Buffer {
-    if (this.offset + length > this.buffer.length) {
-      throw new Error("BufferReader: read past end of buffer");
-    }
-    const slice = this.buffer.subarray(this.offset, this.offset + length);
-    this.offset += length;
-    return Buffer.from(slice);
-  }
-
-  /** Read a Bitcoin CompactSize (VarInt). */
-  readVarInt(): number {
-    const first = this.readUInt8();
-    if (first < 0xfd) return first;
-    if (first === 0xfd) return this.readUInt16LE();
-    if (first === 0xfe) return this.readUInt32LE();
-    // 0xff — 8 bytes, but JS number safe range is ~2^53
-    const val = this.readUInt64LE();
-    if (val > BigInt(Number.MAX_SAFE_INTEGER)) {
-      throw new Error("VarInt value exceeds safe integer range");
-    }
-    return Number(val);
-  }
-}
-
-// ---------------------------------------------------------------------------
-// parseTransaction
+// Public API
 // ---------------------------------------------------------------------------
 
 export function parseTransaction(hexOrBuffer: string | Buffer): ParsedTransaction {
-  const rawBuffer =
-    typeof hexOrBuffer === "string"
-      ? Buffer.from(hexOrBuffer, "hex")
-      : hexOrBuffer;
+  const raw = toBuffer(hexOrBuffer);
+  const reader = new BufferReader(raw);
 
-  const reader = new BufferReader(rawBuffer);
-
-  // Version (4 bytes LE)
   const version = reader.readUInt32LE();
-
-  // Check for SegWit marker
-  let segwit = false;
-  const markerPos = reader.position;
-  const marker = reader.readUInt8();
-
-  if (marker === 0x00) {
-    // SegWit: marker=0x00 flag=0x01
-    const flag = reader.readUInt8();
-    if (flag !== 0x01) {
-      throw new Error(`Invalid SegWit flag: expected 0x01, got 0x${flag.toString(16)}`);
-    }
-    segwit = true;
-  } else {
-    // Legacy: the byte we read is actually the start of input count
-    // We need to "unread" this byte — we'll re-create the reader at the right position
-    // Actually, let's just handle it: the marker byte IS the first byte of the varint
-    // We'll construct a mini-buffer for the varint read
-  }
-
-  // Parse input count
-  let inputCount: number;
-  if (segwit) {
-    inputCount = reader.readVarInt();
-  } else {
-    // marker byte was the first byte of input count varint
-    if (marker < 0xfd) {
-      inputCount = marker;
-    } else {
-      // Need to read more bytes for the varint
-      // Re-parse from markerPos
-      const varIntReader = new BufferReader(rawBuffer.subarray(markerPos));
-      inputCount = varIntReader.readVarInt();
-      // Adjust our reader position
-      // This is a bit hacky — let's use a cleaner approach
-      // Actually the simplest: re-create the reader
-      const cleanReader = new BufferReader(rawBuffer);
-      cleanReader.readSlice(markerPos); // skip to marker position
-      inputCount = cleanReader.readVarInt();
-      // Now we need to sync positions... Let's refactor to avoid this mess.
-      // For now, handle the common case (marker < 0xfd) which covers all realistic transactions
-      throw new Error("Legacy transaction with large input count — edge case to handle");
-    }
-  }
-
-  // Parse inputs
-  const inputs: ParsedInput[] = [];
-  for (let i = 0; i < inputCount; i++) {
-    const txidBytes = reader.readSlice(32);
-    // txid is stored in internal byte order — reverse for display
-    const txid = Buffer.from(txidBytes).reverse().toString("hex");
-    const vout = reader.readUInt32LE();
-    const scriptSigLen = reader.readVarInt();
-    const scriptSig = reader.readSlice(scriptSigLen);
-    const sequence = reader.readUInt32LE();
-    inputs.push({ txid, vout, scriptSig, sequence });
-  }
-
-  // Parse output count
-  const outputCount = reader.readVarInt();
-
-  // Parse outputs
-  const outputs: ParsedOutput[] = [];
-  for (let i = 0; i < outputCount; i++) {
-    const value = reader.readUInt64LE();
-    const scriptPubKeyLen = reader.readVarInt();
-    const scriptPubKey = reader.readSlice(scriptPubKeyLen);
-    outputs.push({ value, scriptPubKey });
-  }
-
-  // Parse witness data (if SegWit)
-  const witness: Buffer[][] = [];
-  if (segwit) {
-    for (let i = 0; i < inputCount; i++) {
-      const itemCount = reader.readVarInt();
-      const items: Buffer[] = [];
-      for (let j = 0; j < itemCount; j++) {
-        const itemLen = reader.readVarInt();
-        const item = reader.readSlice(itemLen);
-        items.push(item);
-      }
-      witness.push(items);
-    }
-  } else {
-    // Legacy: empty witness for each input
-    for (let i = 0; i < inputCount; i++) {
-      witness.push([]);
-    }
-  }
-
-  // Locktime (4 bytes LE)
+  const segwit = detectSegwit(reader);
+  const inputs = readInputs(reader);
+  const outputs = readOutputs(reader);
+  const witness = segwit ? readAllWitness(reader, inputs.length) : emptyWitness(inputs.length);
   const locktime = reader.readUInt32LE();
 
-  // TODO: Compute non-witness and witness byte counts for weight calculation
-  const nonWitnessBytes = 0;
-  const witnessBytes = 0;
+  const metrics = computeByteMetrics(inputs, outputs, witness, segwit, raw.length);
 
   return {
     version,
@@ -202,9 +38,188 @@ export function parseTransaction(hexOrBuffer: string | Buffer): ParsedTransactio
     outputs,
     witness,
     locktime,
-    rawHex: rawBuffer.toString("hex"),
-    rawBuffer,
-    nonWitnessBytes,
-    witnessBytes,
+    rawHex: raw.toString("hex"),
+    rawBuffer: raw,
+    ...metrics,
   };
+}
+
+// ---------------------------------------------------------------------------
+// SegWit detection
+// ---------------------------------------------------------------------------
+
+/**
+ * Detect SegWit by checking for the marker byte (0x00) after the version field.
+ *
+ * In legacy transactions, this position holds the input count varint,
+ * which is never 0x00 (a transaction must have at least one input).
+ * SegWit uses marker=0x00 flag=0x01 as a signal.
+ */
+function detectSegwit(reader: BufferReader): boolean {
+  if (reader.peekUInt8() !== 0x00) {
+    return false;
+  }
+
+  // Consume marker and flag bytes
+  reader.readUInt8(); // marker = 0x00
+  const flag = reader.readUInt8();
+  if (flag !== 0x01) {
+    throw new Error(`Invalid SegWit flag: expected 0x01, got 0x${flag.toString(16)}`);
+  }
+  return true;
+}
+
+// ---------------------------------------------------------------------------
+// Input parsing
+// ---------------------------------------------------------------------------
+
+function readInputs(reader: BufferReader): ParsedInput[] {
+  const count = reader.readCompactSize();
+  const inputs: ParsedInput[] = [];
+
+  for (let i = 0; i < count; i++) {
+    inputs.push(readSingleInput(reader));
+  }
+  return inputs;
+}
+
+function readSingleInput(reader: BufferReader): ParsedInput {
+  const txidBytes = reader.readSlice(32);
+  const txid = reverseToHex(txidBytes);
+  const vout = reader.readUInt32LE();
+  const scriptSigLen = reader.readCompactSize();
+  const scriptSig = reader.readSlice(scriptSigLen);
+  const sequence = reader.readUInt32LE();
+
+  return { txid, vout, scriptSig, sequence };
+}
+
+// ---------------------------------------------------------------------------
+// Output parsing
+// ---------------------------------------------------------------------------
+
+function readOutputs(reader: BufferReader): ParsedOutput[] {
+  const count = reader.readCompactSize();
+  const outputs: ParsedOutput[] = [];
+
+  for (let i = 0; i < count; i++) {
+    outputs.push(readSingleOutput(reader));
+  }
+  return outputs;
+}
+
+function readSingleOutput(reader: BufferReader): ParsedOutput {
+  const value = reader.readUInt64LE();
+  const scriptPubKeyLen = reader.readCompactSize();
+  const scriptPubKey = reader.readSlice(scriptPubKeyLen);
+
+  return { value, scriptPubKey };
+}
+
+// ---------------------------------------------------------------------------
+// Witness parsing
+// ---------------------------------------------------------------------------
+
+function readAllWitness(reader: BufferReader, inputCount: number): Buffer[][] {
+  const witness: Buffer[][] = [];
+
+  for (let i = 0; i < inputCount; i++) {
+    witness.push(readWitnessStack(reader));
+  }
+  return witness;
+}
+
+function readWitnessStack(reader: BufferReader): Buffer[] {
+  const itemCount = reader.readCompactSize();
+  const items: Buffer[] = [];
+
+  for (let j = 0; j < itemCount; j++) {
+    const itemLen = reader.readCompactSize();
+    items.push(reader.readSlice(itemLen));
+  }
+  return items;
+}
+
+function emptyWitness(inputCount: number): Buffer[][] {
+  return Array.from({ length: inputCount }, () => []);
+}
+
+// ---------------------------------------------------------------------------
+// Byte metrics (for weight/vbytes calculation)
+// ---------------------------------------------------------------------------
+
+interface ByteMetrics {
+  nonWitnessBytes: number;
+  witnessBytes: number;
+}
+
+/**
+ * Compute non-witness and witness byte counts.
+ *
+ * Non-witness bytes (counted at weight 4):
+ *   version(4) + varint(in_count) + inputs + varint(out_count) + outputs + locktime(4)
+ *
+ * Witness bytes (counted at weight 1, SegWit only):
+ *   marker(1) + flag(1) + all witness stack data (including item count/length varints)
+ */
+function computeByteMetrics(
+  inputs: ParsedInput[],
+  outputs: ParsedOutput[],
+  witness: Buffer[][],
+  segwit: boolean,
+  totalBytes: number,
+): ByteMetrics {
+  if (!segwit) {
+    return { nonWitnessBytes: totalBytes, witnessBytes: 0 };
+  }
+
+  const witnessBytes = computeWitnessBytes(witness);
+  const nonWitnessBytes = totalBytes - witnessBytes;
+
+  return { nonWitnessBytes, witnessBytes };
+}
+
+/**
+ * Compute the serialized size of the witness section.
+ * Includes the 2-byte marker+flag prefix.
+ */
+function computeWitnessBytes(witness: Buffer[][]): number {
+  // marker(1) + flag(1)
+  let bytes = 2;
+
+  for (const stack of witness) {
+    bytes += compactSizeLength(stack.length); // item count
+    for (const item of stack) {
+      bytes += compactSizeLength(item.length); // item length
+      bytes += item.length;                    // item data
+    }
+  }
+
+  return bytes;
+}
+
+// ---------------------------------------------------------------------------
+// Helpers
+// ---------------------------------------------------------------------------
+
+function toBuffer(hexOrBuffer: string | Buffer): Buffer {
+  if (Buffer.isBuffer(hexOrBuffer)) return hexOrBuffer;
+
+  if (hexOrBuffer.length % 2 !== 0) {
+    throw new Error("Invalid hex string: odd number of characters");
+  }
+  if (!/^[0-9a-fA-F]*$/.test(hexOrBuffer)) {
+    throw new Error("Invalid hex string: contains non-hex characters");
+  }
+
+  return Buffer.from(hexOrBuffer, "hex");
+}
+
+/** Reverse bytes and convert to hex. Used for txid display convention. */
+function reverseToHex(buf: Buffer): string {
+  const reversed = Buffer.alloc(buf.length);
+  for (let i = 0; i < buf.length; i++) {
+    reversed[i] = buf[buf.length - 1 - i];
+  }
+  return reversed.toString("hex");
 }
