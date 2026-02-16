@@ -32,9 +32,9 @@ export function computeWtxid(tx: ParsedTransaction): string | null {
 
 /**
  * Serialize a transaction in legacy format (no marker, flag, or witness).
- * Used for txid computation.
+ * Used for txid and merkle root computation.
  */
-function serializeLegacy(tx: ParsedTransaction): Buffer {
+export function serializeLegacy(tx: ParsedTransaction): Buffer {
   const parts: Buffer[] = [];
 
   // Version (4 bytes LE)
