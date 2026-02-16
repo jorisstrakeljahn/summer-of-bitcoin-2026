@@ -2,6 +2,10 @@ out/
 fixtures/blocks/blk*.dat
 fixtures/blocks/rev*.dat
 node_modules/
+dist/
+.next/
 __pycache__/
 target/
 .env
+*.tsbuildinfo
+PLAN.md

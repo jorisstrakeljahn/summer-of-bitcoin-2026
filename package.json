@@ -1,0 +1,21 @@
+{
+  "name": "chain-lens",
+  "version": "1.0.0",
+  "description": "Bitcoin transaction and block analyzer — CLI + Web Visualizer",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "cli": "tsx src/cli.ts",
+    "build": "tsc --noEmit"
+  },
+  "dependencies": {
+    "bech32": "^2.0.0",
+    "bitcoin-ops": "^1.4.1",
+    "bs58check": "^4.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "tsx": "^4.0.0",
+    "typescript": "^5.0.0"
+  }
+}
