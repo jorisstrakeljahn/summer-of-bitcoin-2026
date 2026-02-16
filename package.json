@@ -6,6 +6,7 @@
   "type": "module",
   "scripts": {
     "cli": "tsx src/cli.ts",
+    "test": "tsx tests/runner.ts",
     "build": "tsc --noEmit"
   },
   "dependencies": {
