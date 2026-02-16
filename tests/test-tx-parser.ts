@@ -5,13 +5,13 @@
 
 import { readFileSync, readdirSync, existsSync } from "fs";
 import { parseTransaction } from "../src/lib/tx-parser.js";
-import { test, assertEqual, assert } from "./helpers.js";
+import { test, assertEqual, assert, assertThrows } from "./helpers.js";
 import type { Fixture } from "../src/lib/types.js";
-
-// --- Fixture validation (size, weight, vbytes, segwit, version, counts) ---
 
 const fixtureDir = "fixtures/transactions";
 const expectedDir = "grader/expected/transactions";
+
+// --- Fixture validation (size, weight, vbytes, segwit, version, counts) ---
 
 for (const file of readdirSync(fixtureDir).filter(f => f.endsWith(".json"))) {
   const name = file.replace(".json", "");
@@ -55,20 +55,6 @@ test("legacy: witness = 0, nonWitness = total", () => {
 
 // --- Error handling ---
 
-test("rejects empty input", () => {
-  let threw = false;
-  try { parseTransaction(""); } catch { threw = true; }
-  assert(threw, "should throw");
-});
-
-test("rejects truncated tx", () => {
-  let threw = false;
-  try { parseTransaction("02000000"); } catch { threw = true; }
-  assert(threw, "should throw");
-});
-
-test("rejects invalid hex", () => {
-  let threw = false;
-  try { parseTransaction("zzzzzzzz"); } catch { threw = true; }
-  assert(threw, "should throw");
-});
+test("rejects empty input", () => assertThrows(() => parseTransaction("")));
+test("rejects truncated tx", () => assertThrows(() => parseTransaction("02000000")));
+test("rejects invalid hex", () => assertThrows(() => parseTransaction("zzzzzzzz")));

@@ -29,7 +29,7 @@ export function parseTransaction(hexOrBuffer: string | Buffer): ParsedTransactio
   const witness = segwit ? readAllWitness(reader, inputs.length) : emptyWitness(inputs.length);
   const locktime = reader.readUInt32LE();
 
-  const metrics = computeByteMetrics(inputs, outputs, witness, segwit, raw.length);
+  const metrics = computeByteMetrics(witness, segwit, raw.length);
 
   return {
     version,
@@ -163,8 +163,6 @@ interface ByteMetrics {
  *   marker(1) + flag(1) + all witness stack data (including item count/length varints)
  */
 function computeByteMetrics(
-  inputs: ParsedInput[],
-  outputs: ParsedOutput[],
   witness: Buffer[][],
   segwit: boolean,
   totalBytes: number,

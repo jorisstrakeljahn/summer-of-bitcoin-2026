@@ -17,77 +17,35 @@ function errorJson(code: string, message: string): ErrorReport {
 function main(): void {
   const args = process.argv.slice(2);
 
-  // --- Block mode ---
   if (args[0] === "--block") {
     if (args.length < 4) {
-      const err = errorJson("INVALID_ARGS", "Block mode requires: --block <blk.dat> <rev.dat> <xor.dat>");
-      console.log(JSON.stringify(err));
+      console.log(JSON.stringify(errorJson("INVALID_ARGS", "Usage: --block <blk.dat> <rev.dat> <xor.dat>")));
       process.exit(1);
     }
-
-    const [, blkFile, revFile, xorFile] = args;
-
-    mkdirSync("out", { recursive: true });
-
-    try {
-      const blkData = readFileSync(blkFile);
-      const revData = readFileSync(revFile);
-      const xorKey = readFileSync(xorFile);
-
-      // TODO: Implement block parsing
-      // import { parseBlockFile } from "./lib/block-parser.js";
-      // const reports = parseBlockFile(blkData, revData, xorKey);
-      // for (const report of reports) {
-      //   const hash = report.block_header.block_hash;
-      //   writeFileSync(`out/${hash}.json`, JSON.stringify(report, null, 2));
-      // }
-
-      void blkData;
-      void revData;
-      void xorKey;
-
-      const err = errorJson("NOT_IMPLEMENTED", "Block parsing is not yet implemented");
-      console.log(JSON.stringify(err));
-      process.exit(1);
-    } catch (e) {
-      const message = e instanceof Error ? e.message : String(e);
-      const err = errorJson("BLOCK_PARSE_ERROR", message);
-      console.log(JSON.stringify(err));
-      process.exit(1);
-    }
-    return;
-  }
-
-  // --- Transaction mode ---
-  if (args.length < 1) {
-    const err = errorJson("INVALID_ARGS", "Usage: cli <fixture.json> or cli --block <blk> <rev> <xor>");
-    console.log(JSON.stringify(err));
+    // TODO: Implement block parsing (Phase 8)
+    console.log(JSON.stringify(errorJson("NOT_IMPLEMENTED", "Block parsing is not yet implemented")));
     process.exit(1);
   }
 
-  const fixturePath = args[0];
+  if (args.length < 1) {
+    console.log(JSON.stringify(errorJson("INVALID_ARGS", "Usage: cli <fixture.json> or cli --block <blk> <rev> <xor>")));
+    process.exit(1);
+  }
 
   try {
-    const fixtureRaw = readFileSync(fixturePath, "utf-8");
-    const fixture: Fixture = JSON.parse(fixtureRaw);
-
+    const fixture: Fixture = JSON.parse(readFileSync(args[0], "utf-8"));
     const result = analyzeTransaction(fixture);
 
-    mkdirSync("out", { recursive: true });
-
     if (result.ok) {
-      // Write to out/<txid>.json
+      mkdirSync("out", { recursive: true });
       writeFileSync(`out/${result.txid}.json`, JSON.stringify(result, null, 2));
     }
 
-    // Print to stdout
     console.log(JSON.stringify(result));
-
     process.exit(result.ok ? 0 : 1);
   } catch (e) {
     const message = e instanceof Error ? e.message : String(e);
-    const err = errorJson("INVALID_TX", message);
-    console.log(JSON.stringify(err));
+    console.log(JSON.stringify(errorJson("INVALID_TX", message)));
     process.exit(1);
   }
 }
