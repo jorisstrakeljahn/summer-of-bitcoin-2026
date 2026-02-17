@@ -1,8 +1,10 @@
 /**
- * Bitcoin block file parser (streaming).
+ * Bitcoin block file parser.
  *
- * Parses blk*.dat files block-by-block via a generator to keep memory low.
- * Each block is preceded by a 4-byte magic number and 4-byte size.
+ * Parses blk*.dat files and matches them with undo data from rev*.dat.
+ * Blocks in blk*.dat may be stored out of height order (download order),
+ * while undo records in rev*.dat are in validation order (by height).
+ * We sort blocks by BIP34 coinbase height before matching with undo records.
  *
  * Block structure:
  *   [magic:4] [size:4] [header:80] [tx_count:varint] [transactions...]
@@ -35,12 +37,16 @@ export interface ParsedBlock {
 }
 
 // ---------------------------------------------------------------------------
-// Public API — streaming, one block at a time
+// Public API
 // ---------------------------------------------------------------------------
 
 /**
  * Iterate over all blocks in a blk/rev file pair, yielding one at a time.
- * This keeps memory usage proportional to ONE block instead of ALL blocks.
+ *
+ * Blocks in blk*.dat may arrive out of height order (Bitcoin Core stores
+ * them in download order). Undo records in rev*.dat are in validation order
+ * (strictly by height). We sort blocks by BIP34 coinbase height to align
+ * them with the undo records before yielding.
  */
 export function* iterateBlocks(
   blkData: Buffer,
@@ -52,19 +58,16 @@ export function* iterateBlocks(
   const blk = needsXor ? applyXor(Buffer.from(blkData), xorKey) : blkData;
   const rev = needsXor ? applyXor(Buffer.from(revData), xorKey) : revData;
 
-  const blkReader = new BufferReader(blk);
+  // Phase 1: Parse all blocks
+  const blocks = readAllBlocks(new BufferReader(blk));
+
+  // Phase 2: Sort by BIP34 coinbase height
+  blocks.sort((a, b) => extractBip34Height(a) - extractBip34Height(b));
+
+  // Phase 3: Parse undo records (already in height order) and match
   const revReader = new BufferReader(rev);
-
-  while (blkReader.remaining >= 8) {
-    const magic = blkReader.readUInt32LE();
-    if (magic !== MAINNET_MAGIC) break;
-
-    const blockSize = blkReader.readUInt32LE();
-    const blockBytes = blkReader.readSlice(blockSize);
-    const block = parseOneBlock(blockBytes);
-
+  for (const block of blocks) {
     const undo = readOneUndo(revReader);
-
     yield { block, undo };
   }
 }
@@ -98,6 +101,33 @@ export function parseCoinbase(tx: ParsedTransaction): {
     coinbaseScriptHex: scriptSig.toString("hex"),
     totalOutputSats: tx.outputs.reduce((s, o) => s + Number(o.value), 0),
   };
+}
+
+// ---------------------------------------------------------------------------
+// Block collection + height extraction
+// ---------------------------------------------------------------------------
+
+function readAllBlocks(blkReader: BufferReader): ParsedBlock[] {
+  const blocks: ParsedBlock[] = [];
+  while (blkReader.remaining >= 8) {
+    const magic = blkReader.readUInt32LE();
+    if (magic !== MAINNET_MAGIC) break;
+    const blockSize = blkReader.readUInt32LE();
+    const blockBytes = blkReader.readSlice(blockSize);
+    blocks.push(parseOneBlock(blockBytes));
+  }
+  return blocks;
+}
+
+/** Extract BIP34 height from the coinbase scriptSig. */
+function extractBip34Height(block: ParsedBlock): number {
+  const scriptSig = block.transactions[0].inputs[0].scriptSig;
+  const pushLen = scriptSig[0];
+  let height = 0;
+  for (let i = 0; i < pushLen && i < scriptSig.length - 1; i++) {
+    height |= scriptSig[1 + i] << (8 * i);
+  }
+  return height;
 }
 
 // ---------------------------------------------------------------------------
