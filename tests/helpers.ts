@@ -1,19 +1,27 @@
 /**
- * Lightweight test helpers. No external dependencies.
+ * Lightweight test helpers — human-readable output, no dependencies.
  */
 
 let passed = 0;
 let failed = 0;
 const errors: string[] = [];
 
+/** Group related tests under a visible section header. */
+export function describe(label: string, fn: () => void): void {
+  console.log(`\n  ${label}`);
+  fn();
+}
+
 export function test(name: string, fn: () => void): void {
   try {
     fn();
     passed++;
+    console.log(`    ✓ ${name}`);
   } catch (e) {
     failed++;
     const msg = e instanceof Error ? e.message : String(e);
-    errors.push(`  FAIL  ${name}\n        ${msg}`);
+    errors.push(`    ✗ ${name}\n      ${msg}`);
+    console.log(`    ✗ ${name}`);
   }
 }
 
@@ -41,9 +49,13 @@ export function assertThrows(fn: () => void, contains?: string): void {
 }
 
 export function summary(): boolean {
+  console.log("");
   if (errors.length > 0) {
-    console.log(`\n${errors.join("\n\n")}\n`);
+    console.log("  Failures:\n");
+    console.log(errors.join("\n\n"));
+    console.log("");
   }
-  console.log(`${passed} passed, ${failed} failed`);
+  const total = passed + failed;
+  console.log(`  ${total} tests — ${passed} passed, ${failed} failed`);
   return failed === 0;
 }
