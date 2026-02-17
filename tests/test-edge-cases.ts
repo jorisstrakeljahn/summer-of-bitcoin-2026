@@ -330,7 +330,7 @@ describe("OP_RETURN additional edge cases", () => {
 
   test("empty data hex when only OP_RETURN opcode", () => {
     assertEqual(parseOpReturnPayload("6a").op_return_data_hex, "");
-    assertEqual(parseOpReturnPayload("6a").op_return_data_utf8, null);
+    assertEqual(parseOpReturnPayload("6a").op_return_data_utf8, "");
     assertEqual(parseOpReturnPayload("6a").op_return_protocol, "unknown");
   });
 
