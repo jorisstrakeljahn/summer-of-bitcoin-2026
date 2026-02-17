@@ -21,7 +21,7 @@ function locktimeLabel(report: TransactionReport): string {
 
 export function MetricsCards({ report }: MetricsCardsProps) {
   return (
-    <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+    <div className="grid gap-3 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
       <MetricCard label="Transaction ID" tooltip="A unique identifier for this transaction, computed by double-SHA256 hashing the transaction data.">
         <span className="inline-flex items-center gap-1 font-mono text-xs">
           {truncateTxid(report.txid)}

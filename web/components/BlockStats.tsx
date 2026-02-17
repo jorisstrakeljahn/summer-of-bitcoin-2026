@@ -15,7 +15,7 @@ export function BlockStats({ report }: BlockStatsProps) {
   return (
     <Card>
       <CardContent className="pt-6 space-y-4">
-        <div className="grid grid-cols-3 gap-4 text-sm">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm">
           <div>
             <p className="text-xs text-muted-foreground mb-1">Total Fees</p>
             <SatsDisplay sats={stats.total_fees_sats} />

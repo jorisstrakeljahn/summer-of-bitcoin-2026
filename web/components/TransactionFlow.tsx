@@ -25,7 +25,6 @@ function buildGraph(report: TransactionReport): { nodes: Node[]; edges: Edge[] }
   const nodes: Node[] = [];
   const edges: Edge[] = [];
 
-  const NODE_W = 200;
   const NODE_H = 80;
   const COL_TX = 300;
   const COL_OUT = 600;
@@ -67,10 +66,10 @@ function buildGraph(report: TransactionReport): { nodes: Node[]; edges: Edge[] }
       source: id,
       target: "tx",
       animated: true,
-      style: { stroke: "hsl(var(--muted-foreground))" },
+      style: { stroke: "#71717a" },
       label: `${vin.prevout.value_sats.toLocaleString()} sat`,
-      labelStyle: { fontSize: 10, fill: "hsl(var(--muted-foreground))" },
-      labelBgStyle: { fill: "hsl(var(--background))", fillOpacity: 0.8 },
+      labelStyle: { fontSize: 10, fill: "#a1a1aa" },
+      labelBgStyle: { fill: "#09090b", fillOpacity: 0.8 },
     });
   });
 
@@ -95,7 +94,7 @@ function buildGraph(report: TransactionReport): { nodes: Node[]; edges: Edge[] }
       source: "tx",
       target: id,
       animated: true,
-      style: { stroke: "hsl(var(--muted-foreground))" },
+      style: { stroke: "#71717a" },
     });
   });
 
@@ -129,7 +128,8 @@ export function TransactionFlow({ report }: TransactionFlowProps) {
     <Card>
       <CardContent className="pt-6 pb-2">
         <p className="mb-3 text-xs text-muted-foreground">Value Flow</p>
-        <div style={{ height }} className="rounded-lg border bg-background">
+        <div style={{ height }} className="overflow-x-auto rounded-lg border bg-background">
+          <div className="min-w-[600px]" style={{ height: "100%" }}>
           <ReactFlow
             nodes={nodes}
             edges={edges}
@@ -146,6 +146,7 @@ export function TransactionFlow({ report }: TransactionFlowProps) {
             nodesConnectable={false}
             elementsSelectable={false}
           />
+          </div>
         </div>
       </CardContent>
     </Card>
