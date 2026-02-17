@@ -19,6 +19,21 @@ type AppState =
 export default function Home() {
   const [state, setState] = useState<AppState>({ mode: "idle" });
 
+  async function handleAnalyzeFixture(name: string) {
+    setState({ mode: "loading" });
+    try {
+      const res = await fetch(`/api/analyze-fixture?name=${encodeURIComponent(name)}`);
+      const result = await res.json();
+      if (result.ok) {
+        setState({ mode: "tx-result", report: result as TransactionReport });
+      } else {
+        setState({ mode: "error", error: result.error });
+      }
+    } catch {
+      setState({ mode: "error", error: { code: "CLIENT_ERROR", message: "Failed to load fixture" } });
+    }
+  }
+
   async function handleAnalyzeTx(fixtureJson: string) {
     setState({ mode: "loading" });
 
@@ -80,6 +95,7 @@ export default function Home() {
       <main className="mx-auto w-full max-w-6xl flex-1 space-y-8 px-4 py-8 sm:px-6">
         <InputPanel
           onAnalyzeTx={handleAnalyzeTx}
+          onAnalyzeFixture={handleAnalyzeFixture}
           onAnalyzeBlock={handleAnalyzeBlock}
           loading={state.mode === "loading"}
         />

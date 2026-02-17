@@ -20,7 +20,7 @@ export function TxDetail({ report }: TxDetailProps) {
   const hasRelativeTimelocks = report.vin.some((v) => v.relative_timelock.enabled);
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-5">
       {/* Story-like summary */}
       <div className="space-y-2 text-sm leading-relaxed">
         <p>
@@ -44,13 +44,13 @@ export function TxDetail({ report }: TxDetailProps) {
       {/* Format Badges */}
       <div className="flex items-center gap-2 flex-wrap">
         {report.segwit ? (
-          <Badge className="bg-primary/20 text-primary">SegWit</Badge>
+          <Badge variant="secondary" className="bg-zinc-800 text-zinc-300">SegWit</Badge>
         ) : (
-          <Badge variant="secondary">Legacy</Badge>
+          <Badge variant="secondary" className="bg-zinc-800 text-zinc-300">Legacy</Badge>
         )}
-        <Badge variant="secondary">Version {report.version}</Badge>
+        <Badge variant="secondary" className="bg-zinc-800 text-zinc-300">Version {report.version}</Badge>
         {report.rbf_signaling && (
-          <Badge className="bg-blue-900/40 text-blue-300">
+          <Badge variant="secondary" className="bg-zinc-800 text-zinc-300">
             <Repeat className="h-3 w-3 mr-1" />RBF
           </Badge>
         )}
@@ -215,14 +215,14 @@ function DetailRow({ label, tooltip, explain, children }: {
   label: string; tooltip?: string; explain?: string; children: React.ReactNode;
 }) {
   return (
-    <div className="space-y-1">
-      <p className="text-xs text-muted-foreground flex items-center gap-1">
+    <div className="space-y-1.5">
+      <p className="text-sm font-medium text-muted-foreground flex items-center gap-1">
         {label}
         {tooltip && <InfoTooltip text={tooltip} />}
       </p>
-      <div className="text-sm">{children}</div>
+      <div>{children}</div>
       {explain && (
-        <p className="text-[10px] text-muted-foreground/60 leading-relaxed">{explain}</p>
+        <p className="text-xs text-muted-foreground/60 leading-relaxed">{explain}</p>
       )}
     </div>
   );

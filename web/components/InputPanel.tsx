@@ -11,11 +11,12 @@ import { ExampleChips } from "./ExampleChips";
 
 interface InputPanelProps {
   onAnalyzeTx: (fixtureJson: string) => void;
+  onAnalyzeFixture: (name: string) => void;
   onAnalyzeBlock: (blk: File, rev: File, xor: File) => void;
   loading: boolean;
 }
 
-export function InputPanel({ onAnalyzeTx, onAnalyzeBlock, loading }: InputPanelProps) {
+export function InputPanel({ onAnalyzeTx, onAnalyzeFixture, onAnalyzeBlock, loading }: InputPanelProps) {
   const [input, setInput] = useState("");
   const [blkFile, setBlkFile] = useState<File | null>(null);
   const [revFile, setRevFile] = useState<File | null>(null);
@@ -24,15 +25,8 @@ export function InputPanel({ onAnalyzeTx, onAnalyzeBlock, loading }: InputPanelP
   const revRef = useRef<HTMLInputElement>(null);
   const xorRef = useRef<HTMLInputElement>(null);
 
-  async function loadAndAnalyze(file: string) {
-    try {
-      const res = await fetch(`/api/fixture?name=${file}`);
-      if (!res.ok) return;
-      const json = await res.json();
-      const text = JSON.stringify(json, null, 2);
-      setInput(text);
-      onAnalyzeTx(text);
-    } catch { /* ignore */ }
+  function loadAndAnalyze(file: string) {
+    onAnalyzeFixture(file);
   }
 
   function handleTxSubmit() {

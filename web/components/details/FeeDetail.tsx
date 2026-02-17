@@ -14,7 +14,7 @@ export function FeeDetail({ report }: FeeDetailProps) {
   const savings = report.segwit_savings;
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-5">
       {/* Fee Amount */}
       <div className="text-center space-y-1">
         <SatsDisplay sats={report.fee_sats} className="text-2xl font-bold" />
@@ -192,14 +192,14 @@ function DetailRow({ label, tooltip, explain, children }: {
   label: string; tooltip?: string; explain?: string; children: React.ReactNode;
 }) {
   return (
-    <div className="space-y-1">
-      <p className="text-xs text-muted-foreground flex items-center gap-1">
+    <div className="space-y-1.5">
+      <p className="text-sm font-medium text-muted-foreground flex items-center gap-1">
         {label}
         {tooltip && <InfoTooltip text={tooltip} />}
       </p>
-      <div className="text-sm">{children}</div>
+      <div>{children}</div>
       {explain && (
-        <p className="text-[10px] text-muted-foreground/60 leading-relaxed">{explain}</p>
+        <p className="text-xs text-muted-foreground/60 leading-relaxed">{explain}</p>
       )}
     </div>
   );

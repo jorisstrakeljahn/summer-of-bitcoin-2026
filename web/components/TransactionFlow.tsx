@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useCallback, useState } from "react";
+import { useMemo, useCallback } from "react";
 import {
   ReactFlow,
   Panel,
@@ -9,8 +9,6 @@ import {
   type Node,
   type Edge,
   type NodeMouseHandler,
-  type OnNodesChange,
-  type OnEdgesChange,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 import type { TransactionReport } from "@/lib/types";
@@ -72,14 +70,15 @@ function buildGraph(report: TransactionReport): { nodes: Node[]; edges: Edge[] }
   const edges: Edge[] = [];
 
   const NODE_H = 80;
+  const ROW_GAP = 44;
   const COL_TX = 320;
   const COL_OUT = 650;
 
   const inputCount = report.vin.length;
   const outputCount = report.vout.length + 1;
 
-  const inputTotalH = inputCount * (NODE_H + 24);
-  const outputTotalH = outputCount * (NODE_H + 24);
+  const inputTotalH = inputCount * (NODE_H + ROW_GAP);
+  const outputTotalH = outputCount * (NODE_H + ROW_GAP);
   const totalH = Math.max(inputTotalH, outputTotalH);
 
   const maxInputVal = Math.max(...report.vin.map((v) => v.prevout.value_sats), 1);
@@ -89,6 +88,8 @@ function buildGraph(report: TransactionReport): { nodes: Node[]; edges: Edge[] }
     report.vout.filter((v) => v.value_sats < 546 && v.script_type !== "op_return").map((v) => v.n),
   );
   const hasHighFee = report.warnings.some((w) => w.code === "HIGH_FEE");
+
+  const totalOut = report.total_output_sats + report.fee_sats;
 
   nodes.push({
     id: "tx",
@@ -108,7 +109,7 @@ function buildGraph(report: TransactionReport): { nodes: Node[]; edges: Edge[] }
     nodes.push({
       id,
       type: "flowInput",
-      position: { x: 0, y: inputStartY + i * (NODE_H + 24) },
+      position: { x: 0, y: inputStartY + i * (NODE_H + ROW_GAP) },
       data: {
         label: `Input #${i}`,
         address: vin.address,
@@ -127,9 +128,6 @@ function buildGraph(report: TransactionReport): { nodes: Node[]; edges: Edge[] }
         stroke: GRAY,
         strokeWidth: clampThickness(vin.prevout.value_sats, maxInputVal),
       },
-      label: `${vin.prevout.value_sats.toLocaleString()} sat`,
-      labelStyle: { fontSize: 10, fill: "#a1a1aa" },
-      labelBgStyle: { fill: "#09090b", fillOpacity: 0.8 },
     });
   });
 
@@ -139,13 +137,13 @@ function buildGraph(report: TransactionReport): { nodes: Node[]; edges: Edge[] }
     nodes.push({
       id,
       type: "flowOutput",
-      position: { x: COL_OUT, y: outputStartY + i * (NODE_H + 24) },
+      position: { x: COL_OUT, y: outputStartY + i * (NODE_H + ROW_GAP) },
       data: {
         label: `Output #${i}`,
         address: vout.address,
         sats: vout.value_sats,
         scriptType: vout.script_type,
-        proportion: report.total_output_sats > 0 ? vout.value_sats / report.total_output_sats : 0,
+        proportion: totalOut > 0 ? vout.value_sats / totalOut : 0,
         isDust: dustOutputs.has(vout.n),
         isOpReturn: vout.script_type === "op_return",
       },
@@ -166,11 +164,12 @@ function buildGraph(report: TransactionReport): { nodes: Node[]; edges: Edge[] }
   nodes.push({
     id: "fee",
     type: "flowFee",
-    position: { x: COL_OUT, y: outputStartY + feeIdx * (NODE_H + 24) },
+    position: { x: COL_OUT, y: outputStartY + feeIdx * (NODE_H + ROW_GAP) },
     data: {
       sats: report.fee_sats,
       rate: report.fee_rate_sat_vb,
       highFee: hasHighFee,
+      proportion: totalOut > 0 ? report.fee_sats / totalOut : 0,
     },
   });
   edges.push({
@@ -179,7 +178,7 @@ function buildGraph(report: TransactionReport): { nodes: Node[]; edges: Edge[] }
     target: "fee",
     animated: true,
     style: {
-      stroke: ORANGE,
+      stroke: GRAY,
       strokeDasharray: "5 3",
       strokeWidth: clampThickness(report.fee_sats, maxOutputVal),
     },
@@ -210,22 +209,18 @@ function applyHighlight(
 
   const edges = baseEdges.map((e) => {
     if (connectedEdges.has(e.id)) {
-      const isFeeEdge = e.id === "e-fee";
       return {
         ...e,
         style: {
           ...e.style,
           stroke: ORANGE,
-          strokeDasharray: isFeeEdge ? "5 3" : undefined,
         },
-        labelStyle: { ...(e.labelStyle as object), fill: ORANGE },
         animated: true,
       };
     }
     return {
       ...e,
       style: { ...e.style, stroke: GRAY_DIM, opacity: 0.25 },
-      labelStyle: { ...(e.labelStyle as object), fill: GRAY_DIM, opacity: 0.25 },
       animated: false,
     };
   });
@@ -244,7 +239,6 @@ export function TransactionFlow({ report, onNodeSelect, selectedNodeId }: Transa
   const [nodes, setNodes, onNodesChange] = useNodesState(highlightedNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(highlightedEdges);
 
-  // Sync when highlighted data changes (selection changed or report changed)
   useMemo(() => {
     setNodes(highlightedNodes.map((hn) => {
       const existing = nodes.find((n) => n.id === hn.id);

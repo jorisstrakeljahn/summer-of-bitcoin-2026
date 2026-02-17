@@ -25,7 +25,7 @@ export function FlowOutputNode({ data }: NodeProps) {
       title={d.isOpReturn ? "OP_RETURN: embedded data output (unspendable)" : `Sends ${d.sats.toLocaleString()} sat to ${d.address ?? "unknown address"} (${d.scriptType.toUpperCase()})`}
       className="group cursor-pointer rounded-lg border bg-card px-4 py-3 text-card-foreground shadow-sm transition-all hover:border-primary/50 hover:shadow-md min-w-[180px]"
     >
-      <Handle type="target" position={Position.Left} className="!bg-primary !w-2 !h-2" />
+      <Handle type="target" position={Position.Left} className="bg-primary! w-2! h-2!" />
       <div className="flex items-center justify-between mb-1">
         <p className="text-[10px] text-muted-foreground">{d.label}</p>
         <div className="flex items-center gap-1">

@@ -27,7 +27,7 @@ export function OutputDetail({ vout }: OutputDetailProps) {
   const isDust = vout.value_sats < 546 && vout.script_type !== "op_return";
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-5">
       {/* Value & Type */}
       <div className="flex items-center justify-between">
         <SatsDisplay sats={vout.value_sats} className="text-lg font-semibold" />
@@ -137,7 +137,7 @@ export function OutputDetail({ vout }: OutputDetailProps) {
             Raw Script Data
           </AccordionTrigger>
           <AccordionContent className="space-y-3">
-            <p className="text-[10px] text-muted-foreground/70 leading-relaxed">
+            <p className="text-xs text-muted-foreground/70 leading-relaxed">
               The ScriptPubKey is the &quot;lock&quot; on these coins. Only someone who can provide the matching
               &quot;key&quot; (signature) can spend them in a future transaction.
             </p>
@@ -162,14 +162,14 @@ function DetailRow({ label, tooltip, explain, children }: {
   label: string; tooltip?: string; explain?: string; children: React.ReactNode;
 }) {
   return (
-    <div className="space-y-1">
-      <p className="text-xs text-muted-foreground flex items-center gap-1">
+    <div className="space-y-1.5">
+      <p className="text-sm font-medium text-muted-foreground flex items-center gap-1">
         {label}
         {tooltip && <InfoTooltip text={tooltip} />}
       </p>
-      <div className="text-sm">{children}</div>
+      <div>{children}</div>
       {explain && (
-        <p className="text-[10px] text-muted-foreground/60 leading-relaxed">{explain}</p>
+        <p className="text-xs text-muted-foreground/60 leading-relaxed">{explain}</p>
       )}
     </div>
   );
@@ -177,10 +177,10 @@ function DetailRow({ label, tooltip, explain, children }: {
 
 function ScriptBlock({ label, explain, children }: { label: string; explain?: string; children: React.ReactNode }) {
   return (
-    <div className="space-y-1">
-      <p className="text-[10px] text-muted-foreground">{label}</p>
-      {explain && <p className="text-[10px] text-muted-foreground/60">{explain}</p>}
-      <code className="block rounded bg-background border p-2 font-mono text-[10px] break-all max-h-24 overflow-y-auto">
+    <div className="space-y-1.5">
+      <p className="text-xs text-muted-foreground">{label}</p>
+      {explain && <p className="text-xs text-muted-foreground/60">{explain}</p>}
+      <code className="block rounded bg-background border p-2.5 font-mono text-xs break-all max-h-28 overflow-y-auto">
         {children}
       </code>
     </div>

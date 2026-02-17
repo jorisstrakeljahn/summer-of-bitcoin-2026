@@ -18,6 +18,7 @@ import { FeeDetail } from "./details/FeeDetail";
 interface NodeDetailSheetProps {
   report: TransactionReport;
   selected: SelectedNode | null;
+  open: boolean;
   onClose: () => void;
 }
 
@@ -47,29 +48,31 @@ function getDescription(selected: SelectedNode, report: TransactionReport): stri
   }
 }
 
-export function NodeDetailSheet({ report, selected, onClose }: NodeDetailSheetProps) {
+export function NodeDetailSheet({ report, selected, open, onClose }: NodeDetailSheetProps) {
   return (
-    <Sheet open={selected !== null} onOpenChange={(open) => { if (!open) onClose(); }}>
-      <SheetContent side="right" className="w-full sm:max-w-md">
+    <Sheet open={open} onOpenChange={(isOpen) => { if (!isOpen) onClose(); }}>
+      <SheetContent side="right" className="w-full sm:max-w-lg">
         {selected && (
           <>
-            <SheetHeader>
-              <SheetTitle>{getTitle(selected)}</SheetTitle>
-              <SheetDescription>{getDescription(selected, report)}</SheetDescription>
+            <SheetHeader className="pb-2">
+              <SheetTitle className="text-lg">{getTitle(selected)}</SheetTitle>
+              <SheetDescription className="text-sm">{getDescription(selected, report)}</SheetDescription>
             </SheetHeader>
-            <ScrollArea className="flex-1 px-4 pb-4">
-              {selected.type === "input" && (
-                <InputDetail vin={report.vin[selected.index]} index={selected.index} />
-              )}
-              {selected.type === "output" && (
-                <OutputDetail vout={report.vout[selected.index]} />
-              )}
-              {selected.type === "tx" && (
-                <TxDetail report={report} />
-              )}
-              {selected.type === "fee" && (
-                <FeeDetail report={report} />
-              )}
+            <ScrollArea className="flex-1 px-4 pb-6">
+              <div className="text-sm">
+                {selected.type === "input" && (
+                  <InputDetail vin={report.vin[selected.index]} index={selected.index} />
+                )}
+                {selected.type === "output" && (
+                  <OutputDetail vout={report.vout[selected.index]} />
+                )}
+                {selected.type === "tx" && (
+                  <TxDetail report={report} />
+                )}
+                {selected.type === "fee" && (
+                  <FeeDetail report={report} />
+                )}
+              </div>
             </ScrollArea>
           </>
         )}

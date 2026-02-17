@@ -44,7 +44,7 @@ export function FlowInputNode({ data }: NodeProps) {
       <p className="text-[9px] text-muted-foreground/60 mt-0.5 text-right opacity-0 group-hover:opacity-100 transition-opacity">
         click for details
       </p>
-      <Handle type="source" position={Position.Right} className="!bg-primary !w-2 !h-2" />
+      <Handle type="source" position={Position.Right} className="bg-primary! w-2! h-2!" />
     </div>
   );
 }

@@ -24,9 +24,20 @@ function selectionToNodeId(sel: SelectedNode | null): string | null {
 
 export function TransactionResult({ report }: TransactionResultProps) {
   const [selected, setSelected] = useState<SelectedNode | null>(null);
+  const [sheetOpen, setSheetOpen] = useState(false);
 
   const handleNodeSelect = useCallback((sel: SelectedNode | null) => {
-    setSelected(sel);
+    if (sel === null) {
+      setSelected(null);
+      setSheetOpen(false);
+    } else {
+      setSelected(sel);
+      setSheetOpen(true);
+    }
+  }, []);
+
+  const handleSheetClose = useCallback(() => {
+    setSheetOpen(false);
   }, []);
 
   return (
@@ -48,7 +59,8 @@ export function TransactionResult({ report }: TransactionResultProps) {
       <NodeDetailSheet
         report={report}
         selected={selected}
-        onClose={() => setSelected(null)}
+        open={sheetOpen}
+        onClose={handleSheetClose}
       />
     </div>
   );

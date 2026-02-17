@@ -37,7 +37,7 @@ export function InputDetail({ vin, index }: InputDetailProps) {
   const timelockText = relTimelockText(vin);
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-5">
       {/* Value & Type */}
       <div className="flex items-center justify-between">
         <SatsDisplay sats={vin.prevout.value_sats} className="text-lg font-semibold" />
@@ -140,7 +140,7 @@ export function InputDetail({ vin, index }: InputDetailProps) {
             Raw Script Data
           </AccordionTrigger>
           <AccordionContent className="space-y-3">
-            <p className="text-[10px] text-muted-foreground/70 leading-relaxed">
+            <p className="text-xs text-muted-foreground/70 leading-relaxed">
               Scripts are the Bitcoin programming language that controls how coins can be spent.
               The ScriptSig/Witness proves you&apos;re authorized to spend these coins (like a digital signature).
             </p>
@@ -158,13 +158,13 @@ export function InputDetail({ vin, index }: InputDetailProps) {
             )}
 
             {vin.witness.length > 0 && (
-              <div className="space-y-1">
-                <p className="text-[10px] text-muted-foreground">
+              <div className="space-y-1.5">
+                <p className="text-xs text-muted-foreground">
                   Witness ({vin.witness.length} items)
                   <InfoTooltip text="SegWit witness data: the signature and public key are stored here separately, which is why SegWit transactions are cheaper." />
                 </p>
                 {vin.witness.map((w, i) => (
-                  <code key={i} className="block rounded bg-background border p-2 font-mono text-[10px] break-all">
+                  <code key={i} className="block rounded bg-background border p-2.5 font-mono text-xs break-all">
                     [{i}] {w || "(empty)"}
                   </code>
                 ))}
@@ -191,14 +191,14 @@ function DetailRow({ label, tooltip, explain, children }: {
   label: string; tooltip?: string; explain?: string; children: React.ReactNode;
 }) {
   return (
-    <div className="space-y-1">
-      <p className="text-xs text-muted-foreground flex items-center gap-1">
+    <div className="space-y-1.5">
+      <p className="text-sm font-medium text-muted-foreground flex items-center gap-1">
         {label}
         {tooltip && <InfoTooltip text={tooltip} />}
       </p>
-      <div className="text-sm">{children}</div>
+      <div>{children}</div>
       {explain && (
-        <p className="text-[10px] text-muted-foreground/60 leading-relaxed">{explain}</p>
+        <p className="text-xs text-muted-foreground/60 leading-relaxed">{explain}</p>
       )}
     </div>
   );
@@ -206,10 +206,10 @@ function DetailRow({ label, tooltip, explain, children }: {
 
 function ScriptBlock({ label, explain, children }: { label: string; explain?: string; children: React.ReactNode }) {
   return (
-    <div className="space-y-1">
-      <p className="text-[10px] text-muted-foreground">{label}</p>
-      {explain && <p className="text-[10px] text-muted-foreground/60">{explain}</p>}
-      <code className="block rounded bg-background border p-2 font-mono text-[10px] break-all max-h-24 overflow-y-auto">
+    <div className="space-y-1.5">
+      <p className="text-xs text-muted-foreground">{label}</p>
+      {explain && <p className="text-xs text-muted-foreground/60">{explain}</p>}
+      <code className="block rounded bg-background border p-2.5 font-mono text-xs break-all max-h-28 overflow-y-auto">
         {children}
       </code>
     </div>

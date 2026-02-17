@@ -4,7 +4,6 @@ import type { TransactionReport } from "@/lib/types";
 import { CopyButton } from "./CopyButton";
 import { Badge } from "@/components/ui/badge";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import { Repeat } from "lucide-react";
 
 interface SummaryBarProps {
   report: TransactionReport;
@@ -17,7 +16,6 @@ function truncateTxid(txid: string): string {
 export function SummaryBar({ report }: SummaryBarProps) {
   return (
     <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 rounded-lg border bg-card px-4 py-2.5 text-xs">
-      {/* TXID */}
       <Tooltip>
         <TooltipTrigger asChild>
           <span className="inline-flex items-center gap-1 font-mono text-muted-foreground">
@@ -30,7 +28,6 @@ export function SummaryBar({ report }: SummaryBarProps) {
 
       <Sep />
 
-      {/* Fee */}
       <Tooltip>
         <TooltipTrigger asChild>
           <span className="tabular-nums">
@@ -38,31 +35,26 @@ export function SummaryBar({ report }: SummaryBarProps) {
             <span className="text-muted-foreground ml-1">({report.fee_rate_sat_vb} sat/vB)</span>
           </span>
         </TooltipTrigger>
-        <TooltipContent>Fee: the amount paid to miners for including this transaction</TooltipContent>
+        <TooltipContent>Fee paid to miners</TooltipContent>
       </Tooltip>
 
       <Sep />
 
-      {/* Size */}
       <Tooltip>
         <TooltipTrigger asChild>
           <span className="tabular-nums text-muted-foreground">
             {report.vbytes} vB · {report.weight} WU
           </span>
         </TooltipTrigger>
-        <TooltipContent>Virtual size (vBytes) and weight units determine block space usage</TooltipContent>
+        <TooltipContent>Virtual size and weight units</TooltipContent>
       </Tooltip>
 
       <Sep />
 
-      {/* Format */}
-      {report.segwit ? (
-        <Badge className="bg-primary/20 text-primary text-[10px] px-1.5 py-0">SegWit</Badge>
-      ) : (
-        <Badge variant="secondary" className="text-[10px] px-1.5 py-0">Legacy</Badge>
-      )}
+      <Badge variant="secondary" className="text-[10px] px-1.5 py-0 bg-zinc-800 text-zinc-300">
+        {report.segwit ? "SegWit" : "Legacy"}
+      </Badge>
 
-      {/* I/O Count */}
       <Tooltip>
         <TooltipTrigger asChild>
           <span className="tabular-nums text-muted-foreground">
@@ -72,19 +64,17 @@ export function SummaryBar({ report }: SummaryBarProps) {
         <TooltipContent>{report.vin.length} inputs → {report.vout.length} outputs</TooltipContent>
       </Tooltip>
 
-      {/* RBF */}
       {report.rbf_signaling && (
         <Tooltip>
           <TooltipTrigger asChild>
-            <Badge className="bg-blue-900/40 text-blue-300 text-[10px] px-1.5 py-0">
-              <Repeat className="h-2.5 w-2.5 mr-0.5" />RBF
+            <Badge variant="secondary" className="text-[10px] px-1.5 py-0 bg-zinc-800 text-zinc-300">
+              RBF
             </Badge>
           </TooltipTrigger>
-          <TooltipContent>Replace-By-Fee: sender can bump the fee before confirmation</TooltipContent>
+          <TooltipContent>Replace-By-Fee: sender can bump the fee</TooltipContent>
         </Tooltip>
       )}
 
-      {/* SegWit Savings */}
       {report.segwit_savings && (
         <Tooltip>
           <TooltipTrigger asChild>
@@ -92,7 +82,7 @@ export function SummaryBar({ report }: SummaryBarProps) {
               −{report.segwit_savings.savings_pct}%
             </span>
           </TooltipTrigger>
-          <TooltipContent>SegWit discount: {report.segwit_savings.savings_pct}% less weight compared to legacy</TooltipContent>
+          <TooltipContent>SegWit discount: {report.segwit_savings.savings_pct}% less weight</TooltipContent>
         </Tooltip>
       )}
     </div>
