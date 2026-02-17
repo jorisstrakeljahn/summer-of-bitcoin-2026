@@ -22,8 +22,8 @@ export function TxDetail({ report }: TxDetailProps) {
   return (
     <div className="space-y-5">
       {/* Story-like summary */}
-      <div className="space-y-2 text-sm leading-relaxed">
-        <p>
+      <div className="space-y-2 leading-relaxed">
+        <p className="text-sm text-foreground/80">
           This transaction takes{" "}
           <strong className="text-foreground">{satsToBtc(report.total_input_sats)} BTC</strong>{" "}
           from {report.vin.length} input{report.vin.length !== 1 ? "s" : ""} and distributes{" "}
@@ -33,7 +33,7 @@ export function TxDetail({ report }: TxDetailProps) {
           <strong className="text-primary">{report.fee_sats.toLocaleString()} sat</strong>{" "}
           goes to the miner as a processing fee.
         </p>
-        <p className="text-xs text-muted-foreground">
+        <p className="text-sm text-foreground/50">
           Think of it like writing a check: you take money from your accounts (inputs),
           write amounts to recipients (outputs), and the bank keeps a small fee.
         </p>
@@ -59,10 +59,10 @@ export function TxDetail({ report }: TxDetailProps) {
       {/* SegWit / Legacy Explanation */}
       <Accordion type="single" collapsible>
         <AccordionItem value="format-explain" className="border-0">
-          <AccordionTrigger className="py-2 text-xs hover:no-underline">
+          <AccordionTrigger className="py-2 text-sm hover:no-underline">
             What does {report.segwit ? "SegWit" : "Legacy"} mean?
           </AccordionTrigger>
-          <AccordionContent className="text-xs text-muted-foreground leading-relaxed">
+          <AccordionContent className="text-sm text-foreground/60 leading-relaxed">
             {report.segwit ? (
               <>
                 <strong>Segregated Witness (SegWit)</strong> is a Bitcoin upgrade from 2017 that separates
@@ -92,7 +92,7 @@ export function TxDetail({ report }: TxDetailProps) {
         explain="Computed by hashing the transaction data twice with SHA-256. Like a receipt number — no two transactions have the same ID."
       >
         <div className="flex items-center gap-1">
-          <code className="font-mono text-[10px] break-all flex-1">{report.txid}</code>
+          <code className="font-mono text-xs break-all flex-1">{report.txid}</code>
           <CopyButton text={report.txid} />
         </div>
       </DetailRow>
@@ -104,7 +104,7 @@ export function TxDetail({ report }: TxDetailProps) {
           explain="SegWit transactions have two IDs. This one includes the signature data, while the regular TXID doesn't. This fixes the 'transaction malleability' problem."
         >
           <div className="flex items-center gap-1">
-            <code className="font-mono text-[10px] break-all flex-1">{report.wtxid}</code>
+            <code className="font-mono text-xs break-all flex-1">{report.wtxid}</code>
             <CopyButton text={report.wtxid} />
           </div>
         </DetailRow>
@@ -117,7 +117,7 @@ export function TxDetail({ report }: TxDetailProps) {
         tooltip="How much block space this transaction occupies."
         explain="Bitcoin blocks have a 4 million weight unit (WU) limit. Virtual bytes (vB) = WU ÷ 4. Smaller transactions are cheaper."
       >
-        <span className="tabular-nums text-xs">
+        <span className="tabular-nums text-sm">
           {report.vbytes} vB · {report.weight} WU · {report.size_bytes} bytes
         </span>
       </DetailRow>
@@ -129,7 +129,7 @@ export function TxDetail({ report }: TxDetailProps) {
       >
         <div className="flex items-baseline gap-2">
           <SatsDisplay sats={report.fee_sats} />
-          <span className="text-xs text-muted-foreground">({report.fee_rate_sat_vb} sat/vB)</span>
+          <span className="text-sm text-foreground/50">({report.fee_rate_sat_vb} sat/vB)</span>
         </div>
       </DetailRow>
 
@@ -145,14 +145,14 @@ export function TxDetail({ report }: TxDetailProps) {
       {report.warnings.length > 0 && (
         <>
           <Separator />
-          <p className="text-xs font-medium flex items-center gap-1">
-            <AlertTriangle className="h-3.5 w-3.5 text-yellow-400" />
+          <p className="text-sm font-medium flex items-center gap-1">
+            <AlertTriangle className="h-4 w-4 text-yellow-400" />
             Warnings
           </p>
           {report.warnings.map((w, i) => (
-            <div key={i} className="rounded-lg bg-yellow-900/20 border border-yellow-800/30 p-2.5 text-xs text-muted-foreground">
-              <p className="font-medium text-yellow-300 mb-0.5">{w.code.replace(/_/g, " ")}</p>
-              <p>{warningText(w.code)}</p>
+            <div key={i} className="rounded-lg bg-yellow-900/20 border border-yellow-800/30 p-3">
+              <p className="font-medium text-yellow-300 text-sm mb-0.5">{w.code.replace(/_/g, " ")}</p>
+              <p className="text-sm text-foreground/60">{warningText(w.code)}</p>
             </div>
           ))}
         </>
@@ -162,8 +162,8 @@ export function TxDetail({ report }: TxDetailProps) {
       {(hasAbsoluteTimelock || hasRelativeTimelocks || report.rbf_signaling) && (
         <>
           <Separator />
-          <p className="text-xs font-medium">Timelocks & RBF</p>
-          <p className="text-[10px] text-muted-foreground/60 leading-relaxed">
+          <p className="text-sm font-medium">Timelocks & RBF</p>
+          <p className="text-sm text-foreground/50 leading-relaxed">
             These features control <em>when</em> a transaction can be confirmed and whether it can be replaced.
           </p>
 
@@ -216,13 +216,13 @@ function DetailRow({ label, tooltip, explain, children }: {
 }) {
   return (
     <div className="space-y-1.5">
-      <p className="text-sm font-medium text-muted-foreground flex items-center gap-1">
+      <p className="text-sm font-medium text-foreground/80 flex items-center gap-1">
         {label}
         {tooltip && <InfoTooltip text={tooltip} />}
       </p>
       <div>{children}</div>
       {explain && (
-        <p className="text-xs text-muted-foreground/60 leading-relaxed">{explain}</p>
+        <p className="text-sm text-foreground/50 leading-relaxed">{explain}</p>
       )}
     </div>
   );
@@ -232,9 +232,9 @@ function InfoBox({ icon, title, children }: { icon: React.ReactNode; title: stri
   return (
     <div className="flex items-start gap-2 rounded-lg bg-secondary/50 border p-3">
       <span className="shrink-0 mt-0.5">{icon}</span>
-      <div className="text-xs">
-        <p className="font-medium mb-0.5">{title}</p>
-        <p className="text-muted-foreground leading-relaxed">{children}</p>
+      <div>
+        <p className="font-medium text-sm mb-0.5">{title}</p>
+        <p className="text-sm text-foreground/60 leading-relaxed">{children}</p>
       </div>
     </div>
   );

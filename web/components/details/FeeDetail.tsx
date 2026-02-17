@@ -18,11 +18,11 @@ export function FeeDetail({ report }: FeeDetailProps) {
       {/* Fee Amount */}
       <div className="text-center space-y-1">
         <SatsDisplay sats={report.fee_sats} className="text-2xl font-bold" />
-        <p className="text-sm text-muted-foreground">{report.fee_rate_sat_vb} sat/vB</p>
+        <p className="text-sm text-foreground/60">{report.fee_rate_sat_vb} sat/vB</p>
       </div>
 
       {/* Plain language */}
-      <p className="text-xs text-muted-foreground leading-relaxed text-center">
+      <p className="text-sm text-foreground/70 leading-relaxed text-center">
         This is the &quot;tip&quot; paid to the miner who includes this transaction in a block.
         The higher the fee rate, the faster the transaction gets confirmed.
       </p>
@@ -31,9 +31,9 @@ export function FeeDetail({ report }: FeeDetailProps) {
       {hasHighFee && (
         <div className="flex items-start gap-2 rounded-lg bg-yellow-900/20 border border-yellow-800/30 p-3">
           <AlertTriangle className="h-4 w-4 text-yellow-400 shrink-0 mt-0.5" />
-          <div className="text-xs">
-            <p className="font-medium text-yellow-300 mb-0.5">High Fee</p>
-            <p className="text-muted-foreground">
+          <div>
+            <p className="font-medium text-yellow-300 text-sm mb-0.5">High Fee</p>
+            <p className="text-sm text-foreground/60">
               This fee is unusually high relative to the transaction size. The sender might be overpaying.
             </p>
           </div>
@@ -45,10 +45,10 @@ export function FeeDetail({ report }: FeeDetailProps) {
       {/* How fees work - expandable */}
       <Accordion type="single" collapsible>
         <AccordionItem value="fee-explain" className="border-0">
-          <AccordionTrigger className="py-2 text-xs hover:no-underline">
+          <AccordionTrigger className="py-2 text-sm hover:no-underline">
             How do Bitcoin fees work?
           </AccordionTrigger>
-          <AccordionContent className="text-xs text-muted-foreground leading-relaxed space-y-2">
+          <AccordionContent className="text-sm text-foreground/60 leading-relaxed space-y-2">
             <p>
               Bitcoin fees are <strong>not</strong> a percentage — they depend on how much <em>block space</em> your
               transaction uses. A transaction sending 1 BTC can cost the same fee as one sending 0.001 BTC
@@ -95,7 +95,7 @@ export function FeeDetail({ report }: FeeDetailProps) {
         label="Transaction Size"
         explain="How much space this transaction takes in a block. Smaller = cheaper. SegWit helps reduce this."
       >
-        <span className="tabular-nums text-xs">
+        <span className="tabular-nums text-sm">
           {report.vbytes} vB · {report.weight} WU
         </span>
       </DetailRow>
@@ -104,7 +104,7 @@ export function FeeDetail({ report }: FeeDetailProps) {
         label="Fee Rate"
         explain="The fee divided by the virtual size. This is what miners look at when choosing which transactions to include."
       >
-        <span className="tabular-nums text-xs font-medium text-primary">
+        <span className="tabular-nums text-sm font-medium text-primary">
           {report.fee_rate_sat_vb} sat/vB
         </span>
       </DetailRow>
@@ -115,17 +115,17 @@ export function FeeDetail({ report }: FeeDetailProps) {
           <Separator />
 
           <div className="flex items-center justify-between">
-            <p className="text-xs font-medium flex items-center gap-1">
-              <TrendingDown className="h-3.5 w-3.5 text-primary" />
+            <p className="text-sm font-medium flex items-center gap-1">
+              <TrendingDown className="h-4 w-4 text-primary" />
               SegWit Discount
               <InfoTooltip text="SegWit signature data is counted at 1/4 weight, making the effective size smaller." />
             </p>
-            <span className="text-lg font-semibold text-primary tabular-nums">
+            <span className="text-xl font-semibold text-primary tabular-nums">
               {savings.savings_pct}% saved
             </span>
           </div>
 
-          <p className="text-[10px] text-muted-foreground/60 leading-relaxed">
+          <p className="text-sm text-foreground/50 leading-relaxed">
             Because this transaction uses SegWit, the signature data gets a 75% discount on weight.
             Without SegWit, this same transaction would weigh {savings.weight_if_legacy.toLocaleString()} WU
             instead of {savings.weight_actual.toLocaleString()} WU.
@@ -148,21 +148,21 @@ export function FeeDetail({ report }: FeeDetailProps) {
             />
           </div>
 
-          <div className="grid grid-cols-3 gap-3 text-center text-xs">
+          <div className="grid grid-cols-3 gap-3 text-center">
             <div>
-              <p className="text-muted-foreground mb-0.5">Witness</p>
-              <p className="tabular-nums font-medium">{savings.witness_bytes} B</p>
-              <p className="text-[10px] text-muted-foreground/50">signatures</p>
+              <p className="text-sm text-foreground/60 mb-0.5">Witness</p>
+              <p className="tabular-nums font-medium text-sm">{savings.witness_bytes} B</p>
+              <p className="text-xs text-foreground/40">signatures</p>
             </div>
             <div>
-              <p className="text-muted-foreground mb-0.5">Non-Witness</p>
-              <p className="tabular-nums font-medium">{savings.non_witness_bytes} B</p>
-              <p className="text-[10px] text-muted-foreground/50">tx data</p>
+              <p className="text-sm text-foreground/60 mb-0.5">Non-Witness</p>
+              <p className="tabular-nums font-medium text-sm">{savings.non_witness_bytes} B</p>
+              <p className="text-xs text-foreground/40">tx data</p>
             </div>
             <div>
-              <p className="text-muted-foreground mb-0.5">Total</p>
-              <p className="tabular-nums font-medium">{savings.total_bytes} B</p>
-              <p className="text-[10px] text-muted-foreground/50">on disk</p>
+              <p className="text-sm text-foreground/60 mb-0.5">Total</p>
+              <p className="tabular-nums font-medium text-sm">{savings.total_bytes} B</p>
+              <p className="text-xs text-foreground/40">on disk</p>
             </div>
           </div>
         </>
@@ -177,9 +177,9 @@ function BarComparison({ label, value, max, unit, color }: {
   const pct = max > 0 ? (value / max) * 100 : 0;
   return (
     <div className="space-y-1">
-      <div className="flex items-center justify-between text-xs">
+      <div className="flex items-center justify-between text-sm">
         <span>{label}</span>
-        <span className="tabular-nums text-muted-foreground">{value.toLocaleString()} {unit}</span>
+        <span className="tabular-nums text-foreground/60">{value.toLocaleString()} {unit}</span>
       </div>
       <div className="h-2.5 w-full overflow-hidden rounded-full bg-secondary">
         <div className={`h-full rounded-full ${color} transition-all`} style={{ width: `${pct}%` }} />
@@ -193,13 +193,13 @@ function DetailRow({ label, tooltip, explain, children }: {
 }) {
   return (
     <div className="space-y-1.5">
-      <p className="text-sm font-medium text-muted-foreground flex items-center gap-1">
+      <p className="text-sm font-medium text-foreground/80 flex items-center gap-1">
         {label}
         {tooltip && <InfoTooltip text={tooltip} />}
       </p>
       <div>{children}</div>
       {explain && (
-        <p className="text-xs text-muted-foreground/60 leading-relaxed">{explain}</p>
+        <p className="text-sm text-foreground/50 leading-relaxed">{explain}</p>
       )}
     </div>
   );

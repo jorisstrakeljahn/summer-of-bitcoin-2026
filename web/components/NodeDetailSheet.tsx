@@ -51,15 +51,15 @@ function getDescription(selected: SelectedNode, report: TransactionReport): stri
 export function NodeDetailSheet({ report, selected, open, onClose }: NodeDetailSheetProps) {
   return (
     <Sheet open={open} onOpenChange={(isOpen) => { if (!isOpen) onClose(); }}>
-      <SheetContent side="right" className="w-full sm:max-w-lg">
+      <SheetContent side="right" className="w-full sm:max-w-lg flex flex-col h-full">
         {selected && (
           <>
-            <SheetHeader className="pb-2">
-              <SheetTitle className="text-lg">{getTitle(selected)}</SheetTitle>
+            <SheetHeader className="shrink-0 pb-2">
+              <SheetTitle className="text-xl">{getTitle(selected)}</SheetTitle>
               <SheetDescription className="text-sm">{getDescription(selected, report)}</SheetDescription>
             </SheetHeader>
-            <ScrollArea className="flex-1 px-4 pb-6">
-              <div className="text-sm">
+            <ScrollArea className="flex-1 min-h-0 px-4 pb-6">
+              <div className="pr-3">
                 {selected.type === "input" && (
                   <InputDetail vin={report.vin[selected.index]} index={selected.index} />
                 )}

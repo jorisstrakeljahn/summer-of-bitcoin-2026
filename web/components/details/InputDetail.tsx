@@ -40,16 +40,16 @@ export function InputDetail({ vin, index }: InputDetailProps) {
     <div className="space-y-5">
       {/* Value & Type */}
       <div className="flex items-center justify-between">
-        <SatsDisplay sats={vin.prevout.value_sats} className="text-lg font-semibold" />
+        <SatsDisplay sats={vin.prevout.value_sats} className="text-xl font-semibold" />
         <ScriptBadge type={vin.script_type} />
       </div>
 
       {/* Plain language explanation */}
-      <p className="text-xs text-muted-foreground leading-relaxed">
+      <p className="text-sm text-foreground/70 leading-relaxed">
         This input is spending <strong className="text-foreground">{vin.prevout.value_sats.toLocaleString()} satoshis</strong> that
         were previously sent to{" "}
         {vin.address ? (
-          <span className="font-mono text-[10px]">{vin.address.slice(0, 12)}…</span>
+          <span className="font-mono text-xs">{vin.address.slice(0, 12)}…</span>
         ) : (
           "an unknown address"
         )}.
@@ -61,10 +61,10 @@ export function InputDetail({ vin, index }: InputDetailProps) {
       {/* Script Type Explanation */}
       <Accordion type="single" collapsible>
         <AccordionItem value="script-explain" className="border-0">
-          <AccordionTrigger className="py-2 text-xs hover:no-underline">
+          <AccordionTrigger className="py-2 text-sm hover:no-underline">
             What does {vin.script_type.toUpperCase()} mean?
           </AccordionTrigger>
-          <AccordionContent className="text-xs text-muted-foreground leading-relaxed">
+          <AccordionContent className="text-sm text-foreground/60 leading-relaxed">
             {scriptTypeExplain(vin.script_type)}
           </AccordionContent>
         </AccordionItem>
@@ -88,8 +88,8 @@ export function InputDetail({ vin, index }: InputDetailProps) {
         explain="Every input references a specific output from a previous transaction. This is the ID of that earlier transaction."
       >
         <div className="flex items-center gap-1">
-          <Hash className="h-3 w-3 text-muted-foreground shrink-0" />
-          <code className="font-mono text-[10px] break-all">{vin.txid}</code>
+          <Hash className="h-3.5 w-3.5 text-foreground/40 shrink-0" />
+          <code className="font-mono text-xs break-all">{vin.txid}</code>
           <CopyButton text={vin.txid} />
         </div>
       </DetailRow>
@@ -100,7 +100,7 @@ export function InputDetail({ vin, index }: InputDetailProps) {
         tooltip="Which specific output from the previous transaction is being spent."
         explain="A transaction can have multiple outputs. This number tells which one we're spending (starting from 0)."
       >
-        <span className="font-mono text-xs">#{vin.vout}</span>
+        <span className="font-mono text-sm">#{vin.vout}</span>
       </DetailRow>
 
       {/* Sequence */}
@@ -109,7 +109,7 @@ export function InputDetail({ vin, index }: InputDetailProps) {
         tooltip="Controls RBF (Replace-By-Fee) and relative timelocks (BIP68/BIP125)."
         explain="A technical field that encodes two features: whether this transaction can be 'bumped' with a higher fee (RBF), and whether there's a waiting period before it can be confirmed."
       >
-        <span className="font-mono text-xs">0x{vin.sequence.toString(16).padStart(8, "0")}</span>
+        <span className="font-mono text-sm">0x{vin.sequence.toString(16).padStart(8, "0")}</span>
       </DetailRow>
 
       {/* Relative Timelock */}
@@ -118,12 +118,12 @@ export function InputDetail({ vin, index }: InputDetailProps) {
           <Separator />
           <div className="flex items-start gap-2 rounded-lg bg-purple-900/20 border border-purple-800/30 p-3">
             <Clock className="h-4 w-4 text-purple-400 shrink-0 mt-0.5" />
-            <div className="text-xs">
-              <p className="font-medium text-purple-300 mb-0.5">Relative Timelock</p>
-              <p className="text-muted-foreground mb-1">
+            <div>
+              <p className="font-medium text-purple-300 text-sm mb-0.5">Relative Timelock</p>
+              <p className="text-sm text-foreground/60 mb-1">
                 This input cannot be spent until <strong>{timelockText}</strong> have passed since the referenced output was confirmed.
               </p>
-              <p className="text-muted-foreground/70 text-[10px]">
+              <p className="text-xs text-foreground/40">
                 Think of it like a check that can only be cashed after a waiting period. This prevents the coins from being spent too quickly after they were received.
               </p>
             </div>
@@ -136,11 +136,11 @@ export function InputDetail({ vin, index }: InputDetailProps) {
       {/* Script Details - collapsible */}
       <Accordion type="single" collapsible>
         <AccordionItem value="scripts" className="border-0">
-          <AccordionTrigger className="py-2 text-xs hover:no-underline">
+          <AccordionTrigger className="py-2 text-sm hover:no-underline">
             Raw Script Data
           </AccordionTrigger>
           <AccordionContent className="space-y-3">
-            <p className="text-xs text-muted-foreground/70 leading-relaxed">
+            <p className="text-sm text-foreground/50 leading-relaxed">
               Scripts are the Bitcoin programming language that controls how coins can be spent.
               The ScriptSig/Witness proves you&apos;re authorized to spend these coins (like a digital signature).
             </p>
@@ -159,7 +159,7 @@ export function InputDetail({ vin, index }: InputDetailProps) {
 
             {vin.witness.length > 0 && (
               <div className="space-y-1.5">
-                <p className="text-xs text-muted-foreground">
+                <p className="text-sm text-foreground/70">
                   Witness ({vin.witness.length} items)
                   <InfoTooltip text="SegWit witness data: the signature and public key are stored here separately, which is why SegWit transactions are cheaper." />
                 </p>
@@ -192,13 +192,13 @@ function DetailRow({ label, tooltip, explain, children }: {
 }) {
   return (
     <div className="space-y-1.5">
-      <p className="text-sm font-medium text-muted-foreground flex items-center gap-1">
+      <p className="text-sm font-medium text-foreground/80 flex items-center gap-1">
         {label}
         {tooltip && <InfoTooltip text={tooltip} />}
       </p>
       <div>{children}</div>
       {explain && (
-        <p className="text-xs text-muted-foreground/60 leading-relaxed">{explain}</p>
+        <p className="text-sm text-foreground/50 leading-relaxed">{explain}</p>
       )}
     </div>
   );
@@ -207,8 +207,8 @@ function DetailRow({ label, tooltip, explain, children }: {
 function ScriptBlock({ label, explain, children }: { label: string; explain?: string; children: React.ReactNode }) {
   return (
     <div className="space-y-1.5">
-      <p className="text-xs text-muted-foreground">{label}</p>
-      {explain && <p className="text-xs text-muted-foreground/60">{explain}</p>}
+      <p className="text-sm text-foreground/70">{label}</p>
+      {explain && <p className="text-sm text-foreground/50">{explain}</p>}
       <code className="block rounded bg-background border p-2.5 font-mono text-xs break-all max-h-28 overflow-y-auto">
         {children}
       </code>
