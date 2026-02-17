@@ -43,9 +43,7 @@ export function classifyInputScript(
       return "p2wsh";
 
     case "p2tr":
-      // Key path: exactly 1 witness item (signature)
-      // Script path: 2+ witness items (last is control block)
-      return witness.length <= 1 ? "p2tr_keypath" : "p2tr_scriptpath";
+      return classifyTaprootSpend(witness);
 
     case "p2sh":
       return classifyP2shInput(scriptSigHex, witness);
@@ -53,6 +51,29 @@ export function classifyInputScript(
     default:
       return "unknown";
   }
+}
+
+/**
+ * Classify a Taproot spend — keypath vs scriptpath.
+ *
+ * BIP341 rules:
+ *   - If the witness stack has exactly 1 element → keypath (Schnorr signature).
+ *   - If the last element starts with 0x50 → it's an annex; strip it for classification.
+ *   - After stripping annex: 1 element → keypath, 2+ elements → scriptpath.
+ *   - Scriptpath: last element (after annex removal) is the control block (0xc0/0xc1 prefix).
+ */
+function classifyTaprootSpend(witness: string[]): InputScriptType {
+  if (witness.length === 0) return "p2tr_keypath";
+  if (witness.length === 1) return "p2tr_keypath";
+
+  // Check for annex: last witness item starts with 0x50
+  let effective = witness;
+  if (witness.length >= 2 && witness[witness.length - 1].startsWith("50")) {
+    effective = witness.slice(0, -1);
+  }
+
+  if (effective.length <= 1) return "p2tr_keypath";
+  return "p2tr_scriptpath";
 }
 
 /** Classify a P2SH input — could be wrapped SegWit (p2sh-p2wpkh or p2sh-p2wsh). */
