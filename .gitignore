@@ -9,5 +9,3 @@ __pycache__/
 target/
 .env
 *.tsbuildinfo
-PLAN.md
-AGENTS.md
