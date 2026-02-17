@@ -1,4 +1,5 @@
 out/
+tmp/
 fixtures/blocks/blk*.dat
 fixtures/blocks/rev*.dat
 node_modules/

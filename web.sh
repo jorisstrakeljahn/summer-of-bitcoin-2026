@@ -17,4 +17,5 @@ SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 PORT="${PORT:-3000}"
 
 echo "http://127.0.0.1:${PORT}"
-exec npx next start "$SCRIPT_DIR/web" -p "$PORT"
+cd "$SCRIPT_DIR/web"
+exec npx next start -p "$PORT"
