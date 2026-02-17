@@ -70,8 +70,8 @@ export function* iterateBlocks(
 }
 
 /** Verify the computed merkle root matches the block header. */
-export function verifyMerkleRoot(block: ParsedBlock): boolean {
-  const txidBuffers = block.transactions.map(tx =>
+export function verifyMerkleRoot(block: ParsedBlock, precomputedTxids?: Buffer[]): boolean {
+  const txidBuffers = precomputedTxids ?? block.transactions.map(tx =>
     sha256d(serializeLegacy(tx)),
   );
   const computed = computeMerkleRoot(txidBuffers);
@@ -158,38 +158,37 @@ function readBlockTransactions(
 
 /** Advance the reader past one transaction without allocating structures. */
 function skipTransaction(reader: BufferReader): void {
-  reader.readUInt32LE(); // version
+  reader.skip(4); // version
 
   let segwit = false;
   if (reader.peekUInt8() === 0x00) {
-    reader.readUInt8();
-    reader.readUInt8();
+    reader.skip(2); // marker + flag
     segwit = true;
   }
 
   const inCount = reader.readCompactSize();
   for (let i = 0; i < inCount; i++) {
-    reader.readSlice(36);
-    reader.readSlice(reader.readCompactSize());
-    reader.readUInt32LE();
+    reader.skip(36); // txid + vout
+    reader.skip(reader.readCompactSize()); // scriptSig
+    reader.skip(4); // sequence
   }
 
   const outCount = reader.readCompactSize();
   for (let i = 0; i < outCount; i++) {
-    reader.readSlice(8);
-    reader.readSlice(reader.readCompactSize());
+    reader.skip(8); // value
+    reader.skip(reader.readCompactSize()); // scriptPubKey
   }
 
   if (segwit) {
     for (let i = 0; i < inCount; i++) {
       const stackSize = reader.readCompactSize();
       for (let j = 0; j < stackSize; j++) {
-        reader.readSlice(reader.readCompactSize());
+        reader.skip(reader.readCompactSize());
       }
     }
   }
 
-  reader.readUInt32LE(); // locktime
+  reader.skip(4); // locktime
 }
 
 // ---------------------------------------------------------------------------

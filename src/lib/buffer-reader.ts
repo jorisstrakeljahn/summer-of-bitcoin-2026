@@ -28,6 +28,12 @@ export class BufferReader {
     this.offset = position;
   }
 
+  /** Advance the cursor by `bytes` without reading data. */
+  skip(bytes: number): void {
+    this.ensureAvailable(bytes);
+    this.offset += bytes;
+  }
+
   /** Read a byte without advancing the cursor. */
   peekUInt8(): number {
     this.ensureAvailable(1);

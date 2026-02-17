@@ -3,12 +3,15 @@
  *
  * Processes blocks one at a time via generator (streaming) to keep
  * memory usage proportional to one block, not all blocks combined.
+ *
+ * Performance: Transactions are parsed ONCE during block parsing.
+ * txid hashes are computed ONCE and reused for both merkle verification
+ * and report generation.
  */
 
 import type {
   BlockReport,
   TransactionReport,
-  Fixture,
   ParsedTransaction,
 } from "./lib/types.js";
 import {
@@ -18,7 +21,10 @@ import {
   type ParsedBlock,
 } from "./lib/block-parser.js";
 import type { BlockUndo } from "./lib/undo-parser.js";
-import { analyzeTransaction } from "./analyzer.js";
+import type { MatchedPrevout } from "./lib/prevout.js";
+import { buildReport } from "./analyzer.js";
+import { computeTxidBuffer } from "./lib/tx-serializer.js";
+import { reverseBuffer } from "./lib/hash.js";
 
 export interface BlockError {
   ok: false;
@@ -56,9 +62,12 @@ export function processBlocks(
 
 function buildBlockReport(block: ParsedBlock, undo: BlockUndo): BlockReport | BlockError {
   try {
-    const merkleValid = verifyMerkleRoot(block);
+    // Compute txid buffers ONCE — reused for merkle + report txids
+    const txidBuffers = block.transactions.map(tx => computeTxidBuffer(tx));
+
+    const merkleValid = verifyMerkleRoot(block, txidBuffers);
     const coinbaseInfo = parseCoinbase(block.transactions[0]);
-    const txReports = buildTransactionReports(block.transactions, undo);
+    const txReports = buildTransactionReports(block.transactions, undo, txidBuffers);
 
     const okReports = txReports.filter((r): r is TransactionReport => r.ok);
     const nonCoinbase = okReports.slice(1);
@@ -102,12 +111,13 @@ function buildBlockReport(block: ParsedBlock, undo: BlockUndo): BlockReport | Bl
 }
 
 // ---------------------------------------------------------------------------
-// Transaction report generation
+// Transaction report generation — direct, no re-parsing
 // ---------------------------------------------------------------------------
 
 function buildTransactionReports(
   transactions: ParsedTransaction[],
   undo: BlockUndo,
+  txidBuffers: Buffer[],
 ): TransactionReport[] {
   const reports: TransactionReport[] = [];
 
@@ -115,39 +125,16 @@ function buildTransactionReports(
     const tx = transactions[i];
     const isCoinbase = i === 0;
 
-    const fixture: Fixture = {
-      network: "mainnet",
-      raw_tx: tx.rawHex,
-      prevouts: isCoinbase
-        ? buildCoinbasePrevouts(tx)
-        : buildUndoPrevouts(tx, undo[i - 1]),
-    };
+    const prevouts: MatchedPrevout[] = isCoinbase
+      ? tx.inputs.map(() => ({ value_sats: 0, script_pubkey_hex: "" }))
+      : undo[i - 1];
 
-    const result = analyzeTransaction(fixture);
-    if (result.ok) {
-      reports.push(result);
-    }
+    const txid = reverseBuffer(txidBuffers[i]).toString("hex");
+    const report = buildReport(tx, prevouts, "mainnet", txid);
+    reports.push(report);
   }
 
   return reports;
-}
-
-function buildCoinbasePrevouts(tx: ParsedTransaction) {
-  return tx.inputs.map(input => ({
-    txid: input.txid,
-    vout: input.vout,
-    value_sats: 0,
-    script_pubkey_hex: "",
-  }));
-}
-
-function buildUndoPrevouts(tx: ParsedTransaction, undoPrevouts: BlockUndo[number]) {
-  return tx.inputs.map((input, i) => ({
-    txid: input.txid,
-    vout: input.vout,
-    value_sats: undoPrevouts[i].value_sats,
-    script_pubkey_hex: undoPrevouts[i].script_pubkey_hex,
-  }));
 }
 
 // ---------------------------------------------------------------------------

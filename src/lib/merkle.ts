@@ -13,18 +13,20 @@ export function computeMerkleRoot(txids: Buffer[]): Buffer {
     return Buffer.alloc(32);
   }
 
-  let level: Buffer[] = txids.map(id => Buffer.from(id));
+  let level: Buffer[] = [...txids];
+  const pair = Buffer.alloc(64);
 
   while (level.length > 1) {
     const next: Buffer[] = [];
 
-    // Duplicate last if odd
     if (level.length % 2 !== 0) {
-      level.push(Buffer.from(level[level.length - 1]));
+      level.push(level[level.length - 1]);
     }
 
     for (let i = 0; i < level.length; i += 2) {
-      next.push(sha256d(Buffer.concat([level[i], level[i + 1]])));
+      level[i].copy(pair, 0);
+      level[i + 1].copy(pair, 32);
+      next.push(sha256d(pair));
     }
 
     level = next;

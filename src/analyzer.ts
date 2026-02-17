@@ -33,15 +33,16 @@ export function analyzeTransaction(fixture: Fixture): CliOutput {
 }
 
 // ---------------------------------------------------------------------------
-// Report builder
+// Report builder (public — used by both CLI fixture mode and block mode)
 // ---------------------------------------------------------------------------
 
-function buildReport(
+export function buildReport(
   tx: ParsedTransaction,
   prevouts: MatchedPrevout[],
   network: string,
+  precomputedTxid?: string,
 ): TransactionReport {
-  const txid = computeTxid(tx);
+  const txid = precomputedTxid ?? computeTxid(tx);
   const wtxid = computeWtxid(tx);
 
   const sizeBytes = tx.rawBuffer.length;

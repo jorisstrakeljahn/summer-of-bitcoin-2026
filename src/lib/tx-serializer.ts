@@ -12,12 +12,19 @@ import { sha256d, reverseBuffer } from "./hash.js";
 import type { ParsedTransaction } from "./types.js";
 
 /**
+ * Compute the raw txid hash (internal byte order, not reversed).
+ * Reusable for both merkle root and txid display.
+ */
+export function computeTxidBuffer(tx: ParsedTransaction): Buffer {
+  return sha256d(serializeLegacy(tx));
+}
+
+/**
  * Compute txid from a parsed transaction.
  * Always uses legacy serialization (no witness data).
  */
 export function computeTxid(tx: ParsedTransaction): string {
-  const serialized = serializeLegacy(tx);
-  return reverseBuffer(sha256d(serialized)).toString("hex");
+  return reverseBuffer(computeTxidBuffer(tx)).toString("hex");
 }
 
 /**
