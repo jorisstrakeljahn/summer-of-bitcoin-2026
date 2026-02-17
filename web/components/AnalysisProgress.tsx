@@ -1,5 +1,18 @@
 "use client";
 
+/**
+ * Simulated progress bar for async analysis operations.
+ *
+ * Uses requestAnimationFrame + direct DOM ref updates instead of CSS transitions
+ * because React state-driven re-renders at 60fps would be expensive and the
+ * transition from "simulated 95%" → "real 100%" needs precise timing control
+ * that CSS transition-duration can't provide (it would overshoot or stutter).
+ *
+ * The progress follows an exponential curve: fast at first, then slowing down
+ * as it approaches 95%, giving the user immediate feedback while never
+ * prematurely reaching 100% before the real operation finishes.
+ */
+
 import { useState, useEffect, useRef, useCallback } from "react";
 
 interface AnalysisProgressProps {

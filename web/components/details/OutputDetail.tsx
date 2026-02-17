@@ -2,10 +2,10 @@ import type { VoutEntry } from "@/lib/types";
 import { ScriptBadge } from "../ScriptBadge";
 import { AddressDisplay } from "../AddressDisplay";
 import { SatsDisplay } from "../SatsDisplay";
-import { InfoTooltip } from "../InfoTooltip";
 import { Separator } from "@/components/ui/separator";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { AlertTriangle, FileCode } from "lucide-react";
+import { DetailRow, ScriptBlock } from "./shared";
 
 interface OutputDetailProps {
   vout: VoutEntry;
@@ -158,31 +158,3 @@ export function OutputDetail({ vout }: OutputDetailProps) {
   );
 }
 
-function DetailRow({ label, tooltip, explain, children }: {
-  label: string; tooltip?: string; explain?: string; children: React.ReactNode;
-}) {
-  return (
-    <div className="space-y-1.5">
-      <p className="text-sm font-medium text-foreground/80 flex items-center gap-1">
-        {label}
-        {tooltip && <InfoTooltip text={tooltip} />}
-      </p>
-      <div>{children}</div>
-      {explain && (
-        <p className="text-sm text-foreground/50 leading-relaxed">{explain}</p>
-      )}
-    </div>
-  );
-}
-
-function ScriptBlock({ label, explain, children }: { label: string; explain?: string; children: React.ReactNode }) {
-  return (
-    <div className="space-y-1.5">
-      <p className="text-sm text-foreground/70">{label}</p>
-      {explain && <p className="text-sm text-foreground/50">{explain}</p>}
-      <code className="block rounded bg-background border p-2.5 font-mono text-xs break-all max-h-28 overflow-y-auto">
-        {children}
-      </code>
-    </div>
-  );
-}

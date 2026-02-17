@@ -78,7 +78,16 @@ function readCoreVarInt(reader: BufferReader): number {
 }
 
 // ---------------------------------------------------------------------------
-// Amount decompression (Bitcoin Core compressor.cpp)
+// Amount decompression (Bitcoin Core compressor.cpp DecompressAmount)
+//
+// Bitcoin Core compresses satoshi values to save space in the undo files.
+// The algorithm encodes the number of trailing zeros (exponent `e`) and the
+// remaining significant digits separately:
+//   1. Subtract 1 (0 is reserved for "amount = 0")
+//   2. e = x % 10  → number of trailing zeros to restore
+//   3. If e < 9: extract last non-zero digit d = (x/10 % 9) + 1, then mantissa
+//   4. If e == 9: mantissa = x/10 + 1 (special case for multiples of 10^9)
+//   5. Multiply mantissa by 10^e to restore original satoshi value
 // ---------------------------------------------------------------------------
 
 function decompressAmount(x: number): number {

@@ -123,7 +123,14 @@ function readAllBlocks(blkReader: BufferReader): ParsedBlock[] {
   return blocks;
 }
 
-/** Extract BIP34 height from the coinbase scriptSig. */
+/**
+ * Extract BIP34 height from the coinbase scriptSig.
+ *
+ * BIP34 requires the coinbase scriptSig to start with a push of the block
+ * height as a little-endian integer. The first byte is the push length (how
+ * many bytes encode the height), followed by the height bytes in LE order.
+ * Example: [03 00 35 0c] → pushLen=3, height = 0x0c3500 = 800000.
+ */
 function extractBip34Height(block: ParsedBlock): number {
   const scriptSig = block.transactions[0].inputs[0].scriptSig;
   const pushLen = scriptSig[0];
@@ -190,7 +197,14 @@ function readBlockTransactions(
   return transactions;
 }
 
-/** Advance the reader past one transaction without allocating structures. */
+/**
+ * Advance the reader past one transaction without allocating structures.
+ *
+ * We use this two-pass approach for performance: first skip each tx to find
+ * its byte boundaries, then parse each tx from its raw slice. This avoids
+ * creating intermediate objects during the boundary-finding pass, which
+ * matters when a single block can contain 3000+ transactions.
+ */
 function skipTransaction(reader: BufferReader): void {
   reader.skip(4); // version
 

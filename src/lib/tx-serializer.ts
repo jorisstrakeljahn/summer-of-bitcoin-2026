@@ -105,7 +105,13 @@ export function serializeLegacy(tx: ParsedTransaction): Buffer {
   return Buffer.concat(parts);
 }
 
-/** Convert a display-order hex txid back to internal byte order. */
+/**
+ * Convert a display-order hex txid back to internal byte order.
+ *
+ * Bitcoin displays hashes (txid, block_hash) in reversed byte order by convention.
+ * The wire format uses little-endian (internal order), so we must reverse
+ * display-order hex before writing it into a serialized transaction.
+ */
 function reverseHexToBuffer(hex: string): Buffer {
   return reverseBuffer(Buffer.from(hex, "hex"));
 }

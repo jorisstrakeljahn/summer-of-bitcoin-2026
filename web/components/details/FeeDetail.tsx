@@ -4,6 +4,7 @@ import { InfoTooltip } from "../InfoTooltip";
 import { Separator } from "@/components/ui/separator";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { AlertTriangle, TrendingDown } from "lucide-react";
+import { DetailRow } from "./shared";
 
 interface FeeDetailProps {
   report: TransactionReport;
@@ -188,19 +189,3 @@ function BarComparison({ label, value, max, unit, color }: {
   );
 }
 
-function DetailRow({ label, tooltip, explain, children }: {
-  label: string; tooltip?: string; explain?: string; children: React.ReactNode;
-}) {
-  return (
-    <div className="space-y-1.5">
-      <p className="text-sm font-medium text-foreground/80 flex items-center gap-1">
-        {label}
-        {tooltip && <InfoTooltip text={tooltip} />}
-      </p>
-      <div>{children}</div>
-      {explain && (
-        <p className="text-sm text-foreground/50 leading-relaxed">{explain}</p>
-      )}
-    </div>
-  );
-}

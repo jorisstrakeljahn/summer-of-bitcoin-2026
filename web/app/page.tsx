@@ -11,6 +11,16 @@ import { ErrorDisplay } from "@/components/ErrorDisplay";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 
+/**
+ * Application state machine — drives what the main page renders.
+ *
+ * Transitions:
+ *   idle ──────────► loading-tx ──────► tx-result
+ *   idle ──────────► loading-block ───► block-list ──► block-loading ──► block-detail
+ *   any loading ───► error                             block-detail ──► block-list (back)
+ *
+ * Each mode carries exactly the data its UI needs (discriminated union).
+ */
 type AppState =
   | { mode: "idle" }
   | { mode: "loading-tx" }

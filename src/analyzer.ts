@@ -2,6 +2,26 @@
  * Transaction analyzer — orchestrates parsing and report generation.
  */
 
+// ---------------------------------------------------------------------------
+// Warning thresholds (Bitcoin Core default relay policy)
+// ---------------------------------------------------------------------------
+const HIGH_FEE_THRESHOLD_SATS = 1_000_000;
+const HIGH_FEE_RATE_THRESHOLD = 200; // sat/vB
+const DUST_THRESHOLD_SATS = 546; // below this, spending costs more than the output is worth
+
+// ---------------------------------------------------------------------------
+// BIP68 sequence field bit masks (relative timelocks)
+// ---------------------------------------------------------------------------
+const BIP68_DISABLE_FLAG = 0x80000000; // bit 31: if set, BIP68 is disabled for this input
+const BIP68_TYPE_FLAG = 0x00400000; // bit 22: 0 = block-based, 1 = time-based (512s granularity)
+const BIP68_VALUE_MASK = 0x0000ffff; // bits 0-15: the actual lock value
+
+// BIP125: sequence < this value signals opt-in RBF
+const BIP125_RBF_MAX_SEQUENCE = 0xfffffffe;
+
+// Locktime boundary: values below this are block heights, above are Unix timestamps
+const LOCKTIME_UNIX_THRESHOLD = 500_000_000;
+
 import type {
   Fixture,
   TransactionReport,
@@ -115,7 +135,7 @@ function computeSegwitSavings(tx: ParsedTransaction, weightActual: number): Segw
 // ---------------------------------------------------------------------------
 
 function detectRbf(tx: ParsedTransaction): boolean {
-  return tx.inputs.some(input => input.sequence < 0xfffffffe);
+  return tx.inputs.some(input => input.sequence < BIP125_RBF_MAX_SEQUENCE);
 }
 
 // ---------------------------------------------------------------------------
@@ -124,20 +144,26 @@ function detectRbf(tx: ParsedTransaction): boolean {
 
 function classifyLocktime(locktime: number): { type: LocktimeType; value: number } {
   if (locktime === 0) return { type: "none", value: 0 };
-  if (locktime < 500_000_000) return { type: "block_height", value: locktime };
+  if (locktime < LOCKTIME_UNIX_THRESHOLD) return { type: "block_height", value: locktime };
   return { type: "unix_timestamp", value: locktime };
 }
 
 // ---------------------------------------------------------------------------
 // Relative timelock (BIP68)
+//
+// The sequence number encodes a relative lock constraint:
+//   Bit 31 (BIP68_DISABLE_FLAG): if set, BIP68 semantics are disabled
+//   Bit 22 (BIP68_TYPE_FLAG):    0 = lock measured in blocks, 1 = in 512-second intervals
+//   Bits 0-15 (BIP68_VALUE_MASK): the actual lock value
 // ---------------------------------------------------------------------------
 
 function decodeRelativeTimelock(sequence: number): RelativeTimelock {
-  if (sequence & 0x80000000) return { enabled: false };
+  if (sequence & BIP68_DISABLE_FLAG) return { enabled: false };
 
-  const masked = sequence & 0xffff;
+  const masked = sequence & BIP68_VALUE_MASK;
 
-  if (sequence & 0x00400000) {
+  if (sequence & BIP68_TYPE_FLAG) {
+    // Time-based: each unit is 512 seconds (~8.5 minutes)
     return { enabled: true, type: "time", value: masked * 512 };
   }
   return { enabled: true, type: "blocks", value: masked };
@@ -215,6 +241,10 @@ function buildVout(tx: ParsedTransaction, network: string): VoutEntry[] {
 
 // ---------------------------------------------------------------------------
 // Warnings
+//
+// Thresholds are based on Bitcoin Core's default relay/mempool policy.
+// HIGH_FEE catches likely user mistakes (accidentally overpaying).
+// DUST_OUTPUT catches outputs that cost more to spend than they're worth.
 // ---------------------------------------------------------------------------
 
 function detectWarnings(
@@ -225,10 +255,10 @@ function detectWarnings(
 ): Warning[] {
   const warnings: Warning[] = [];
 
-  if (feeSats > 1_000_000 || feeRate > 200) {
+  if (feeSats > HIGH_FEE_THRESHOLD_SATS || feeRate > HIGH_FEE_RATE_THRESHOLD) {
     warnings.push({ code: "HIGH_FEE" });
   }
-  if (vout.some(o => o.script_type !== "op_return" && o.value_sats < 546)) {
+  if (vout.some(o => o.script_type !== "op_return" && o.value_sats < DUST_THRESHOLD_SATS)) {
     warnings.push({ code: "DUST_OUTPUT" });
   }
   if (vout.some(o => o.script_type === "unknown")) {

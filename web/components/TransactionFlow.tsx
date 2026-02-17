@@ -37,10 +37,12 @@ interface TransactionFlowProps {
   selectedNodeId: string | null;
 }
 
-const ORANGE = "#f97316";
-const GRAY = "#71717a";
-const GRAY_DIM = "#3f3f46";
+// Colors used for edge/node highlighting states
+const ORANGE = "#f97316"; // selected path accent
+const GRAY = "#71717a"; // default edge color
+const GRAY_DIM = "#3f3f46"; // dimmed (non-selected) edges
 
+/** Scale edge thickness proportionally to value, clamped to [1.5, 8] pixels. */
 function clampThickness(value: number, max: number): number {
   if (max === 0) return 2;
   const ratio = value / max;
@@ -65,51 +67,29 @@ function getConnectedNodeIds(nodeId: string, edges: Edge[]): Set<string> {
   return ids;
 }
 
-function buildGraph(report: TransactionReport): { nodes: Node[]; edges: Edge[] } {
+// Layout constants (px)
+const NODE_H = 80;   // height per node slot
+const ROW_GAP = 44;  // vertical gap between nodes
+const COL_TX = 320;  // x-position of center tx node
+const COL_OUT = 650;  // x-position of output column
+
+/** Shared layout context passed to sub-builders. */
+interface LayoutCtx {
+  startY: number;
+  maxVal: number;
+  totalOut: number;
+}
+
+function buildInputNodes(report: TransactionReport, startY: number, maxInputVal: number): { nodes: Node[]; edges: Edge[] } {
   const nodes: Node[] = [];
   const edges: Edge[] = [];
 
-  const NODE_H = 80;
-  const ROW_GAP = 44;
-  const COL_TX = 320;
-  const COL_OUT = 650;
-
-  const inputCount = report.vin.length;
-  const outputCount = report.vout.length + 1;
-
-  const inputTotalH = inputCount * (NODE_H + ROW_GAP);
-  const outputTotalH = outputCount * (NODE_H + ROW_GAP);
-  const totalH = Math.max(inputTotalH, outputTotalH);
-
-  const maxInputVal = Math.max(...report.vin.map((v) => v.prevout.value_sats), 1);
-  const maxOutputVal = Math.max(...report.vout.map((v) => v.value_sats), report.fee_sats, 1);
-
-  const dustOutputs = new Set(
-    report.vout.filter((v) => v.value_sats < 546 && v.script_type !== "op_return").map((v) => v.n),
-  );
-  const hasHighFee = report.warnings.some((w) => w.code === "HIGH_FEE");
-
-  const totalOut = report.total_output_sats + report.fee_sats;
-
-  nodes.push({
-    id: "tx",
-    type: "flowTx",
-    position: { x: COL_TX, y: totalH / 2 - 30 },
-    data: {
-      txid: report.txid,
-      segwit: report.segwit,
-      rbf: report.rbf_signaling,
-      version: report.version,
-    },
-  });
-
-  const inputStartY = (totalH - inputTotalH) / 2;
   report.vin.forEach((vin, i) => {
     const id = `in-${i}`;
     nodes.push({
       id,
       type: "flowInput",
-      position: { x: 0, y: inputStartY + i * (NODE_H + ROW_GAP) },
+      position: { x: 0, y: startY + i * (NODE_H + ROW_GAP) },
       data: {
         label: `Input #${i}`,
         address: vin.address,
@@ -131,19 +111,29 @@ function buildGraph(report: TransactionReport): { nodes: Node[]; edges: Edge[] }
     });
   });
 
-  const outputStartY = (totalH - outputTotalH) / 2;
+  return { nodes, edges };
+}
+
+function buildOutputNodes(report: TransactionReport, ctx: LayoutCtx): { nodes: Node[]; edges: Edge[] } {
+  const nodes: Node[] = [];
+  const edges: Edge[] = [];
+
+  const dustOutputs = new Set(
+    report.vout.filter((v) => v.value_sats < 546 && v.script_type !== "op_return").map((v) => v.n),
+  );
+
   report.vout.forEach((vout, i) => {
     const id = `out-${i}`;
     nodes.push({
       id,
       type: "flowOutput",
-      position: { x: COL_OUT, y: outputStartY + i * (NODE_H + ROW_GAP) },
+      position: { x: COL_OUT, y: ctx.startY + i * (NODE_H + ROW_GAP) },
       data: {
         label: `Output #${i}`,
         address: vout.address,
         sats: vout.value_sats,
         scriptType: vout.script_type,
-        proportion: totalOut > 0 ? vout.value_sats / totalOut : 0,
+        proportion: ctx.totalOut > 0 ? vout.value_sats / ctx.totalOut : 0,
         isDust: dustOutputs.has(vout.n),
         isOpReturn: vout.script_type === "op_return",
       },
@@ -155,24 +145,30 @@ function buildGraph(report: TransactionReport): { nodes: Node[]; edges: Edge[] }
       animated: true,
       style: {
         stroke: GRAY,
-        strokeWidth: clampThickness(vout.value_sats, maxOutputVal),
+        strokeWidth: clampThickness(vout.value_sats, ctx.maxVal),
       },
     });
   });
 
-  const feeIdx = report.vout.length;
-  nodes.push({
+  return { nodes, edges };
+}
+
+function buildFeeNode(report: TransactionReport, ctx: LayoutCtx, feeIdx: number): { nodes: Node[]; edges: Edge[] } {
+  const hasHighFee = report.warnings.some((w) => w.code === "HIGH_FEE");
+
+  const nodes: Node[] = [{
     id: "fee",
     type: "flowFee",
-    position: { x: COL_OUT, y: outputStartY + feeIdx * (NODE_H + ROW_GAP) },
+    position: { x: COL_OUT, y: ctx.startY + feeIdx * (NODE_H + ROW_GAP) },
     data: {
       sats: report.fee_sats,
       rate: report.fee_rate_sat_vb,
       highFee: hasHighFee,
-      proportion: totalOut > 0 ? report.fee_sats / totalOut : 0,
+      proportion: ctx.totalOut > 0 ? report.fee_sats / ctx.totalOut : 0,
     },
-  });
-  edges.push({
+  }];
+
+  const edges: Edge[] = [{
     id: "e-fee",
     source: "tx",
     target: "fee",
@@ -180,13 +176,70 @@ function buildGraph(report: TransactionReport): { nodes: Node[]; edges: Edge[] }
     style: {
       stroke: GRAY,
       strokeDasharray: "5 3",
-      strokeWidth: clampThickness(report.fee_sats, maxOutputVal),
+      strokeWidth: clampThickness(report.fee_sats, ctx.maxVal),
     },
-  });
+  }];
 
   return { nodes, edges };
 }
 
+/**
+ * Build the ReactFlow graph from a transaction report.
+ *
+ * Layout (3-column):
+ *   x=0       inputs   (left column)
+ *   x=COL_TX  tx node  (center, vertically centered)
+ *   x=COL_OUT outputs + fee node  (right column)
+ *
+ * Edge thickness scales with satoshi value so the user can visually
+ * compare relative amounts at a glance.
+ */
+function buildGraph(report: TransactionReport): { nodes: Node[]; edges: Edge[] } {
+  const inputCount = report.vin.length;
+  const outputCount = report.vout.length + 1; // +1 for fee node
+
+  const inputTotalH = inputCount * (NODE_H + ROW_GAP);
+  const outputTotalH = outputCount * (NODE_H + ROW_GAP);
+  const totalH = Math.max(inputTotalH, outputTotalH);
+
+  const maxInputVal = Math.max(...report.vin.map((v) => v.prevout.value_sats), 1);
+  const maxOutputVal = Math.max(...report.vout.map((v) => v.value_sats), report.fee_sats, 1);
+  const totalOut = report.total_output_sats + report.fee_sats;
+
+  // Center tx node vertically
+  const txNode: Node = {
+    id: "tx",
+    type: "flowTx",
+    position: { x: COL_TX, y: totalH / 2 - 30 },
+    data: {
+      txid: report.txid,
+      segwit: report.segwit,
+      rbf: report.rbf_signaling,
+      version: report.version,
+    },
+  };
+
+  const inputStartY = (totalH - inputTotalH) / 2;
+  const outputStartY = (totalH - outputTotalH) / 2;
+  const outCtx: LayoutCtx = { startY: outputStartY, maxVal: maxOutputVal, totalOut };
+
+  const inputs = buildInputNodes(report, inputStartY, maxInputVal);
+  const outputs = buildOutputNodes(report, outCtx);
+  const fee = buildFeeNode(report, outCtx, report.vout.length);
+
+  return {
+    nodes: [txNode, ...inputs.nodes, ...outputs.nodes, ...fee.nodes],
+    edges: [...inputs.edges, ...outputs.edges, ...fee.edges],
+  };
+}
+
+/**
+ * Apply visual highlighting when a node is selected.
+ *
+ * Connected nodes and edges get the orange accent color, while
+ * everything else is dimmed to 25% opacity. This guides the user's
+ * eye along the value flow path of the clicked node.
+ */
 function applyHighlight(
   baseNodes: Node[],
   baseEdges: Edge[],

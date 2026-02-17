@@ -1,18 +1,10 @@
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import { cn } from "@/lib/utils";
+import { cn, formatSats, satsToBtc } from "@/lib/utils";
 
 interface SatsDisplayProps {
   sats: number;
   className?: string;
   showBtc?: boolean;
-}
-
-function formatSats(sats: number): string {
-  return sats.toLocaleString("en-US");
-}
-
-function satsToBtc(sats: number): string {
-  return (sats / 1e8).toFixed(8);
 }
 
 export function SatsDisplay({ sats, className, showBtc = true }: SatsDisplayProps) {

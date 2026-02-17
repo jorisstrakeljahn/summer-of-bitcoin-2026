@@ -1,18 +1,15 @@
 import type { TransactionReport } from "@/lib/types";
-import { InfoTooltip } from "../InfoTooltip";
 import { CopyButton } from "../CopyButton";
 import { SatsDisplay } from "../SatsDisplay";
 import { Separator } from "@/components/ui/separator";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Badge } from "@/components/ui/badge";
 import { Repeat, Lock, Clock, AlertTriangle } from "lucide-react";
+import { DetailRow, InfoBox } from "./shared";
+import { satsToBtc } from "@/lib/utils";
 
 interface TxDetailProps {
   report: TransactionReport;
-}
-
-function satsToBtc(sats: number): string {
-  return (sats / 1e8).toFixed(8);
 }
 
 export function TxDetail({ report }: TxDetailProps) {
@@ -211,31 +208,3 @@ function warningText(code: string): string {
   }
 }
 
-function DetailRow({ label, tooltip, explain, children }: {
-  label: string; tooltip?: string; explain?: string; children: React.ReactNode;
-}) {
-  return (
-    <div className="space-y-1.5">
-      <p className="text-sm font-medium text-foreground/80 flex items-center gap-1">
-        {label}
-        {tooltip && <InfoTooltip text={tooltip} />}
-      </p>
-      <div>{children}</div>
-      {explain && (
-        <p className="text-sm text-foreground/50 leading-relaxed">{explain}</p>
-      )}
-    </div>
-  );
-}
-
-function InfoBox({ icon, title, children }: { icon: React.ReactNode; title: string; children: React.ReactNode }) {
-  return (
-    <div className="flex items-start gap-2 rounded-lg bg-secondary/50 border p-3">
-      <span className="shrink-0 mt-0.5">{icon}</span>
-      <div>
-        <p className="font-medium text-sm mb-0.5">{title}</p>
-        <p className="text-sm text-foreground/60 leading-relaxed">{children}</p>
-      </div>
-    </div>
-  );
-}

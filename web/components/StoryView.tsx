@@ -1,13 +1,10 @@
 import type { TransactionReport } from "@/lib/types";
 import { Card, CardContent } from "@/components/ui/card";
 import { InfoTooltip } from "./InfoTooltip";
+import { satsToBtc } from "@/lib/utils";
 
 interface StoryViewProps {
   report: TransactionReport;
-}
-
-function satsToBtc(sats: number): string {
-  return (sats / 1e8).toFixed(8);
 }
 
 function uniqueAddresses(report: TransactionReport, field: "vin" | "vout"): number {
