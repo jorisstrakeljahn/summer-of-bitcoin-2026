@@ -1,19 +1,23 @@
 "use client";
 
 import { useState } from "react";
-import type { TransactionReport, BlockReport } from "@/lib/types";
+import type { TransactionReport, BlockReport, BlockSummary } from "@/lib/types";
 import { Header } from "@/components/Header";
 import { InputPanel } from "@/components/InputPanel";
 import { TransactionResult } from "@/components/TransactionResult";
+import { BlockSummaryList } from "@/components/BlockSummaryList";
 import { BlockResult } from "@/components/BlockResult";
 import { ErrorDisplay } from "@/components/ErrorDisplay";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Button } from "@/components/ui/button";
+import { ArrowLeft } from "lucide-react";
 
 type AppState =
   | { mode: "idle" }
   | { mode: "loading" }
   | { mode: "tx-result"; report: TransactionReport }
-  | { mode: "block-result"; blocks: BlockReport[] }
+  | { mode: "block-list"; session: string; blocks: BlockSummary[] }
+  | { mode: "block-detail"; session: string; blocks: BlockSummary[]; report: BlockReport }
+  | { mode: "block-loading"; session: string; blocks: BlockSummary[] }
   | { mode: "error"; error: { code: string; message: string } };
 
 export default function Home() {
@@ -36,7 +40,6 @@ export default function Home() {
 
   async function handleAnalyzeTx(fixtureJson: string) {
     setState({ mode: "loading" });
-
     try {
       const body = JSON.parse(fixtureJson);
       const res = await fetch("/api/analyze", {
@@ -44,25 +47,19 @@ export default function Home() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
       });
-
       const result = await res.json();
-
       if (result.ok) {
         setState({ mode: "tx-result", report: result as TransactionReport });
       } else {
         setState({ mode: "error", error: result.error });
       }
     } catch {
-      setState({
-        mode: "error",
-        error: { code: "CLIENT_ERROR", message: "Invalid JSON input" },
-      });
+      setState({ mode: "error", error: { code: "CLIENT_ERROR", message: "Invalid JSON input" } });
     }
   }
 
   async function handleAnalyzeBlock(blk: File, rev: File, xor: File) {
     setState({ mode: "loading" });
-
     try {
       const formData = new FormData();
       formData.append("blk", blk);
@@ -73,21 +70,37 @@ export default function Home() {
         method: "POST",
         body: formData,
       });
-
       const result = await res.json();
-
       if (result.ok) {
-        setState({ mode: "block-result", blocks: result.blocks as BlockReport[] });
+        setState({
+          mode: "block-list",
+          session: result.session,
+          blocks: result.blocks as BlockSummary[],
+        });
       } else {
         setState({ mode: "error", error: result.error });
       }
     } catch {
-      setState({
-        mode: "error",
-        error: { code: "CLIENT_ERROR", message: "Failed to upload block files" },
-      });
+      setState({ mode: "error", error: { code: "CLIENT_ERROR", message: "Failed to upload block files" } });
     }
   }
+
+  async function handleLoadBlock(session: string, blocks: BlockSummary[], hash: string) {
+    setState({ mode: "block-loading", session, blocks });
+    try {
+      const res = await fetch(`/api/block-report?session=${encodeURIComponent(session)}&hash=${encodeURIComponent(hash)}`);
+      const result = await res.json();
+      if (result.ok !== false) {
+        setState({ mode: "block-detail", session, blocks, report: result as BlockReport });
+      } else {
+        setState({ mode: "error", error: result.error });
+      }
+    } catch {
+      setState({ mode: "error", error: { code: "CLIENT_ERROR", message: "Failed to load block report" } });
+    }
+  }
+
+  const isLoading = state.mode === "loading" || state.mode === "block-loading";
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -97,40 +110,49 @@ export default function Home() {
           onAnalyzeTx={handleAnalyzeTx}
           onAnalyzeFixture={handleAnalyzeFixture}
           onAnalyzeBlock={handleAnalyzeBlock}
-          loading={state.mode === "loading"}
+          loading={isLoading}
         />
 
         {state.mode === "tx-result" && <TransactionResult report={state.report} />}
 
-        {state.mode === "block-result" && (
-          <BlockResultView blocks={state.blocks} />
+        {state.mode === "block-list" && (
+          <BlockSummaryList
+            blocks={state.blocks}
+            onSelectBlock={(hash) => handleLoadBlock(state.session, state.blocks, hash)}
+          />
+        )}
+
+        {state.mode === "block-loading" && (
+          <>
+            <BlockSummaryList
+              blocks={state.blocks}
+              onSelectBlock={() => {}}
+              disabled
+            />
+            <div className="flex items-center justify-center py-12 text-sm text-muted-foreground">
+              <div className="h-5 w-5 animate-spin rounded-full border-2 border-primary border-t-transparent mr-2" />
+              Loading block details…
+            </div>
+          </>
+        )}
+
+        {state.mode === "block-detail" && (
+          <>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="text-muted-foreground"
+              onClick={() => setState({ mode: "block-list", session: state.session, blocks: state.blocks })}
+            >
+              <ArrowLeft className="h-4 w-4 mr-1" />
+              Back to block list
+            </Button>
+            <BlockResult report={state.report} />
+          </>
         )}
 
         {state.mode === "error" && <ErrorDisplay error={state.error} />}
       </main>
     </div>
-  );
-}
-
-function BlockResultView({ blocks }: { blocks: BlockReport[] }) {
-  if (blocks.length === 1) {
-    return <BlockResult report={blocks[0]} />;
-  }
-
-  return (
-    <Tabs defaultValue={blocks[0]?.block_header.block_hash}>
-      <TabsList className="mb-4 flex-wrap h-auto gap-1">
-        {blocks.map((b, i) => (
-          <TabsTrigger key={b.block_header.block_hash} value={b.block_header.block_hash} className="text-xs font-mono">
-            Block #{i} ({b.block_header.block_hash.slice(0, 8)}…)
-          </TabsTrigger>
-        ))}
-      </TabsList>
-      {blocks.map((b) => (
-        <TabsContent key={b.block_header.block_hash} value={b.block_header.block_hash}>
-          <BlockResult report={b} />
-        </TabsContent>
-      ))}
-    </Tabs>
   );
 }

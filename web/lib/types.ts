@@ -129,6 +129,14 @@ export interface BlockReport {
   };
 }
 
+export interface BlockSummary {
+  block_hash: string;
+  block_header: BlockReport["block_header"];
+  tx_count: number;
+  coinbase: BlockReport["coinbase"];
+  block_stats: BlockReport["block_stats"];
+}
+
 export interface ErrorReport {
   ok: false;
   error: {
