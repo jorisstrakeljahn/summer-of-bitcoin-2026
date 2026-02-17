@@ -69,6 +69,15 @@ function buildBlockReport(block: ParsedBlock, undo: BlockUndo): BlockReport | Bl
     const txidBuffers = block.transactions.map(tx => computeTxidBuffer(tx));
 
     const merkleValid = verifyMerkleRoot(block, txidBuffers);
+    if (!merkleValid) {
+      return {
+        ok: false,
+        error: { code: "MERKLE_MISMATCH", message: "Computed merkle root does not match block header" },
+      };
+    }
+
+    validateCoinbase(block.transactions[0]);
+
     const coinbaseInfo = parseCoinbase(block.transactions[0]);
     const txReports = buildTransactionReports(block.transactions, undo, txidBuffers);
 
@@ -110,6 +119,34 @@ function buildBlockReport(block: ParsedBlock, undo: BlockUndo): BlockReport | Bl
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
     return { ok: false, error: { code: "BLOCK_PARSE_ERROR", message } };
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Coinbase validation
+// ---------------------------------------------------------------------------
+
+const NULL_TXID = "0".repeat(64);
+
+function validateCoinbase(tx: ParsedTransaction): void {
+  if (tx.inputs.length !== 1) {
+    throw new Error(
+      `Invalid coinbase: expected exactly 1 input, got ${tx.inputs.length}`,
+    );
+  }
+
+  const input = tx.inputs[0];
+
+  if (input.txid !== NULL_TXID) {
+    throw new Error(
+      `Invalid coinbase: input txid must be all zeros, got ${input.txid}`,
+    );
+  }
+
+  if (input.vout !== 0xffffffff) {
+    throw new Error(
+      `Invalid coinbase: input vout must be 0xFFFFFFFF, got 0x${input.vout.toString(16)}`,
+    );
   }
 }
 

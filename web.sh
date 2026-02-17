@@ -16,6 +16,12 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 PORT="${PORT:-3000}"
 
-echo "http://127.0.0.1:${PORT}"
 cd "$SCRIPT_DIR/web"
+
+# Auto-build if Next.js build output is missing
+if [ ! -d ".next" ]; then
+  npx next build >&2
+fi
+
+echo "http://127.0.0.1:${PORT}"
 exec npx next start -p "$PORT"

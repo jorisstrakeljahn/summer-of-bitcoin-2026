@@ -345,7 +345,7 @@ export function parseOpReturnPayload(scriptHex: string): OpReturnData {
 }
 
 function tryDecodeUtf8(buf: Buffer): string | null {
-  if (buf.length === 0) return null;
+  if (buf.length === 0) return "";
   try {
     const decoder = new TextDecoder("utf-8", { fatal: true });
     return decoder.decode(buf);
