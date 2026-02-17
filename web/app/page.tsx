@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import type { TransactionReport, BlockReport, BlockSummary } from "@/lib/types";
 import { Header } from "@/components/Header";
 import { InputPanel } from "@/components/InputPanel";
@@ -13,7 +13,8 @@ import { ArrowLeft } from "lucide-react";
 
 type AppState =
   | { mode: "idle" }
-  | { mode: "loading" }
+  | { mode: "loading-tx" }
+  | { mode: "loading-block" }
   | { mode: "tx-result"; report: TransactionReport }
   | { mode: "block-list"; session: string; blocks: BlockSummary[] }
   | { mode: "block-detail"; session: string; blocks: BlockSummary[]; report: BlockReport }
@@ -22,14 +23,18 @@ type AppState =
 
 export default function Home() {
   const [state, setState] = useState<AppState>({ mode: "idle" });
+  const [inputCollapsed, setInputCollapsed] = useState(false);
+
+  const collapseInput = useCallback(() => setInputCollapsed(true), []);
 
   async function handleAnalyzeFixture(name: string) {
-    setState({ mode: "loading" });
+    setState({ mode: "loading-tx" });
     try {
       const res = await fetch(`/api/analyze-fixture?name=${encodeURIComponent(name)}`);
       const result = await res.json();
       if (result.ok) {
         setState({ mode: "tx-result", report: result as TransactionReport });
+        collapseInput();
       } else {
         setState({ mode: "error", error: result.error });
       }
@@ -39,7 +44,7 @@ export default function Home() {
   }
 
   async function handleAnalyzeTx(fixtureJson: string) {
-    setState({ mode: "loading" });
+    setState({ mode: "loading-tx" });
     try {
       const body = JSON.parse(fixtureJson);
       const res = await fetch("/api/analyze", {
@@ -50,6 +55,7 @@ export default function Home() {
       const result = await res.json();
       if (result.ok) {
         setState({ mode: "tx-result", report: result as TransactionReport });
+        collapseInput();
       } else {
         setState({ mode: "error", error: result.error });
       }
@@ -59,7 +65,7 @@ export default function Home() {
   }
 
   async function handleAnalyzeBlock(blk: File, rev: File, xor: File) {
-    setState({ mode: "loading" });
+    setState({ mode: "loading-block" });
     try {
       const formData = new FormData();
       formData.append("blk", blk);
@@ -77,6 +83,7 @@ export default function Home() {
           session: result.session,
           blocks: result.blocks as BlockSummary[],
         });
+        collapseInput();
       } else {
         setState({ mode: "error", error: result.error });
       }
@@ -100,7 +107,11 @@ export default function Home() {
     }
   }
 
-  const isLoading = state.mode === "loading" || state.mode === "block-loading";
+  const isLoading = state.mode === "loading-tx" || state.mode === "loading-block" || state.mode === "block-loading";
+
+  const loadingType: "tx" | "block" | null =
+    state.mode === "loading-tx" ? "tx" :
+    state.mode === "loading-block" ? "block" : null;
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -111,6 +122,9 @@ export default function Home() {
           onAnalyzeFixture={handleAnalyzeFixture}
           onAnalyzeBlock={handleAnalyzeBlock}
           loading={isLoading}
+          loadingType={loadingType}
+          collapsed={inputCollapsed}
+          onToggleCollapse={() => setInputCollapsed((c) => !c)}
         />
 
         {state.mode === "tx-result" && <TransactionResult report={state.report} />}
@@ -129,9 +143,9 @@ export default function Home() {
               onSelectBlock={() => {}}
               disabled
             />
-            <div className="flex items-center justify-center py-12 text-sm text-muted-foreground">
-              <div className="h-5 w-5 animate-spin rounded-full border-2 border-primary border-t-transparent mr-2" />
-              Loading block details…
+            <div className="flex flex-col items-center justify-center py-12 gap-3">
+              <div className="h-8 w-8 animate-spin rounded-full border-3 border-primary border-t-transparent" />
+              <p className="text-sm text-foreground/70">Loading block details…</p>
             </div>
           </>
         )}

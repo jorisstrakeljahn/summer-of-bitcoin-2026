@@ -4,7 +4,7 @@ import type { BlockSummary } from "@/lib/types";
 import { Card, CardContent } from "@/components/ui/card";
 import { CopyButton } from "./CopyButton";
 import { Badge } from "@/components/ui/badge";
-import { Check, X, ChevronRight } from "lucide-react";
+import { X, ChevronRight } from "lucide-react";
 
 interface BlockSummaryListProps {
   blocks: BlockSummary[];
@@ -44,11 +44,7 @@ export function BlockSummaryList({ blocks, onSelectBlock, disabled }: BlockSumma
                           Height {b.coinbase.bip34_height.toLocaleString()}
                         </Badge>
                       )}
-                      {b.block_header.merkle_root_valid ? (
-                        <Badge className="bg-green-900/40 text-green-300 text-[10px]">
-                          <Check className="h-3 w-3 mr-0.5" />Merkle OK
-                        </Badge>
-                      ) : (
+                      {!b.block_header.merkle_root_valid && (
                         <Badge className="bg-red-900/40 text-red-300 text-[10px]">
                           <X className="h-3 w-3 mr-0.5" />Merkle Invalid
                         </Badge>
