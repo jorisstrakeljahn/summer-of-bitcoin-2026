@@ -56,6 +56,7 @@ export async function POST(request: Request) {
       blkPath,
       revPath,
       xorPath,
+      "--all",
     ], {
       cwd: sessionDir,
       timeout: 300_000,

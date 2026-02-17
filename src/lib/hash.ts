@@ -27,7 +27,7 @@ export function hash160(data: Buffer): Buffer {
 
 /** Reverse a buffer (returns a new buffer). Used for display-order txid/block hash. */
 export function reverseBuffer(buf: Buffer): Buffer {
-  const reversed = Buffer.alloc(buf.length);
+  const reversed = Buffer.allocUnsafe(buf.length);
   for (let i = 0; i < buf.length; i++) {
     reversed[i] = buf[buf.length - 1 - i];
   }

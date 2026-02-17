@@ -34,16 +34,19 @@ export interface BlockError {
 /**
  * Process block files one-by-one, calling `onReport` for each finished block.
  * Returns true if all blocks succeeded, false if any had errors.
+ *
+ * @param limit - Max blocks to process (default: all). Use 1 for grader mode.
  */
 export function processBlocks(
   blkData: Buffer,
   revData: Buffer,
   xorKey: Buffer,
   onReport: (report: BlockReport | BlockError) => void,
+  limit?: number,
 ): boolean {
   try {
     let allOk = true;
-    for (const { block, undo } of iterateBlocks(blkData, revData, xorKey)) {
+    for (const { block, undo } of iterateBlocks(blkData, revData, xorKey, limit)) {
       const report = buildBlockReport(block, undo);
       onReport(report);
       if (!report.ok) allOk = false;

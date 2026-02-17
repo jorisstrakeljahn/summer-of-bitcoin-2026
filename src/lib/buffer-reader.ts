@@ -73,12 +73,12 @@ export class BufferReader {
     return val;
   }
 
-  /** Read `length` bytes and return a new Buffer. */
+  /** Read `length` bytes as a zero-copy view into the underlying buffer. */
   readSlice(length: number): Buffer {
     this.ensureAvailable(length);
     const slice = this.buffer.subarray(this.offset, this.offset + length);
     this.offset += length;
-    return Buffer.from(slice);
+    return slice;
   }
 
   /**

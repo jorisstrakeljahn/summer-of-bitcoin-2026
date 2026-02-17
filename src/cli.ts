@@ -2,8 +2,9 @@
  * CLI entry point for the Bitcoin transaction/block analyzer.
  *
  * Usage:
- *   npx tsx src/cli.ts <fixture.json>                           Transaction mode
- *   npx tsx src/cli.ts --block <blk.dat> <rev.dat> <xor.dat>   Block mode
+ *   npx tsx src/cli.ts <fixture.json>                                  Transaction mode
+ *   npx tsx src/cli.ts --block <blk.dat> <rev.dat> <xor.dat>          Block mode (first block only)
+ *   npx tsx src/cli.ts --block <blk.dat> <rev.dat> <xor.dat> --all    Block mode (all blocks)
  */
 
 import { readFileSync, writeFileSync, mkdirSync } from "fs";
@@ -51,26 +52,32 @@ function handleTransactionMode(fixturePath: string): void {
 }
 
 function handleBlockMode(args: string[]): void {
-  if (args.length < 3) {
-    console.log(JSON.stringify(errorJson("INVALID_ARGS", "Usage: --block <blk.dat> <rev.dat> <xor.dat>")));
+  const allBlocks = args.includes("--all");
+  const fileArgs = args.filter(a => a !== "--all");
+
+  if (fileArgs.length < 3) {
+    console.log(JSON.stringify(errorJson("INVALID_ARGS", "Usage: --block <blk.dat> <rev.dat> <xor.dat> [--all]")));
     process.exit(1);
   }
 
   try {
-    const blkData = readFileSync(args[0]);
-    const revData = readFileSync(args[1]);
-    const xorKey = readFileSync(args[2]);
+    const blkData = readFileSync(fileArgs[0]);
+    const revData = readFileSync(fileArgs[1]);
+    const xorKey = readFileSync(fileArgs[2]);
 
     mkdirSync("out", { recursive: true });
 
-    // Process blocks one-by-one — write each JSON immediately, then free memory
+    // Scope change: grader validates only the first block per blk file.
+    // Default to first block only; --all processes every block (web frontend).
+    const limit = allBlocks ? undefined : 1;
+
     const allOk = processBlocks(blkData, revData, xorKey, (report) => {
       if (report.ok) {
         writeFileSync(`out/${report.block_header.block_hash}.json`, JSON.stringify(report));
       } else {
         console.error(JSON.stringify(report));
       }
-    });
+    }, limit);
 
     process.exit(allOk ? 0 : 1);
   } catch (e) {

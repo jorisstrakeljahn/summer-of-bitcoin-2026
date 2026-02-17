@@ -8,15 +8,35 @@
  * but the spec requires null).
  */
 
+import { createHash } from "crypto";
 import { sha256d, reverseBuffer } from "./hash.js";
 import type { ParsedTransaction } from "./types.js";
 
 /**
  * Compute the raw txid hash (internal byte order, not reversed).
  * Reusable for both merkle root and txid display.
+ *
+ * For SegWit: extracts legacy bytes directly from rawBuffer via streaming
+ * SHA256d, avoiding serializeLegacy() which creates many small buffer
+ * allocations. This is critical for block mode with 300K+ transactions.
+ *
+ * SegWit raw:    [version:4][marker:1][flag:1][inputs+outputs][witness][locktime:4]
+ * Legacy needed: [version:4][inputs+outputs][locktime:4]
  */
 export function computeTxidBuffer(tx: ParsedTransaction): Buffer {
-  return sha256d(serializeLegacy(tx));
+  if (!tx.segwit) {
+    return sha256d(tx.rawBuffer);
+  }
+
+  const raw = tx.rawBuffer;
+  const middleLen = tx.nonWitnessBytes - 8;
+
+  const inner = createHash("sha256");
+  inner.update(raw.subarray(0, 4));
+  inner.update(raw.subarray(6, 6 + middleLen));
+  inner.update(raw.subarray(raw.length - 4));
+
+  return createHash("sha256").update(inner.digest()).digest();
 }
 
 /**
