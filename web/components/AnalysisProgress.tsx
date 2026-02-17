@@ -14,6 +14,7 @@ export function AnalysisProgress({ active, label, estimatedMs = 8000 }: Analysis
   const rafRef = useRef<number>(0);
   const startRef = useRef(0);
   const wasActiveRef = useRef(false);
+  const barRef = useRef<HTMLDivElement>(null);
 
   const stopAnimation = useCallback(() => {
     cancelAnimationFrame(rafRef.current);
@@ -31,6 +32,9 @@ export function AnalysisProgress({ active, label, estimatedMs = 8000 }: Analysis
         const ratio = elapsed / estimatedMs;
         const simulated = Math.min(95, 100 * (1 - Math.exp(-1.8 * ratio)));
         setProgress(simulated);
+        if (barRef.current) {
+          barRef.current.style.width = `${simulated}%`;
+        }
         rafRef.current = requestAnimationFrame(tick);
       }
 
@@ -42,6 +46,9 @@ export function AnalysisProgress({ active, label, estimatedMs = 8000 }: Analysis
       wasActiveRef.current = false;
       stopAnimation();
       setProgress(100);
+      if (barRef.current) {
+        barRef.current.style.width = "100%";
+      }
       const timeout = setTimeout(() => {
         setVisible(false);
         setProgress(0);
@@ -52,18 +59,17 @@ export function AnalysisProgress({ active, label, estimatedMs = 8000 }: Analysis
 
   if (!visible) return null;
 
-  const displayPct = Math.round(progress);
-
   return (
     <div className="space-y-1.5 py-1">
       <div className="flex items-center justify-between text-sm">
         <span className="text-foreground/70">{label}</span>
-        <span className="tabular-nums text-primary font-medium">{displayPct}%</span>
+        <span className="tabular-nums text-primary font-medium">{Math.round(progress)}%</span>
       </div>
       <div className="h-2.5 w-full overflow-hidden rounded-full bg-secondary">
         <div
+          ref={barRef}
           className="h-full rounded-full bg-primary"
-          style={{ width: `${progress}%`, transition: "width 150ms linear" }}
+          style={{ width: `${progress}%` }}
         />
       </div>
     </div>

@@ -39,7 +39,7 @@ export function TechnicalDetails({ report }: TechnicalDetailsProps) {
 
           <div>
             <p className="text-xs text-muted-foreground mb-1">Full JSON Report</p>
-            <JsonViewer data={report} maxHeight="500px" />
+            <JsonViewer data={report} maxHeight="70vh" />
           </div>
         </AccordionContent>
       </AccordionItem>

@@ -101,7 +101,7 @@ export function InputPanel({
                 <Textarea
                   id="fixture-input"
                   placeholder='{"network":"mainnet","raw_tx":"0200...","prevouts":[...]}'
-                  className="min-h-[140px] font-mono text-xs resize-y"
+                  className="min-h-[80px] max-h-[350px] font-mono text-xs overflow-y-auto"
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
                   disabled={loading}

@@ -1,5 +1,4 @@
 import { CopyButton } from "./CopyButton";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
 
 interface JsonViewerProps {
@@ -8,7 +7,7 @@ interface JsonViewerProps {
   maxHeight?: string;
 }
 
-export function JsonViewer({ data, className, maxHeight = "400px" }: JsonViewerProps) {
+export function JsonViewer({ data, className, maxHeight = "60vh" }: JsonViewerProps) {
   const json = typeof data === "string" ? data : JSON.stringify(data, null, 2);
 
   return (
@@ -16,11 +15,14 @@ export function JsonViewer({ data, className, maxHeight = "400px" }: JsonViewerP
       <div className="absolute right-2 top-2 z-10">
         <CopyButton text={json} />
       </div>
-      <ScrollArea style={{ maxHeight }}>
-        <pre className="p-4 text-xs font-mono leading-relaxed text-muted-foreground overflow-x-auto">
+      <div
+        className="overflow-auto"
+        style={{ maxHeight }}
+      >
+        <pre className="p-4 text-xs font-mono leading-relaxed text-muted-foreground whitespace-pre">
           {json}
         </pre>
-      </ScrollArea>
+      </div>
     </div>
   );
 }
