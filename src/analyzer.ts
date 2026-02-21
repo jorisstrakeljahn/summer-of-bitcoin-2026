@@ -43,13 +43,33 @@ import { deriveAddress } from "./lib/address.js";
 
 export function analyzeTransaction(fixture: Fixture): CliOutput {
   try {
-    const parsed = parseTransaction(fixture.raw_tx);
+    if (!fixture || typeof fixture !== "object") {
+      return { ok: false, error: { code: "INVALID_FIXTURE", message: "Fixture must be a JSON object" } };
+    }
+    if (typeof fixture.raw_tx !== "string" || fixture.raw_tx.length === 0) {
+      return { ok: false, error: { code: "INVALID_FIXTURE", message: "raw_tx must be a non-empty hex string" } };
+    }
+    if (!Array.isArray(fixture.prevouts)) {
+      return { ok: false, error: { code: "INVALID_FIXTURE", message: "prevouts must be an array" } };
+    }
+
+    const rawTx = normalizeHex(fixture.raw_tx);
+    if (rawTx.length === 0) {
+      return { ok: false, error: { code: "INVALID_FIXTURE", message: "raw_tx is empty after normalization" } };
+    }
+    const parsed = parseTransaction(rawTx);
     const prevouts = matchPrevouts(parsed.inputs, fixture.prevouts);
-    return buildReport(parsed, prevouts, fixture.network);
+    return buildReport(parsed, prevouts, fixture.network ?? "mainnet");
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
     return { ok: false, error: { code: "INVALID_TX", message } } satisfies ErrorReport;
   }
+}
+
+function normalizeHex(hex: string): string {
+  let h = hex.trim();
+  if (h.startsWith("0x") || h.startsWith("0X")) h = h.slice(2);
+  return h;
 }
 
 // ---------------------------------------------------------------------------

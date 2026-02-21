@@ -64,6 +64,10 @@ export function* iterateBlocks(
   // Phase 1: Parse all blocks
   const blocks = readAllBlocks(new BufferReader(blk));
 
+  if (blocks.length === 0) {
+    throw new Error("No valid blocks found in block data file");
+  }
+
   // Phase 2: Sort by BIP34 coinbase height
   blocks.sort((a, b) => extractBip34Height(a) - extractBip34Height(b));
 

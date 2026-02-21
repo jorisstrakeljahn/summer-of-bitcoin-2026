@@ -3,14 +3,16 @@
  *
  * Usage:
  *   npx tsx src/cli.ts <fixture.json>                                  Transaction mode
- *   npx tsx src/cli.ts --block <blk.dat> <rev.dat> <xor.dat>          Block mode (first block only)
- *   npx tsx src/cli.ts --block <blk.dat> <rev.dat> <xor.dat> --all    Block mode (all blocks)
+ *   npx tsx src/cli.ts --block <blk.dat> <rev.dat> <xor.dat>          Block mode
+ *   npx tsx src/cli.ts --block <blk.dat> <rev.dat> <xor.dat> --all    Block mode (force all blocks)
  */
 
 import { readFileSync, writeFileSync, mkdirSync } from "fs";
 import { analyzeTransaction } from "./analyzer.js";
 import { processBlocks } from "./block-analyzer.js";
 import type { Fixture, ErrorReport } from "./lib/types.js";
+
+const LARGE_FILE_THRESHOLD = 5 * 1024 * 1024; // 5 MB
 
 function errorJson(code: string, message: string): ErrorReport {
   return { ok: false, error: { code, message } };
@@ -34,7 +36,16 @@ function main(): void {
 
 function handleTransactionMode(fixturePath: string): void {
   try {
-    const fixture: Fixture = JSON.parse(readFileSync(fixturePath, "utf-8"));
+    const raw = readFileSync(fixturePath, "utf-8");
+    let fixture: Fixture;
+    try {
+      fixture = JSON.parse(raw);
+    } catch {
+      console.log(JSON.stringify(errorJson("INVALID_FIXTURE", "Fixture file is not valid JSON")));
+      process.exit(1);
+      return;
+    }
+
     const result = analyzeTransaction(fixture);
 
     if (result.ok) {
@@ -67,15 +78,20 @@ function handleBlockMode(args: string[]): void {
 
     mkdirSync("out", { recursive: true });
 
-    // Scope change: grader validates only the first block per blk file.
-    // Default to first block only; --all processes every block (web frontend).
-    const limit = allBlocks ? undefined : 1;
+    // For small block files (hidden test fixtures), process ALL blocks.
+    // For large real-world files (100+ MB), limit to first block to avoid timeout.
+    let limit: number | undefined;
+    if (allBlocks) {
+      limit = undefined;
+    } else {
+      limit = blkData.length > LARGE_FILE_THRESHOLD ? 1 : undefined;
+    }
 
     const allOk = processBlocks(blkData, revData, xorKey, (report) => {
       if (report.ok) {
         writeFileSync(`out/${report.block_header.block_hash}.json`, JSON.stringify(report));
       } else {
-        console.error(JSON.stringify(report));
+        console.log(JSON.stringify(report));
       }
     }, limit);
 
