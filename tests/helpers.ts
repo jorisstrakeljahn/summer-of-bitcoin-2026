@@ -1,7 +1,29 @@
+/**
+ * Test fixture factories.
+ *
+ * Provides builders for UTXOs, payments, change templates, and full
+ * fixtures with sensible defaults. All scriptPubKey values use valid
+ * Bitcoin script patterns matching the declared script_type.
+ *
+ * Usage:
+ *   makeUtxo()                          → 100k sat P2WPKH UTXO
+ *   makeUtxo({ value_sats: 50_000 })    → override specific fields
+ *   makeFixture({ rbf: true })          → full fixture with RBF enabled
+ */
+
 import type { Utxo, Payment, ChangeTemplate, Fixture, ScriptType } from "../src/types.js";
 
 let counter = 0;
 
+/**
+ * Returns a valid scriptPubKey hex for the given script type.
+ * These match the standard output script patterns defined in Bitcoin:
+ *   P2PKH:      OP_DUP OP_HASH160 <20> OP_EQUALVERIFY OP_CHECKSIG
+ *   P2SH:       OP_HASH160 <20> OP_EQUAL
+ *   P2WPKH:     OP_0 <20>
+ *   P2WSH:      OP_0 <32>
+ *   P2TR:       OP_1 <32>
+ */
 function scriptPubkeyForType(type: ScriptType): string {
   switch (type) {
     case "p2pkh":
