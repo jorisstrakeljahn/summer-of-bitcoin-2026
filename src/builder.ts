@@ -1,4 +1,4 @@
-import type { Fixture, BuildResult, CoinSelectionResult } from "./types";
+import type { Fixture, BuildResult } from "./types";
 import { parseFixture, ValidationError } from "./validation";
 import { selectCoins, selectCoinsAllStrategies } from "./coin-selection/index";
 import { computeRbfLocktime } from "./rbf-locktime";

@@ -8,7 +8,7 @@ export const branchAndBound: CoinSelectionStrategy = {
   name: "branch_and_bound",
 
   select(params: CoinSelectionParams): CoinSelectionResult | null {
-    const { utxos, payments, change, feeRate, maxInputs } = params;
+    const { utxos, payments, feeRate, maxInputs } = params;
     const paymentSum = payments.reduce((s, p) => s + p.value_sats, 0);
     const limit = maxInputs ?? utxos.length;
 
@@ -46,14 +46,15 @@ export const branchAndBound: CoinSelectionStrategy = {
 
     if (!bestMatch) return null;
 
-    const vbytes = estimateVbytes(bestMatch, payments, null);
+    const matched: Utxo[] = bestMatch;
+    const vbytes = estimateVbytes(matched, payments, null);
     const fee = Math.ceil(vbytes * feeRate);
-    const leftover = bestMatch.reduce((s, u) => s + u.value_sats, 0) - paymentSum;
+    const leftover = matched.reduce((s, u) => s + u.value_sats, 0) - paymentSum;
 
     if (leftover < fee) return null;
 
     return {
-      selectedUtxos: bestMatch,
+      selectedUtxos: matched,
       fee: leftover,
       changeAmount: null,
       vbytes,
