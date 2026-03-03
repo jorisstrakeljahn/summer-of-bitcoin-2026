@@ -2,6 +2,7 @@ import type { ScriptType, Utxo, Payment, ChangeTemplate } from "./types.js";
 
 const INPUT_VBYTES: Record<string, number> = {
   p2pkh: 148,
+  p2sh: 256,
   "p2sh-p2wpkh": 91,
   p2wpkh: 68,
   p2wsh: 104,
@@ -11,6 +12,7 @@ const INPUT_VBYTES: Record<string, number> = {
 const OUTPUT_VBYTES: Record<string, number> = {
   p2pkh: 34,
   p2sh: 32,
+  "p2sh-p2wpkh": 32,
   p2wpkh: 31,
   p2wsh: 43,
   p2tr: 43,
