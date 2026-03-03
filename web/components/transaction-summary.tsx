@@ -31,7 +31,10 @@ export function TransactionSummary({ report }: TransactionSummaryProps) {
       <div>
         <h2 className="text-base font-medium">Transaction Summary</h2>
         <p className="text-sm text-muted-foreground">
-          Overview of the constructed transaction — fees, size, and strategy used.
+          Every Bitcoin transaction pays a mining fee proportional to its size in virtual bytes
+          (vB), not the amount being sent. Adding more inputs or outputs increases the size and
+          therefore the fee. The fee rate (sat/vB) determines how quickly miners will include
+          the transaction in a block.
         </p>
       </div>
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">

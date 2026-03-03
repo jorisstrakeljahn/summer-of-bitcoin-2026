@@ -47,7 +47,10 @@ export function InputsTable({ inputs }: InputsTableProps) {
           <span className="text-muted-foreground font-normal ml-1.5">({inputs.length})</span>
         </h2>
         <p className="text-sm text-muted-foreground">
-          The UTXOs selected from the available pool to fund this transaction.
+          Bitcoin wallets don&apos;t hold a single balance — they track individual coins called UTXOs
+          (Unspent Transaction Outputs). To send bitcoin, the wallet selects one or more of
+          these coins as inputs. The total input value must cover the payment amount plus the
+          mining fee.
         </p>
       </div>
       <div className="border rounded-lg overflow-hidden">

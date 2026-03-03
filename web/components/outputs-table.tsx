@@ -47,7 +47,11 @@ export function OutputsTable({ outputs }: OutputsTableProps) {
           <span className="text-muted-foreground font-normal ml-1.5">({outputs.length})</span>
         </h2>
         <p className="text-sm text-muted-foreground">
-          Payment destinations and change. The change output returns leftover value back to your wallet.
+          Each output sends value to a Bitcoin address. Payment outputs go to the recipient.
+          If the selected inputs exceed the payment + fee, a <strong>change</strong> output
+          returns the leftover to the sender&apos;s wallet — just like receiving coins back at a
+          cash register. Outputs below 546 sats are considered <strong>dust</strong> and are
+          rejected by the network because they cost more in fees to spend than they are worth.
         </p>
       </div>
       <div className="border rounded-lg overflow-hidden">

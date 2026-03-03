@@ -264,7 +264,10 @@ export function PsbtViewer({ base64 }: PsbtViewerProps) {
         <div>
           <h2 className="text-base font-medium">PSBT</h2>
           <p className="text-sm text-muted-foreground">
-            The unsigned transaction encoded as a Partially Signed Bitcoin Transaction (BIP-174).
+            A PSBT (Partially Signed Bitcoin Transaction) packages the unsigned transaction
+            together with metadata each signer needs — like the value and script of each input
+            being spent. This lets hardware wallets and multi-signature setups verify and sign
+            the transaction safely without trusting the software that built it.
           </p>
         </div>
         <ViewToggle view={view} onViewChange={setView} />

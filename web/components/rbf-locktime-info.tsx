@@ -20,7 +20,10 @@ export function RbfLocktimeInfo({ report }: RbfLocktimeInfoProps) {
       <div>
         <h2 className="text-base font-medium">RBF &amp; Locktime</h2>
         <p className="text-sm text-muted-foreground">
-          Replace-By-Fee signaling and time-lock settings for the unsigned transaction.
+          <strong>RBF</strong> (Replace-By-Fee) lets the sender broadcast a new version of a
+          transaction with a higher fee if the original is stuck unconfirmed.&nbsp;
+          <strong>Locktime</strong> prevents a transaction from being mined before a certain
+          block height or point in time — useful for scheduled payments or anti-fee-sniping.
         </p>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
