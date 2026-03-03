@@ -6,4 +6,7 @@ cd "$SCRIPT_DIR"
 
 npm install
 
+cd "$SCRIPT_DIR/web"
+npm install
+
 echo "Setup complete"
