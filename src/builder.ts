@@ -46,13 +46,14 @@ export function build(fixtureRaw: unknown): BuildResult {
     });
 
     const feeRateSatVb = coinResult.fee / coinResult.vbytes;
+    const roundedFeeRate = Math.round(feeRateSatVb * 100) / 100;
     const changeIndex = coinResult.changeAmount !== null
       ? outputs.findIndex((o) => o.is_change)
       : null;
 
     const warnings = detectWarnings({
       feeSats: coinResult.fee,
-      feeRateSatVb: feeRateSatVb,
+      feeRateSatVb: roundedFeeRate,
       changeAmount: coinResult.changeAmount,
       rbfSignaling: rbfLocktime.rbfSignaling,
     });
@@ -65,7 +66,7 @@ export function build(fixtureRaw: unknown): BuildResult {
       outputs,
       change_index: changeIndex !== -1 ? changeIndex : null,
       fee_sats: coinResult.fee,
-      fee_rate_sat_vb: Math.round(feeRateSatVb * 100) / 100,
+      fee_rate_sat_vb: roundedFeeRate,
       vbytes: coinResult.vbytes,
       rbf_signaling: rbfLocktime.rbfSignaling,
       locktime: rbfLocktime.nLockTime,
