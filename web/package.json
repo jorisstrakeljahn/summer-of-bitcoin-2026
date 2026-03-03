@@ -9,6 +9,7 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@xyflow/react": "^12.10.1",
     "bech32": "^2.0.0",
     "bitcoinjs-lib": "^7.0.1",
     "bs58check": "^4.0.0",
