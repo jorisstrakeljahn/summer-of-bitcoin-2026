@@ -1,5 +1,5 @@
 import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
-import { basename, dirname } from "node:path";
+import { basename } from "node:path";
 import { build } from "./builder.js";
 
 function main(): void {

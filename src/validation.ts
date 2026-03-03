@@ -47,6 +47,16 @@ function assertPositiveNumber(val: unknown, field: string): asserts val is numbe
   }
 }
 
+function assertPositiveInteger(val: unknown, field: string): asserts val is number {
+  assertNumber(val, field);
+  if (!Number.isInteger(val) || val <= 0) {
+    throw new ValidationError(
+      "INVALID_FIXTURE",
+      `${field} must be a positive integer (got ${val})`,
+    );
+  }
+}
+
 function assertNonNegativeInteger(val: unknown, field: string): asserts val is number {
   assertNumber(val, field);
   if (!Number.isInteger(val) || val < 0) {
@@ -109,7 +119,7 @@ export function parseFixture(raw: unknown): Fixture {
       );
     }
     assertNonNegativeInteger(u.vout, `utxos[${i}].vout`);
-    assertPositiveNumber(u.value_sats, `utxos[${i}].value_sats`);
+    assertPositiveInteger(u.value_sats, `utxos[${i}].value_sats`);
     assertHex(u.script_pubkey_hex, `utxos[${i}].script_pubkey_hex`);
     assertScriptType(u.script_type, `utxos[${i}].script_type`);
     assertString(u.address, `utxos[${i}].address`);
@@ -134,7 +144,7 @@ export function parseFixture(raw: unknown): Fixture {
     assertString(p.address, `payments[${i}].address`);
     assertHex(p.script_pubkey_hex, `payments[${i}].script_pubkey_hex`);
     assertScriptType(p.script_type, `payments[${i}].script_type`);
-    assertPositiveNumber(p.value_sats, `payments[${i}].value_sats`);
+    assertPositiveInteger(p.value_sats, `payments[${i}].value_sats`);
 
     return {
       address: p.address as string,
@@ -185,7 +195,7 @@ export function parseFixture(raw: unknown): Fixture {
   if (raw.policy !== undefined) {
     assertObject(raw.policy, "policy");
     if (raw.policy.max_inputs !== undefined) {
-      assertPositiveNumber(raw.policy.max_inputs, "policy.max_inputs");
+      assertPositiveInteger(raw.policy.max_inputs, "policy.max_inputs");
       fixture.policy = { max_inputs: raw.policy.max_inputs as number };
     }
   }
