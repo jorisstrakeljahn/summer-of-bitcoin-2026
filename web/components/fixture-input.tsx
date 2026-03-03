@@ -81,7 +81,7 @@ export function FixtureInput({ value, onChange, onBuild, loading }: FixtureInput
         onChange={(e) => onChange(e.target.value)}
         onKeyDown={handleKeyDown}
         placeholder='{"network": "mainnet", "utxos": [...], "payments": [...], ...}'
-        className="font-mono text-sm min-h-[120px] max-h-[280px] resize-y overflow-y-auto"
+        className="font-mono text-sm min-h-[160px] max-h-[320px] resize-y overflow-y-auto [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-border [&::-webkit-scrollbar-thumb]:rounded-full"
       />
       <div className="flex items-center gap-3">
         <Button
