@@ -1,6 +1,7 @@
 import type { CoinSelectionParams } from "./types.js";
 import type { CoinSelectionResult } from "../types.js";
 import { largestFirst } from "./largest-first.js";
+import { InsufficientFundsError } from "../fee-calculator.js";
 
 const strategies = [largestFirst];
 
@@ -13,7 +14,9 @@ export function selectCoins(params: CoinSelectionParams): CoinSelectionResult {
   }
 
   if (results.length === 0) {
-    throw new Error("No coin selection strategy found a valid solution");
+    const available = params.utxos.reduce((s, u) => s + u.value_sats, 0);
+    const needed = params.payments.reduce((s, p) => s + p.value_sats, 0);
+    throw new InsufficientFundsError(available, needed, 0);
   }
 
   results.sort((a, b) => a.fee - b.fee);
