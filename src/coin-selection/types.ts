@@ -1,4 +1,4 @@
-import type { Utxo, Payment, ChangeTemplate, CoinSelectionResult } from "../types.js";
+import type { Utxo, Payment, ChangeTemplate, CoinSelectionResult } from "../types";
 
 export interface CoinSelectionParams {
   utxos: Utxo[];

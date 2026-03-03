@@ -1,4 +1,4 @@
-import type { ScriptType, Utxo, Payment, ChangeTemplate } from "./types.js";
+import type { ScriptType, Utxo, Payment, ChangeTemplate } from "./types";
 
 const INPUT_VBYTES: Record<string, number> = {
   p2pkh: 148,

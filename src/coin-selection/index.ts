@@ -1,7 +1,7 @@
-import type { CoinSelectionParams } from "./types.js";
-import type { CoinSelectionResult } from "../types.js";
-import { largestFirst } from "./largest-first.js";
-import { InsufficientFundsError } from "../fee-calculator.js";
+import type { CoinSelectionParams } from "./types";
+import type { CoinSelectionResult } from "../types";
+import { largestFirst } from "./largest-first";
+import { InsufficientFundsError } from "../fee-calculator";
 
 const strategies = [largestFirst];
 

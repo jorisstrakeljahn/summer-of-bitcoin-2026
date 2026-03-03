@@ -1,4 +1,4 @@
-import type { Fixture, RbfLocktimeResult } from "./types.js";
+import type { Fixture, RbfLocktimeResult } from "./types";
 
 const SEQUENCE_FINAL = 0xffffffff;
 const SEQUENCE_LOCKTIME_ENABLED = 0xfffffffe;

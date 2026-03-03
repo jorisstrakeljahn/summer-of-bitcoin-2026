@@ -1,5 +1,5 @@
-import type { Utxo, Payment, ChangeTemplate, FeeChangeResult } from "./types.js";
-import { estimateVbytes } from "./vbytes.js";
+import type { Utxo, Payment, ChangeTemplate, FeeChangeResult } from "./types";
+import { estimateVbytes } from "./vbytes";
 
 const DUST_THRESHOLD = 546;
 

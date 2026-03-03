@@ -1,4 +1,4 @@
-import type { Warning } from "./types.js";
+import type { Warning } from "./types";
 
 export function detectWarnings(params: {
   feeSats: number;

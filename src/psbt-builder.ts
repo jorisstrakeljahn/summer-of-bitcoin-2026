@@ -1,5 +1,5 @@
 import * as bitcoin from "bitcoinjs-lib";
-import type { Utxo, OutputEntry, ChangeTemplate, Payment } from "./types.js";
+import type { Utxo, OutputEntry, ChangeTemplate, Payment } from "./types";
 
 export function buildPsbt(params: {
   network: string;

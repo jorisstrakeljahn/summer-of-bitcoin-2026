@@ -1,4 +1,4 @@
-import type { Fixture, ScriptType } from "./types.js";
+import type { Fixture, ScriptType } from "./types";
 
 const VALID_SCRIPT_TYPES: ScriptType[] = [
   "p2pkh",

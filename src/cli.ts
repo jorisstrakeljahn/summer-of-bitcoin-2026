@@ -1,6 +1,6 @@
 import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
 import { basename } from "node:path";
-import { build } from "./builder.js";
+import { build } from "./builder";
 
 function main(): void {
   const args = process.argv.slice(2);

@@ -1,10 +1,10 @@
-import type { Fixture, BuildResult } from "./types.js";
-import { parseFixture, ValidationError } from "./validation.js";
-import { selectCoins } from "./coin-selection/index.js";
-import { computeRbfLocktime } from "./rbf-locktime.js";
-import { buildPsbt } from "./psbt-builder.js";
-import { detectWarnings } from "./warnings.js";
-import { InsufficientFundsError } from "./fee-calculator.js";
+import type { Fixture, BuildResult } from "./types";
+import { parseFixture, ValidationError } from "./validation";
+import { selectCoins } from "./coin-selection/index";
+import { computeRbfLocktime } from "./rbf-locktime";
+import { buildPsbt } from "./psbt-builder";
+import { detectWarnings } from "./warnings";
+import { InsufficientFundsError } from "./fee-calculator";
 
 export function build(fixtureRaw: unknown): BuildResult {
   let fixture: Fixture;
