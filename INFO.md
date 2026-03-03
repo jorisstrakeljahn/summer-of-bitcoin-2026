@@ -47,12 +47,4 @@ out/           CLI output directory (gitignored)
 | `web.sh` | Web server entry point |
 | `setup.sh` | Install dependencies |
 | `grade.sh` | Grading script (DO NOT MODIFY) |
-| `demo.md` | Demo video link (required for submission) |
-
-## Checklist Before Submission
-
-- [ ] `bash grade.sh` → 24/24 passed
-- [ ] `npx vitest run` → 68/68 passed
-- [ ] `./web.sh` starts, /api/health returns `{ "ok": true }`
-- [ ] `demo.md` contains video link (< 2 min, unlisted YouTube/Loom/Drive)
-- [ ] `git push`
+| `demo.md` | Demo video link |
