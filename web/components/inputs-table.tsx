@@ -1,4 +1,8 @@
+"use client";
+
+import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
+import { CopyableText } from "@/components/copyable-text";
 import {
   Table,
   TableBody,
@@ -20,14 +24,24 @@ interface InputsTableProps {
   inputs: SelectedInput[];
 }
 
-function truncate(s: string, len = 14): string {
-  if (s.length <= len) return s;
-  const half = Math.floor((len - 1) / 2);
-  return `${s.slice(0, half)}…${s.slice(-half)}`;
-}
+const INITIAL_VISIBLE = 5;
+const LOAD_MORE_STEP = 10;
 
 export function InputsTable({ inputs }: InputsTableProps) {
+  const [visibleCount, setVisibleCount] = useState(INITIAL_VISIBLE);
   const total = inputs.reduce((s, i) => s + i.value_sats, 0);
+
+  const needsExpansion = inputs.length > INITIAL_VISIBLE;
+  const visible = needsExpansion ? inputs.slice(0, visibleCount) : inputs;
+  const remaining = inputs.length - visibleCount;
+
+  function showMore() {
+    setVisibleCount((prev) => Math.min(prev + LOAD_MORE_STEP, inputs.length));
+  }
+
+  function showAll() {
+    setVisibleCount(inputs.length);
+  }
 
   return (
     <div className="space-y-3">
@@ -51,11 +65,14 @@ export function InputsTable({ inputs }: InputsTableProps) {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {inputs.map((input, i) => (
+            {visible.map((input, i) => (
               <TableRow key={`${input.txid}:${input.vout}`}>
                 <TableCell className="font-mono text-sm text-muted-foreground">{i}</TableCell>
                 <TableCell className="font-mono text-sm">
-                  {truncate(input.txid)}:{input.vout}
+                  <span className="inline-flex items-center gap-0.5">
+                    <CopyableText text={input.txid} truncateLen={16} className="text-sm" />
+                    <span className="text-muted-foreground">:{input.vout}</span>
+                  </span>
                 </TableCell>
                 <TableCell className="text-right font-mono text-sm">
                   {input.value_sats.toLocaleString()}
@@ -67,6 +84,31 @@ export function InputsTable({ inputs }: InputsTableProps) {
                 </TableCell>
               </TableRow>
             ))}
+            {remaining > 0 && (
+              <TableRow>
+                <TableCell colSpan={4} className="text-center py-2">
+                  <span className="inline-flex items-center gap-3">
+                    <button
+                      onClick={showMore}
+                      className="text-xs text-primary hover:text-primary/80 transition-colors cursor-pointer font-medium"
+                    >
+                      +{Math.min(LOAD_MORE_STEP, remaining)} more
+                    </button>
+                    {remaining > LOAD_MORE_STEP && (
+                      <>
+                        <span className="text-muted-foreground text-xs">|</span>
+                        <button
+                          onClick={showAll}
+                          className="text-xs text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+                        >
+                          show all {inputs.length}
+                        </button>
+                      </>
+                    )}
+                  </span>
+                </TableCell>
+              </TableRow>
+            )}
             <TableRow className="bg-muted/50">
               <TableCell colSpan={2} className="text-sm font-medium">Total</TableCell>
               <TableCell className="text-right font-mono text-sm font-medium">

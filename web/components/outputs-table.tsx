@@ -1,4 +1,8 @@
+"use client";
+
+import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
+import { CopyableText } from "@/components/copyable-text";
 import {
   Table,
   TableBody,
@@ -18,17 +22,26 @@ interface OutputEntry {
 
 interface OutputsTableProps {
   outputs: OutputEntry[];
-  changeIndex: number | null;
 }
 
-function truncate(s: string, len = 18): string {
-  if (s.length <= len) return s;
-  const half = Math.floor((len - 1) / 2);
-  return `${s.slice(0, half)}…${s.slice(-half)}`;
-}
+const INITIAL_VISIBLE = 5;
+const LOAD_MORE_STEP = 10;
 
-export function OutputsTable({ outputs, changeIndex }: OutputsTableProps) {
+export function OutputsTable({ outputs }: OutputsTableProps) {
+  const [visibleCount, setVisibleCount] = useState(INITIAL_VISIBLE);
   const total = outputs.reduce((s, o) => s + o.value_sats, 0);
+
+  const needsExpansion = outputs.length > INITIAL_VISIBLE;
+  const visible = needsExpansion ? outputs.slice(0, visibleCount) : outputs;
+  const remaining = outputs.length - visibleCount;
+
+  function showMore() {
+    setVisibleCount((prev) => Math.min(prev + LOAD_MORE_STEP, outputs.length));
+  }
+
+  function showAll() {
+    setVisibleCount(outputs.length);
+  }
 
   return (
     <div className="space-y-3">
@@ -52,16 +65,18 @@ export function OutputsTable({ outputs, changeIndex }: OutputsTableProps) {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {outputs.map((output) => (
+            {visible.map((output) => (
               <TableRow key={output.n}>
                 <TableCell className="font-mono text-sm text-muted-foreground">{output.n}</TableCell>
                 <TableCell className="font-mono text-sm">
-                  {truncate(output.address)}
-                  {output.is_change && (
-                    <Badge className="ml-2 text-xs bg-primary/15 text-primary border-primary/30">
-                      change
-                    </Badge>
-                  )}
+                  <span className="flex items-center gap-1 flex-wrap">
+                    <CopyableText text={output.address} truncateLen={20} />
+                    {output.is_change && (
+                      <Badge className="text-xs bg-primary/15 text-primary border-primary/30">
+                        change
+                      </Badge>
+                    )}
+                  </span>
                 </TableCell>
                 <TableCell className="text-right font-mono text-sm">
                   {output.value_sats.toLocaleString()}
@@ -73,6 +88,31 @@ export function OutputsTable({ outputs, changeIndex }: OutputsTableProps) {
                 </TableCell>
               </TableRow>
             ))}
+            {remaining > 0 && (
+              <TableRow>
+                <TableCell colSpan={4} className="text-center py-2">
+                  <span className="inline-flex items-center gap-3">
+                    <button
+                      onClick={showMore}
+                      className="text-xs text-primary hover:text-primary/80 transition-colors cursor-pointer font-medium"
+                    >
+                      +{Math.min(LOAD_MORE_STEP, remaining)} more
+                    </button>
+                    {remaining > LOAD_MORE_STEP && (
+                      <>
+                        <span className="text-muted-foreground text-xs">|</span>
+                        <button
+                          onClick={showAll}
+                          className="text-xs text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+                        >
+                          show all {outputs.length}
+                        </button>
+                      </>
+                    )}
+                  </span>
+                </TableCell>
+              </TableRow>
+            )}
             <TableRow className="bg-muted/50">
               <TableCell colSpan={2} className="text-sm font-medium">Total</TableCell>
               <TableCell className="text-right font-mono text-sm font-medium">
