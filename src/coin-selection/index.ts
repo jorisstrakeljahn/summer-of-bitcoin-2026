@@ -1,9 +1,11 @@
 import type { CoinSelectionParams } from "./types";
 import type { CoinSelectionResult } from "../types";
 import { largestFirst } from "./largest-first";
+import { branchAndBound } from "./branch-and-bound";
+import { lowestFee } from "./lowest-fee";
 import { InsufficientFundsError } from "../fee-calculator";
 
-const strategies = [largestFirst];
+const strategies = [branchAndBound, lowestFee, largestFirst];
 
 export function selectCoins(params: CoinSelectionParams): CoinSelectionResult {
   const results: CoinSelectionResult[] = [];
