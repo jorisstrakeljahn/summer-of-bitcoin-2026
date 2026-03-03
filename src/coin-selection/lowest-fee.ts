@@ -1,3 +1,16 @@
+/**
+ * Lowest-fee (efficiency-sorted) coin selection.
+ *
+ * Sorts UTXOs by "effective value density" — sats per vbyte of input
+ * cost — and greedily accumulates the most efficient inputs first.
+ * This naturally prefers cheaper script types (P2TR > P2WPKH > P2PKH).
+ *
+ * Trade-offs:
+ *   + Minimizes total fee by preferring cheap-to-spend inputs
+ *   + Prefers modern script types (better for the ecosystem)
+ *   − May select more inputs than largest-first
+ */
+
 import type { CoinSelectionStrategy, CoinSelectionParams } from "./types";
 import type { CoinSelectionResult } from "../types";
 import { inputVbytes } from "../vbytes";

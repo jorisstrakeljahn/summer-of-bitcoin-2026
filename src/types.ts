@@ -1,3 +1,10 @@
+/**
+ * Core type definitions for the PSBT transaction builder.
+ *
+ * Models the fixture input format, the build pipeline's intermediate
+ * representations, and the final JSON report structure.
+ */
+
 export type ScriptType =
   | "p2pkh"
   | "p2sh"
@@ -5,6 +12,8 @@ export type ScriptType =
   | "p2wpkh"
   | "p2wsh"
   | "p2tr";
+
+// ── Fixture input types ────────────────────────────────────────────
 
 export interface Utxo {
   txid: string;
@@ -43,6 +52,8 @@ export interface Fixture {
   current_height?: number;
   policy?: Policy;
 }
+
+// ── Build output types ─────────────────────────────────────────────
 
 export interface OutputEntry {
   n: number;
@@ -83,6 +94,8 @@ export interface BuildError {
 }
 
 export type BuildResult = BuildReport | BuildError;
+
+// ── Internal pipeline types ────────────────────────────────────────
 
 export interface RbfLocktimeResult {
   nSequence: number;

@@ -1,3 +1,17 @@
+/**
+ * Defensive fixture validation.
+ *
+ * Parses raw JSON into a strongly-typed Fixture, rejecting malformed
+ * inputs with structured errors. Every field is validated for type,
+ * range, and format before reaching the build pipeline.
+ *
+ * Design philosophy:
+ *   - Fail fast with descriptive error messages
+ *   - Never pass unchecked data downstream
+ *   - Extra/unknown fields in the fixture are silently ignored
+ *     (forward-compatible with future fixture extensions)
+ */
+
 import type { Fixture, ScriptType } from "./types";
 
 const VALID_SCRIPT_TYPES: ScriptType[] = [
@@ -9,6 +23,8 @@ const VALID_SCRIPT_TYPES: ScriptType[] = [
   "p2tr",
 ];
 
+// ── Validation error ───────────────────────────────────────────────
+
 class ValidationError extends Error {
   constructor(
     public code: string,
@@ -18,6 +34,8 @@ class ValidationError extends Error {
     this.name = "ValidationError";
   }
 }
+
+// ── Type assertion helpers ─────────────────────────────────────────
 
 function assertString(val: unknown, field: string): asserts val is string {
   if (typeof val !== "string" || val.length === 0) {
@@ -99,6 +117,8 @@ function assertObject(val: unknown, field: string): asserts val is Record<string
   }
 }
 
+// ── Main parser ────────────────────────────────────────────────────
+
 export function parseFixture(raw: unknown): Fixture {
   assertObject(raw, "fixture");
 
@@ -166,6 +186,8 @@ export function parseFixture(raw: unknown): Fixture {
   };
 
   assertPositiveNumber(raw.fee_rate_sat_vb, "fee_rate_sat_vb");
+
+  // ── Optional fields ────────────────────────────────────────────
 
   const fixture: Fixture = {
     network: raw.network as string,

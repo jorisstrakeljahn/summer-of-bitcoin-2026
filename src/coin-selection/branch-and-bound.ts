@@ -1,3 +1,22 @@
+/**
+ * Branch-and-Bound coin selection.
+ *
+ * Searches for an input combination that exactly covers payments + fee
+ * without creating a change output. Inspired by Bitcoin Core's
+ * implementation (see: src/wallet/coinselection.cpp).
+ *
+ * The algorithm performs a depth-first search over UTXO subsets,
+ * pruning branches that exceed a "waste" threshold (excess sats that
+ * would be absorbed as fee). Exploration is capped at MAX_TRIES to
+ * bound runtime on large UTXO pools.
+ *
+ * Trade-offs:
+ *   + Eliminates change output (~31 vB saved, better privacy)
+ *   + Optimal when an exact or near-exact match exists
+ *   − Exponential worst-case (mitigated by MAX_TRIES cap)
+ *   − Returns null when no suitable match is found (needs fallback)
+ */
+
 import type { CoinSelectionStrategy, CoinSelectionParams } from "./types";
 import type { CoinSelectionResult, Utxo } from "../types";
 import { estimateVbytes } from "../vbytes";
@@ -12,8 +31,9 @@ export const branchAndBound: CoinSelectionStrategy = {
     const paymentSum = payments.reduce((s, p) => s + p.value_sats, 0);
     const limit = maxInputs ?? utxos.length;
 
-    const sorted = [...utxos].sort((a, b) => b.value_sats - a.value_sats);
-    const available = sorted.slice(0, limit);
+    const candidates = [...utxos]
+      .sort((a, b) => b.value_sats - a.value_sats)
+      .slice(0, limit);
 
     let bestMatch: Utxo[] | null = null;
     let bestWaste = Infinity;
@@ -34,10 +54,10 @@ export const branchAndBound: CoinSelectionStrategy = {
         if (waste <= 0) return;
       }
 
-      for (let i = index; i < available.length; i++) {
+      for (let i = index; i < candidates.length; i++) {
         if (selected.length >= limit) break;
-        selected.push(available[i]);
-        search(i + 1, selected, currentSum + available[i].value_sats);
+        selected.push(candidates[i]);
+        search(i + 1, selected, currentSum + candidates[i].value_sats);
         selected.pop();
       }
     }

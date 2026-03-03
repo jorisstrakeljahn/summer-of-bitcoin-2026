@@ -1,3 +1,13 @@
+/**
+ * CLI entry point for the PSBT transaction builder.
+ *
+ * Usage: cli.sh <fixture.json>
+ *
+ * Reads a fixture file, runs the build pipeline, and writes the JSON
+ * report to out/<fixture_name>.json. On error, writes a structured
+ * error report to the same path and exits with code 1.
+ */
+
 import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
 import { basename } from "node:path";
 import { build } from "./builder";
@@ -16,16 +26,14 @@ function main(): void {
   }
 
   const fixturePath = args[0];
-  const fixtureName = basename(fixturePath);
   const outputDir = "out";
-  const outputPath = `${outputDir}/${fixtureName}`;
+  const outputPath = `${outputDir}/${basename(fixturePath)}`;
 
   mkdirSync(outputDir, { recursive: true });
 
   let rawJson: unknown;
   try {
-    const content = readFileSync(fixturePath, "utf-8");
-    rawJson = JSON.parse(content);
+    rawJson = JSON.parse(readFileSync(fixturePath, "utf-8"));
   } catch (e) {
     const message = e instanceof Error ? e.message : String(e);
     const error = {

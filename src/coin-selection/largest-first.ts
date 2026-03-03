@@ -1,3 +1,17 @@
+/**
+ * Largest-first (greedy) coin selection.
+ *
+ * Sorts UTXOs by value descending and accumulates inputs until the
+ * total covers payments + fees. Simple and reliable — serves as the
+ * fallback when more sophisticated strategies fail.
+ *
+ * Trade-offs:
+ *   + Always finds a solution if one exists
+ *   + Minimizes input count
+ *   − May produce unnecessarily large change outputs
+ *   − Consolidates large UTXOs first (privacy implications)
+ */
+
 import type { CoinSelectionStrategy, CoinSelectionParams } from "./types";
 import type { CoinSelectionResult } from "../types";
 import { calculateFeeAndChange, InsufficientFundsError } from "../fee-calculator";
