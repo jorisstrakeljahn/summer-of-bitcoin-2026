@@ -71,12 +71,12 @@ function makeNode(
     sourcePosition: Position.Right,
     targetPosition: Position.Left,
     style: {
-      background: "#1e293b",
+      background: "var(--card)",
       border: `2px solid ${borderColor}`,
       borderRadius: "8px",
       padding: "8px 12px",
       fontSize: "12px",
-      color: "#e2e8f0",
+      color: "var(--card-foreground)",
       fontFamily: "monospace",
       minWidth: "120px",
       textAlign: "center" as const,
@@ -89,7 +89,7 @@ function makeOverflowNode(id: string, x: number, y: number, count: number, color
   return makeNode(id, x, y, `+${count} more`, color, {
     border: `1px dashed ${color}`,
     fontSize: "11px",
-    color: "#94a3b8",
+    color: "var(--muted-foreground)",
   });
 }
 
@@ -215,7 +215,10 @@ export function TransactionFlow({ report }: TransactionFlowProps) {
       <div>
         <h2 className="text-base font-medium">Transaction Flow</h2>
         <p className="text-sm text-muted-foreground">
-          Value flow from inputs through the transaction to outputs and mining fee.
+          This diagram shows how value moves through the transaction. Inputs (coins from your
+          wallet) flow into the transaction, which distributes them to payment outputs and —
+          if there is leftover — a change output back to you. The mining fee is the difference
+          between total inputs and total outputs.
         </p>
       </div>
       <div className="border rounded-lg overflow-hidden" style={{ height: flowHeight }}>
@@ -234,7 +237,7 @@ export function TransactionFlow({ report }: TransactionFlowProps) {
           zoomOnPinch={false}
           preventScrolling={false}
         >
-          <Background variant={BackgroundVariant.Dots} gap={20} size={1} color="#334155" />
+          <Background variant={BackgroundVariant.Dots} gap={20} size={1} color="var(--border)" />
         </ReactFlow>
       </div>
       <div className="flex items-center gap-4 text-xs text-muted-foreground">
