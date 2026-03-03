@@ -1,3 +1,13 @@
+/**
+ * Copyable text with truncation and expand/collapse.
+ *
+ * Used for long hex strings (txids, addresses, scripts) that need
+ * to be truncated in table cells but should still be fully viewable
+ * and copyable on demand. Renders inline with two interactive
+ * elements: click the text to expand/collapse, click the icon to
+ * copy to clipboard.
+ */
+
 "use client";
 
 import { useState } from "react";

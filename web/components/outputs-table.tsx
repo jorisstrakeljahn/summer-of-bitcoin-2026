@@ -1,8 +1,17 @@
+/**
+ * Transaction outputs table.
+ *
+ * Shows payment destinations and the change output (if any). The
+ * change output is visually tagged so users can distinguish where
+ * funds are going vs. what returns to their wallet.
+ */
+
 "use client";
 
-import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { CopyableText } from "@/components/copyable-text";
+import { ExpandControls } from "@/components/expand-controls";
+import { useProgressiveList } from "@/hooks/use-progressive-list";
 import {
   Table,
   TableBody,
@@ -24,24 +33,11 @@ interface OutputsTableProps {
   outputs: OutputEntry[];
 }
 
-const INITIAL_VISIBLE = 5;
 const LOAD_MORE_STEP = 10;
 
 export function OutputsTable({ outputs }: OutputsTableProps) {
-  const [visibleCount, setVisibleCount] = useState(INITIAL_VISIBLE);
+  const { visible, remaining, showMore, showAll } = useProgressiveList(outputs);
   const total = outputs.reduce((s, o) => s + o.value_sats, 0);
-
-  const needsExpansion = outputs.length > INITIAL_VISIBLE;
-  const visible = needsExpansion ? outputs.slice(0, visibleCount) : outputs;
-  const remaining = outputs.length - visibleCount;
-
-  function showMore() {
-    setVisibleCount((prev) => Math.min(prev + LOAD_MORE_STEP, outputs.length));
-  }
-
-  function showAll() {
-    setVisibleCount(outputs.length);
-  }
 
   return (
     <div className="space-y-3">
@@ -88,31 +84,13 @@ export function OutputsTable({ outputs }: OutputsTableProps) {
                 </TableCell>
               </TableRow>
             ))}
-            {remaining > 0 && (
-              <TableRow>
-                <TableCell colSpan={4} className="text-center py-2">
-                  <span className="inline-flex items-center gap-3">
-                    <button
-                      onClick={showMore}
-                      className="text-xs text-primary hover:text-primary/80 transition-colors cursor-pointer font-medium"
-                    >
-                      +{Math.min(LOAD_MORE_STEP, remaining)} more
-                    </button>
-                    {remaining > LOAD_MORE_STEP && (
-                      <>
-                        <span className="text-muted-foreground text-xs">|</span>
-                        <button
-                          onClick={showAll}
-                          className="text-xs text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
-                        >
-                          show all {outputs.length}
-                        </button>
-                      </>
-                    )}
-                  </span>
-                </TableCell>
-              </TableRow>
-            )}
+            <ExpandControls
+              remaining={remaining}
+              total={outputs.length}
+              step={LOAD_MORE_STEP}
+              onShowMore={showMore}
+              onShowAll={showAll}
+            />
             <TableRow className="bg-muted/50">
               <TableCell colSpan={2} className="text-sm font-medium">Total</TableCell>
               <TableCell className="text-right font-mono text-sm font-medium">

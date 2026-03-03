@@ -1,3 +1,13 @@
+/**
+ * Coin selection strategy comparison table.
+ *
+ * When multiple strategies produce a valid result, this table
+ * shows them side-by-side so users can see the trade-offs between
+ * approaches (fee, virtual size, input count, change presence).
+ * The strategy with the lowest fee is automatically selected and
+ * highlighted.
+ */
+
 import { Badge } from "@/components/ui/badge";
 import {
   Table,
@@ -7,14 +17,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-
-interface StrategySummary {
-  name: string;
-  fee: number;
-  vbytes: number;
-  inputCount: number;
-  hasChange: boolean;
-}
+import type { StrategySummary } from "@/lib/types";
 
 interface StrategyComparisonProps {
   strategies: StrategySummary[];

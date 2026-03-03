@@ -1,28 +1,14 @@
+/**
+ * POST /api/psbt-decode — Decode a PSBT from base64.
+ *
+ * Parses the base64-encoded PSBT using bitcoinjs-lib, extracts the
+ * unsigned transaction fields (version, locktime, inputs, outputs),
+ * and returns them as structured JSON for the frontend viewer.
+ */
+
 import { NextRequest, NextResponse } from "next/server";
 import * as bitcoin from "bitcoinjs-lib";
-
-interface DecodedInput {
-  index: number;
-  txid: string;
-  vout: number;
-  sequence: string;
-  witnessUtxo: { value: number; script: string } | null;
-}
-
-interface DecodedOutput {
-  index: number;
-  value: number;
-  script: string;
-}
-
-interface DecodedPsbt {
-  version: number;
-  locktime: number;
-  inputCount: number;
-  outputCount: number;
-  inputs: DecodedInput[];
-  outputs: DecodedOutput[];
-}
+import type { DecodedPsbt, DecodedInput, DecodedOutput } from "@/lib/types";
 
 export async function POST(request: NextRequest) {
   let body: { psbt_base64?: string };

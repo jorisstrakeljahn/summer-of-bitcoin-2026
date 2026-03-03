@@ -1,3 +1,17 @@
+/**
+ * PSBT viewer with decoded and raw base64 views.
+ *
+ * Fetches the decoded PSBT structure from /api/psbt-decode and
+ * renders it as an interactive card grid. Users can toggle between
+ * the decoded field-level view and the raw base64 string.
+ *
+ * Sub-components:
+ *   FieldLabel   — Label with optional tooltip (BIP field docs)
+ *   InputCard    — Single decoded PSBT input
+ *   OutputCard   — Single decoded PSBT output
+ *   DecodedView  — Full decoded PSBT layout
+ */
+
 "use client";
 
 import { useState, useEffect } from "react";
@@ -8,32 +22,13 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { useProgressiveList } from "@/hooks/use-progressive-list";
+import type { DecodedPsbt, DecodedInput, DecodedOutput } from "@/lib/types";
+
+// ── Constants ──────────────────────────────────────────────────────
 
 interface PsbtViewerProps {
   base64: string;
-}
-
-interface DecodedInput {
-  index: number;
-  txid: string;
-  vout: number;
-  sequence: string;
-  witnessUtxo: { value: number; script: string } | null;
-}
-
-interface DecodedOutput {
-  index: number;
-  value: number;
-  script: string;
-}
-
-interface DecodedPsbt {
-  version: number;
-  locktime: number;
-  inputCount: number;
-  outputCount: number;
-  inputs: DecodedInput[];
-  outputs: DecodedOutput[];
 }
 
 const FIELD_TOOLTIPS: Record<string, string> = {
@@ -45,8 +40,7 @@ const FIELD_TOOLTIPS: Record<string, string> = {
   value: "Amount in satoshis.",
 };
 
-const INITIAL_VISIBLE = 3;
-const LOAD_MORE_STEP = 10;
+// ── Helpers ────────────────────────────────────────────────────────
 
 function truncateHex(hex: string, len = 16): string {
   if (hex.length <= len) return hex;
@@ -54,6 +48,7 @@ function truncateHex(hex: string, len = 16): string {
   return `${hex.slice(0, half)}…${hex.slice(-half)}`;
 }
 
+/** Identifies standard script types by their scriptPubKey pattern. */
 function detectScriptType(script: string): string {
   if (script.startsWith("76a914") && script.endsWith("88ac") && script.length === 50) return "P2PKH";
   if (script.startsWith("a914") && script.endsWith("87") && script.length === 46) return "P2SH";
@@ -62,6 +57,8 @@ function detectScriptType(script: string): string {
   if (script.startsWith("5120") && script.length === 68) return "P2TR";
   return "unknown";
 }
+
+// ── Sub-components ─────────────────────────────────────────────────
 
 function FieldLabel({ name, tooltip }: { name: string; tooltip?: string }) {
   const tip = tooltip ?? FIELD_TOOLTIPS[name];
@@ -141,23 +138,16 @@ function OutputCard({ out }: { out: DecodedOutput }) {
   );
 }
 
-function ExpandableList<T>({
+function ExpandableCardList<T>({
   items,
   renderItem,
   label,
 }: {
   items: T[];
-  renderItem: (item: T, i: number) => React.ReactNode;
+  renderItem: (item: T) => React.ReactNode;
   label: string;
 }) {
-  const [visibleCount, setVisibleCount] = useState(INITIAL_VISIBLE);
-
-  const visible = items.slice(0, visibleCount);
-  const remaining = items.length - visibleCount;
-
-  function showMore() {
-    setVisibleCount((prev) => Math.min(prev + LOAD_MORE_STEP, items.length));
-  }
+  const { visible, remaining, showMore } = useProgressiveList(items, 3);
 
   return (
     <div className="space-y-2">
@@ -166,7 +156,9 @@ function ExpandableList<T>({
         <span className="text-muted-foreground font-normal ml-1">({items.length})</span>
       </p>
       <div className="space-y-2">
-        {visible.map((item, i) => renderItem(item, i))}
+        {visible.map((item, i) => (
+          <div key={i}>{renderItem(item)}</div>
+        ))}
       </div>
       {remaining > 0 && (
         <button
@@ -179,6 +171,8 @@ function ExpandableList<T>({
     </div>
   );
 }
+
+// ── Decoded view ───────────────────────────────────────────────────
 
 function DecodedView({ decoded }: { decoded: DecodedPsbt }) {
   return (
@@ -203,23 +197,25 @@ function DecodedView({ decoded }: { decoded: DecodedPsbt }) {
       </div>
 
       {decoded.inputs.length > 0 && (
-        <ExpandableList
+        <ExpandableCardList
           items={decoded.inputs}
           label="Inputs"
-          renderItem={(inp) => <InputCard key={inp.index} inp={inp} />}
+          renderItem={(inp) => <InputCard inp={inp} />}
         />
       )}
 
       {decoded.outputs.length > 0 && (
-        <ExpandableList
+        <ExpandableCardList
           items={decoded.outputs}
           label="Outputs"
-          renderItem={(out) => <OutputCard key={out.index} out={out} />}
+          renderItem={(out) => <OutputCard out={out} />}
         />
       )}
     </div>
   );
 }
+
+// ── Main component ─────────────────────────────────────────────────
 
 export function PsbtViewer({ base64 }: PsbtViewerProps) {
   const [expanded, setExpanded] = useState(false);
@@ -271,55 +267,19 @@ export function PsbtViewer({ base64 }: PsbtViewerProps) {
             The unsigned transaction encoded as a Partially Signed Bitcoin Transaction (BIP-174).
           </p>
         </div>
-        <div className="flex gap-1 border rounded-md p-0.5 bg-muted/30">
-          <button
-            onClick={() => setView("decoded")}
-            className={`px-2.5 py-1 text-xs rounded transition-colors cursor-pointer ${
-              view === "decoded"
-                ? "bg-background text-foreground shadow-sm"
-                : "text-muted-foreground hover:text-foreground"
-            }`}
-          >
-            Decoded
-          </button>
-          <button
-            onClick={() => setView("base64")}
-            className={`px-2.5 py-1 text-xs rounded transition-colors cursor-pointer ${
-              view === "base64"
-                ? "bg-background text-foreground shadow-sm"
-                : "text-muted-foreground hover:text-foreground"
-            }`}
-          >
-            Base64
-          </button>
-        </div>
+        <ViewToggle view={view} onViewChange={setView} />
       </div>
 
       <div className="border rounded-lg p-4 bg-muted/30">
         {view === "base64" ? (
-          <>
-            <pre className="text-sm font-mono break-all whitespace-pre-wrap text-muted-foreground">
-              {expanded ? base64 : preview}
-            </pre>
-            <div className="flex items-center gap-2 mt-3">
-              <Button variant="outline" size="sm" onClick={handleCopy} className="cursor-pointer">
-                {copied ? "Copied!" : "Copy"}
-              </Button>
-              {base64.length > 120 && (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setExpanded(!expanded)}
-                  className="cursor-pointer"
-                >
-                  {expanded ? "Collapse" : "Show full"}
-                </Button>
-              )}
-              <span className="text-xs text-muted-foreground ml-auto">
-                {base64.length} chars
-              </span>
-            </div>
-          </>
+          <Base64View
+            base64={base64}
+            preview={preview}
+            expanded={expanded}
+            onToggleExpand={() => setExpanded(!expanded)}
+            copied={copied}
+            onCopy={handleCopy}
+          />
         ) : decoded ? (
           <DecodedView decoded={decoded} />
         ) : decodeError ? (
@@ -329,5 +289,80 @@ export function PsbtViewer({ base64 }: PsbtViewerProps) {
         )}
       </div>
     </div>
+  );
+}
+
+// ── Extracted sub-components ───────────────────────────────────────
+
+function ViewToggle({
+  view,
+  onViewChange,
+}: {
+  view: "base64" | "decoded";
+  onViewChange: (v: "base64" | "decoded") => void;
+}) {
+  const options = [
+    { key: "decoded" as const, label: "Decoded" },
+    { key: "base64" as const, label: "Base64" },
+  ];
+
+  return (
+    <div className="flex gap-1 border rounded-md p-0.5 bg-muted/30">
+      {options.map((opt) => (
+        <button
+          key={opt.key}
+          onClick={() => onViewChange(opt.key)}
+          className={`px-2.5 py-1 text-xs rounded transition-colors cursor-pointer ${
+            view === opt.key
+              ? "bg-background text-foreground shadow-sm"
+              : "text-muted-foreground hover:text-foreground"
+          }`}
+        >
+          {opt.label}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+function Base64View({
+  base64,
+  preview,
+  expanded,
+  onToggleExpand,
+  copied,
+  onCopy,
+}: {
+  base64: string;
+  preview: string;
+  expanded: boolean;
+  onToggleExpand: () => void;
+  copied: boolean;
+  onCopy: () => void;
+}) {
+  return (
+    <>
+      <pre className="text-sm font-mono break-all whitespace-pre-wrap text-muted-foreground">
+        {expanded ? base64 : preview}
+      </pre>
+      <div className="flex items-center gap-2 mt-3">
+        <Button variant="outline" size="sm" onClick={onCopy} className="cursor-pointer">
+          {copied ? "Copied!" : "Copy"}
+        </Button>
+        {base64.length > 120 && (
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={onToggleExpand}
+            className="cursor-pointer"
+          >
+            {expanded ? "Collapse" : "Show full"}
+          </Button>
+        )}
+        <span className="text-xs text-muted-foreground ml-auto">
+          {base64.length} chars
+        </span>
+      </div>
+    </>
   );
 }

@@ -1,3 +1,13 @@
+/**
+ * GET /api/fixtures — Serve bundled test fixtures.
+ *
+ * With ?name=<filename>: returns the content of a specific fixture
+ * file from the fixtures/ directory.
+ *
+ * Without parameters: returns a list of all available fixture
+ * filenames for the example picker in the UI.
+ */
+
 import { NextRequest, NextResponse } from "next/server";
 import { readdirSync, readFileSync } from "node:fs";
 import { join, resolve } from "node:path";

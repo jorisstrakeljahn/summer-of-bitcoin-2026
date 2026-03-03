@@ -1,3 +1,22 @@
+/**
+ * Transaction flow diagram.
+ *
+ * Renders a React Flow graph showing how value moves from inputs
+ * through the transaction node to outputs and the mining fee.
+ * Edge thickness is proportional to the value being transferred.
+ *
+ * For transactions with many inputs/outputs, only the first 8 are
+ * shown as individual nodes; the rest are collapsed into a "+N more"
+ * placeholder to keep the diagram readable.
+ *
+ * Color coding:
+ *   Blue   — Inputs (UTXOs being spent)
+ *   Green  — Payment outputs
+ *   Yellow — Change output (back to sender's wallet)
+ *   Red    — Mining fee (value consumed, not an actual output)
+ *   Purple — Transaction node (central hub)
+ */
+
 "use client";
 
 import { useMemo, useCallback } from "react";
@@ -12,15 +31,19 @@ import {
 import "@xyflow/react/dist/style.css";
 import type { BuildReport } from "@/lib/core";
 
-interface TransactionFlowProps {
-  report: BuildReport;
-}
+// ── Color scheme ───────────────────────────────────────────────────
 
-function truncate(s: string, len = 10): string {
-  if (s.length <= len) return s;
-  const half = Math.floor((len - 1) / 2);
-  return `${s.slice(0, half)}…${s.slice(-half)}`;
-}
+const COLORS = {
+  input: "#3b82f6",
+  payment: "#22c55e",
+  change: "#eab308",
+  fee: "#ef4444",
+  tx: "#8b5cf6",
+} as const;
+
+const MAX_VISIBLE = 8;
+
+// ── Helpers ────────────────────────────────────────────────────────
 
 function formatSats(sats: number): string {
   if (sats >= 1_000_000) return `${(sats / 1_000_000).toFixed(2)}M`;
@@ -28,211 +51,160 @@ function formatSats(sats: number): string {
   return `${sats}`;
 }
 
-const INPUT_COLOR = "#3b82f6";
-const PAYMENT_COLOR = "#22c55e";
-const CHANGE_COLOR = "#eab308";
-const FEE_COLOR = "#ef4444";
-const TX_COLOR = "#8b5cf6";
+/**
+ * Creates a flow node with consistent styling.
+ * All nodes share the same dark background and mono font; they
+ * differ only in border color, label, and position.
+ */
+function makeNode(
+  id: string,
+  x: number,
+  y: number,
+  label: string,
+  borderColor: string,
+  overrides: Partial<Node["style"]> = {},
+): Node {
+  return {
+    id,
+    position: { x, y },
+    data: { label },
+    sourcePosition: Position.Right,
+    targetPosition: Position.Left,
+    style: {
+      background: "#1e293b",
+      border: `2px solid ${borderColor}`,
+      borderRadius: "8px",
+      padding: "8px 12px",
+      fontSize: "12px",
+      color: "#e2e8f0",
+      fontFamily: "monospace",
+      minWidth: "120px",
+      textAlign: "center" as const,
+      ...overrides,
+    },
+  };
+}
 
-export function TransactionFlow({ report }: TransactionFlowProps) {
+function makeOverflowNode(id: string, x: number, y: number, count: number, color: string): Node {
+  return makeNode(id, x, y, `+${count} more`, color, {
+    border: `1px dashed ${color}`,
+    fontSize: "11px",
+    color: "#94a3b8",
+  });
+}
+
+function makeEdge(
+  id: string,
+  source: string,
+  target: string,
+  color: string,
+  width: number,
+  dashed = false,
+): Edge {
+  return {
+    id,
+    source,
+    target,
+    animated: false,
+    style: {
+      stroke: color,
+      strokeWidth: width,
+      opacity: dashed ? 0.4 : 0.6,
+      ...(dashed && { strokeDasharray: "4 4" }),
+    },
+  };
+}
+
+// ── Graph builder ──────────────────────────────────────────────────
+
+function buildGraph(report: BuildReport): { nodes: Node[]; edges: Edge[] } {
+  const nodes: Node[] = [];
+  const edges: Edge[] = [];
+
   const totalInput = report.selected_inputs.reduce((s, i) => s + i.value_sats, 0);
+  const edgeWidth = (value: number) => Math.max(1, (value / totalInput) * 6);
 
-  const maxVisible = 8;
-  const inputsToShow = report.selected_inputs.slice(0, maxVisible);
+  const inputsToShow = report.selected_inputs.slice(0, MAX_VISIBLE);
   const hiddenInputs = report.selected_inputs.length - inputsToShow.length;
-  const outputsToShow = report.outputs.slice(0, maxVisible);
+  const outputsToShow = report.outputs.slice(0, MAX_VISIBLE);
   const hiddenOutputs = report.outputs.length - outputsToShow.length;
 
-  const { nodes, edges } = useMemo(() => {
-    const nodeList: Node[] = [];
-    const edgeList: Edge[] = [];
+  const inputCount = inputsToShow.length + (hiddenInputs > 0 ? 1 : 0);
+  const outputCount = outputsToShow.length + (hiddenOutputs > 0 ? 1 : 0) + 1;
+  const maxCount = Math.max(inputCount, outputCount);
+  const spacing = 80;
+  const totalHeight = maxCount * spacing;
+  const inputStartY = (totalHeight - inputCount * spacing) / 2;
+  const outputStartY = (totalHeight - outputCount * spacing) / 2;
 
-    const inputCount = inputsToShow.length + (hiddenInputs > 0 ? 1 : 0);
-    const outputCount = outputsToShow.length + (hiddenOutputs > 0 ? 1 : 0) + 1;
-    const maxCount = Math.max(inputCount, outputCount);
-    const spacing = 80;
-    const totalHeight = maxCount * spacing;
-    const inputStartY = (totalHeight - inputCount * spacing) / 2;
-    const outputStartY = (totalHeight - outputCount * spacing) / 2;
+  // Inputs
+  inputsToShow.forEach((input, i) => {
+    nodes.push(makeNode(`input-${i}`, 0, inputStartY + i * spacing, `${formatSats(input.value_sats)} sats`, COLORS.input));
+    edges.push(makeEdge(`e-input-${i}`, `input-${i}`, "tx", COLORS.input, edgeWidth(input.value_sats)));
+  });
 
-    inputsToShow.forEach((input, i) => {
-      nodeList.push({
-        id: `input-${i}`,
-        position: { x: 0, y: inputStartY + i * spacing },
-        data: {
-          label: `${formatSats(input.value_sats)} sats`,
-        },
-        sourcePosition: Position.Right,
-        targetPosition: Position.Left,
-        style: {
-          background: "#1e293b",
-          border: `2px solid ${INPUT_COLOR}`,
-          borderRadius: "8px",
-          padding: "8px 12px",
-          fontSize: "12px",
-          color: "#e2e8f0",
-          fontFamily: "monospace",
-          minWidth: "120px",
-          textAlign: "center" as const,
-        },
-      });
+  if (hiddenInputs > 0) {
+    const y = inputStartY + inputsToShow.length * spacing;
+    nodes.push(makeOverflowNode("input-more", 0, y, hiddenInputs, COLORS.input));
+    edges.push(makeEdge("e-input-more", "input-more", "tx", COLORS.input, 1, true));
+  }
 
-      const w = Math.max(1, (input.value_sats / totalInput) * 6);
-      edgeList.push({
-        id: `e-input-${i}`,
-        source: `input-${i}`,
-        target: "tx",
-        animated: false,
-        style: { stroke: INPUT_COLOR, strokeWidth: w, opacity: 0.6 },
-      });
-    });
+  // Central TX node
+  nodes.push(makeNode("tx", 220, totalHeight / 2 - 30, `TX\n${report.vbytes} vB`, COLORS.tx, {
+    borderRadius: "12px",
+    padding: "12px 16px",
+    minWidth: "80px",
+    whiteSpace: "pre-line" as const,
+  }));
 
-    if (hiddenInputs > 0) {
-      const idx = inputsToShow.length;
-      nodeList.push({
-        id: "input-more",
-        position: { x: 0, y: inputStartY + idx * spacing },
-        data: { label: `+${hiddenInputs} more` },
-        sourcePosition: Position.Right,
-        targetPosition: Position.Left,
-        style: {
-          background: "#1e293b",
-          border: `1px dashed ${INPUT_COLOR}`,
-          borderRadius: "8px",
-          padding: "8px 12px",
-          fontSize: "11px",
-          color: "#94a3b8",
-          fontFamily: "monospace",
-          minWidth: "120px",
-          textAlign: "center" as const,
-        },
-      });
-      edgeList.push({
-        id: "e-input-more",
-        source: "input-more",
-        target: "tx",
-        style: { stroke: INPUT_COLOR, strokeWidth: 1, strokeDasharray: "4 4", opacity: 0.4 },
-      });
-    }
+  // Outputs
+  outputsToShow.forEach((output, i) => {
+    const color = output.is_change ? COLORS.change : COLORS.payment;
+    const label = output.is_change
+      ? `${formatSats(output.value_sats)} change`
+      : `${formatSats(output.value_sats)} sats`;
 
-    nodeList.push({
-      id: "tx",
-      position: { x: 220, y: totalHeight / 2 - 30 },
-      data: { label: `TX\n${report.vbytes} vB` },
-      sourcePosition: Position.Right,
-      targetPosition: Position.Left,
-      style: {
-        background: "#1e293b",
-        border: `2px solid ${TX_COLOR}`,
-        borderRadius: "12px",
-        padding: "12px 16px",
-        fontSize: "12px",
-        color: "#e2e8f0",
-        fontFamily: "monospace",
-        minWidth: "80px",
-        textAlign: "center" as const,
-        whiteSpace: "pre-line" as const,
-      },
-    });
+    nodes.push(makeNode(`output-${i}`, 440, outputStartY + i * spacing, label, color));
+    edges.push(makeEdge(`e-output-${i}`, "tx", `output-${i}`, color, edgeWidth(output.value_sats)));
+  });
 
-    outputsToShow.forEach((output, i) => {
-      const color = output.is_change ? CHANGE_COLOR : PAYMENT_COLOR;
-      const label = output.is_change
-        ? `${formatSats(output.value_sats)} change`
-        : `${formatSats(output.value_sats)} sats`;
+  if (hiddenOutputs > 0) {
+    const y = outputStartY + outputsToShow.length * spacing;
+    nodes.push(makeOverflowNode("output-more", 440, y, hiddenOutputs, COLORS.payment));
+    edges.push(makeEdge("e-output-more", "tx", "output-more", COLORS.payment, 1, true));
+  }
 
-      nodeList.push({
-        id: `output-${i}`,
-        position: { x: 440, y: outputStartY + i * spacing },
-        data: { label },
-        sourcePosition: Position.Right,
-        targetPosition: Position.Left,
-        style: {
-          background: "#1e293b",
-          border: `2px solid ${color}`,
-          borderRadius: "8px",
-          padding: "8px 12px",
-          fontSize: "12px",
-          color: "#e2e8f0",
-          fontFamily: "monospace",
-          minWidth: "120px",
-          textAlign: "center" as const,
-        },
-      });
+  // Fee node (always last on the output side)
+  const feeIdx = outputsToShow.length + (hiddenOutputs > 0 ? 1 : 0);
+  nodes.push(makeNode("fee", 440, outputStartY + feeIdx * spacing, `${formatSats(report.fee_sats)} fee`, COLORS.fee, {
+    color: COLORS.fee,
+  }));
+  edges.push(makeEdge("e-fee", "tx", "fee", COLORS.fee, edgeWidth(report.fee_sats)));
 
-      const w = Math.max(1, (output.value_sats / totalInput) * 6);
-      edgeList.push({
-        id: `e-output-${i}`,
-        source: "tx",
-        target: `output-${i}`,
-        style: { stroke: color, strokeWidth: w, opacity: 0.6 },
-      });
-    });
+  return { nodes, edges };
+}
 
-    if (hiddenOutputs > 0) {
-      const idx = outputsToShow.length;
-      nodeList.push({
-        id: "output-more",
-        position: { x: 440, y: outputStartY + idx * spacing },
-        data: { label: `+${hiddenOutputs} more` },
-        sourcePosition: Position.Right,
-        targetPosition: Position.Left,
-        style: {
-          background: "#1e293b",
-          border: `1px dashed ${PAYMENT_COLOR}`,
-          borderRadius: "8px",
-          padding: "8px 12px",
-          fontSize: "11px",
-          color: "#94a3b8",
-          fontFamily: "monospace",
-          minWidth: "120px",
-          textAlign: "center" as const,
-        },
-      });
-      edgeList.push({
-        id: "e-output-more",
-        source: "tx",
-        target: "output-more",
-        style: { stroke: PAYMENT_COLOR, strokeWidth: 1, strokeDasharray: "4 4", opacity: 0.4 },
-      });
-    }
+// ── Legend ──────────────────────────────────────────────────────────
 
-    const feeIdx = outputsToShow.length + (hiddenOutputs > 0 ? 1 : 0);
-    nodeList.push({
-      id: "fee",
-      position: { x: 440, y: outputStartY + feeIdx * spacing },
-      data: { label: `${formatSats(report.fee_sats)} fee` },
-      sourcePosition: Position.Right,
-      targetPosition: Position.Left,
-      style: {
-        background: "#1e293b",
-        border: `2px solid ${FEE_COLOR}`,
-        borderRadius: "8px",
-        padding: "8px 12px",
-        fontSize: "12px",
-        color: FEE_COLOR,
-        fontFamily: "monospace",
-        minWidth: "120px",
-        textAlign: "center" as const,
-      },
-    });
+const LEGEND_ITEMS = [
+  { color: COLORS.input, label: "Inputs" },
+  { color: COLORS.payment, label: "Payments" },
+  { color: COLORS.change, label: "Change" },
+  { color: COLORS.fee, label: "Fee" },
+];
 
-    const feeW = Math.max(1, (report.fee_sats / totalInput) * 6);
-    edgeList.push({
-      id: "e-fee",
-      source: "tx",
-      target: "fee",
-      style: { stroke: FEE_COLOR, strokeWidth: feeW, opacity: 0.5 },
-    });
+// ── Main component ─────────────────────────────────────────────────
 
-    return { nodes: nodeList, edges: edgeList };
-  }, [report, inputsToShow, outputsToShow, hiddenInputs, hiddenOutputs, totalInput]);
+interface TransactionFlowProps {
+  report: BuildReport;
+}
 
-  const itemCount = Math.max(
-    inputsToShow.length + (hiddenInputs > 0 ? 1 : 0),
-    outputsToShow.length + (hiddenOutputs > 0 ? 1 : 0) + 1,
-  );
-  const flowHeight = Math.max(300, itemCount * 80 + 40);
+export function TransactionFlow({ report }: TransactionFlowProps) {
+  const { nodes, edges } = useMemo(() => buildGraph(report), [report]);
+
+  const inputCount = Math.min(report.selected_inputs.length, MAX_VISIBLE) + (report.selected_inputs.length > MAX_VISIBLE ? 1 : 0);
+  const outputCount = Math.min(report.outputs.length, MAX_VISIBLE) + (report.outputs.length > MAX_VISIBLE ? 1 : 0) + 1;
+  const flowHeight = Math.max(300, Math.max(inputCount, outputCount) * 80 + 40);
 
   const onInit = useCallback((instance: { fitView: () => void }) => {
     setTimeout(() => instance.fitView(), 50);
@@ -266,18 +238,11 @@ export function TransactionFlow({ report }: TransactionFlowProps) {
         </ReactFlow>
       </div>
       <div className="flex items-center gap-4 text-xs text-muted-foreground">
-        <span className="flex items-center gap-1.5">
-          <span className="w-3 h-3 rounded-sm" style={{ background: INPUT_COLOR }} /> Inputs
-        </span>
-        <span className="flex items-center gap-1.5">
-          <span className="w-3 h-3 rounded-sm" style={{ background: PAYMENT_COLOR }} /> Payments
-        </span>
-        <span className="flex items-center gap-1.5">
-          <span className="w-3 h-3 rounded-sm" style={{ background: CHANGE_COLOR }} /> Change
-        </span>
-        <span className="flex items-center gap-1.5">
-          <span className="w-3 h-3 rounded-sm" style={{ background: FEE_COLOR }} /> Fee
-        </span>
+        {LEGEND_ITEMS.map(({ color, label }) => (
+          <span key={label} className="flex items-center gap-1.5">
+            <span className="w-3 h-3 rounded-sm" style={{ background: color }} /> {label}
+          </span>
+        ))}
       </div>
     </div>
   );

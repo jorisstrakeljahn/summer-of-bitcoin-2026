@@ -1,3 +1,17 @@
+/**
+ * Transaction warnings display.
+ *
+ * Shows safety warnings emitted by the build pipeline as hoverable
+ * badges. Each warning code has a human-readable explanation that
+ * appears in a tooltip on hover.
+ *
+ * Warning codes:
+ *   HIGH_FEE       — Fee exceeds safety thresholds
+ *   SEND_ALL       — No change output, all excess goes to miners
+ *   DUST_CHANGE    — Change below dust threshold (defensive check)
+ *   RBF_SIGNALING  — Transaction is replaceable via BIP-125
+ */
+
 import { Badge } from "@/components/ui/badge";
 import {
   Tooltip,
@@ -25,42 +39,34 @@ interface WarningsDisplayProps {
 }
 
 export function WarningsDisplay({ warnings }: WarningsDisplayProps) {
-  if (warnings.length === 0) {
-    return (
-      <div className="space-y-2">
-        <div>
-          <h2 className="text-base font-medium">Warnings</h2>
-          <p className="text-sm text-muted-foreground">
-            Safety checks for unusual or risky transaction properties.
-          </p>
-        </div>
-        <p className="text-sm text-muted-foreground italic">No warnings — everything looks good.</p>
-      </div>
-    );
-  }
-
   return (
     <div className="space-y-2">
       <div>
         <h2 className="text-base font-medium">Warnings</h2>
         <p className="text-sm text-muted-foreground">
-          Safety checks for unusual or risky transaction properties. Hover for details.
+          Safety checks for unusual or risky transaction properties.
+          {warnings.length > 0 && " Hover for details."}
         </p>
       </div>
-      <div className="flex flex-wrap gap-2">
-        {warnings.map((w, i) => (
-          <Tooltip key={i}>
-            <TooltipTrigger>
-              <Badge variant="outline" className="font-mono text-xs py-1 px-2.5 cursor-help border-primary/40 text-primary">
-                {w.code}
-              </Badge>
-            </TooltipTrigger>
-            <TooltipContent side="bottom" className="max-w-xs text-sm">
-              {WARNING_INFO[w.code] ?? "Unknown warning."}
-            </TooltipContent>
-          </Tooltip>
-        ))}
-      </div>
+
+      {warnings.length === 0 ? (
+        <p className="text-sm text-muted-foreground italic">No warnings — everything looks good.</p>
+      ) : (
+        <div className="flex flex-wrap gap-2">
+          {warnings.map((w, i) => (
+            <Tooltip key={i}>
+              <TooltipTrigger>
+                <Badge variant="outline" className="font-mono text-xs py-1 px-2.5 cursor-help border-primary/40 text-primary">
+                  {w.code}
+                </Badge>
+              </TooltipTrigger>
+              <TooltipContent side="bottom" className="max-w-xs text-sm">
+                {WARNING_INFO[w.code] ?? "Unknown warning."}
+              </TooltipContent>
+            </Tooltip>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

@@ -1,3 +1,15 @@
+/**
+ * Fixture JSON input panel.
+ *
+ * Provides three ways to load a fixture:
+ *   1. Paste or type raw JSON into the textarea
+ *   2. Upload a .json file via the file picker
+ *   3. Click an example button to load a bundled fixture
+ *
+ * Supports Cmd+Enter (or Ctrl+Enter) as a keyboard shortcut
+ * to trigger the build without clicking the button.
+ */
+
 "use client";
 
 import { useRef } from "react";
@@ -41,7 +53,7 @@ export function FixtureInput({ value, onChange, onBuild, loading }: FixtureInput
       const text = await res.text();
       onChange(text);
     } catch {
-      /* ignore */
+      /* network errors are non-critical for example loading */
     }
   }
 
@@ -61,6 +73,7 @@ export function FixtureInput({ value, onChange, onBuild, loading }: FixtureInput
         </p>
       </div>
 
+      {/* Example fixture buttons */}
       <div className="space-y-2">
         <p className="text-sm text-muted-foreground">Examples</p>
         <div className="flex flex-wrap gap-2">
@@ -83,6 +96,8 @@ export function FixtureInput({ value, onChange, onBuild, loading }: FixtureInput
         placeholder='{"network": "mainnet", "utxos": [...], "payments": [...], ...}'
         className="font-mono text-sm min-h-[160px] max-h-[320px] resize-y overflow-y-auto [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-border [&::-webkit-scrollbar-thumb]:rounded-full"
       />
+
+      {/* Action buttons */}
       <div className="flex items-center gap-3">
         <Button
           onClick={onBuild}

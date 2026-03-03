@@ -1,3 +1,14 @@
+/**
+ * Main application page.
+ *
+ * Orchestrates the fixture-to-report flow: the user provides a
+ * fixture JSON, clicks "Build Transaction", and the page renders
+ * the result as a set of visualization components.
+ *
+ * State management is intentionally simple (useState) since the
+ * app has a single linear flow with no cross-page navigation.
+ */
+
 "use client";
 
 import { useState } from "react";
@@ -13,7 +24,7 @@ import { StrategyComparison } from "@/components/strategy-comparison";
 import { PrivacyMeter } from "@/components/privacy-meter";
 import { TransactionFlow } from "@/components/transaction-flow";
 import type { BuildResult } from "@/lib/core";
-import type { StrategySummary } from "@/lib/core";
+import type { StrategySummary } from "@/lib/types";
 
 export default function Home() {
   const [fixture, setFixture] = useState("");
@@ -76,12 +87,14 @@ export default function Home() {
           loading={loading}
         />
 
+        {/* Client-side validation error */}
         {error && (
           <div className="border border-destructive/50 rounded-lg p-4 text-base text-destructive bg-destructive/10">
             {error}
           </div>
         )}
 
+        {/* Build pipeline error (structured) */}
         {result && !result.ok && (
           <div className="border border-destructive/50 rounded-lg p-4 space-y-1 bg-destructive/10">
             <p className="text-base font-medium text-destructive">Build failed</p>
@@ -91,6 +104,7 @@ export default function Home() {
           </div>
         )}
 
+        {/* Successful build result */}
         {report && (
           <div className="space-y-8">
             <Separator />

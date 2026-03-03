@@ -1,3 +1,27 @@
+/**
+ * Privacy meter with heuristic chain-analysis scoring.
+ *
+ * Evaluates how easily a blockchain observer could de-anonymize
+ * the transaction by identifying the change output or linking
+ * inputs to the same wallet. The score (0–100) is based on four
+ * heuristics commonly used by chain-analysis tools:
+ *
+ *   Address Reuse (-30)
+ *     Multiple inputs sharing one address confirm common ownership.
+ *
+ *   Change Type Mismatch (-25)
+ *     If the change output uses a different script type than the
+ *     payments, it's trivially identifiable as change.
+ *
+ *   Single vs. Multi-Input (-20)
+ *     Spending from multiple addresses links them as belonging
+ *     to the same wallet (common-input-ownership heuristic).
+ *
+ *   Excessive Input Merging (-25)
+ *     Consolidating many distinct addresses in a single transaction
+ *     creates a large cluster for chain-analysis.
+ */
+
 "use client";
 
 import { useMemo } from "react";
@@ -7,6 +31,8 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import type { BuildReport } from "@/lib/core";
+
+// ── Types ──────────────────────────────────────────────────────────
 
 interface PrivacyMeterProps {
   report: BuildReport;
@@ -20,12 +46,16 @@ interface PrivacyCheck {
   impact: number;
 }
 
+// ── Analysis ───────────────────────────────────────────────────────
+
 function analyzePrivacy(report: BuildReport): { score: number; checks: PrivacyCheck[] } {
   const checks: PrivacyCheck[] = [];
   let score = 100;
 
   const inputAddresses = report.selected_inputs.map((i) => i.address);
   const uniqueAddresses = new Set(inputAddresses);
+
+  // Heuristic 1: Address reuse
   const hasAddressReuse = uniqueAddresses.size < inputAddresses.length;
   checks.push({
     id: "address_reuse",
@@ -38,6 +68,7 @@ function analyzePrivacy(report: BuildReport): { score: number; checks: PrivacyCh
   });
   if (hasAddressReuse) score -= 30;
 
+  // Heuristic 2: Change type vs. payment type
   const changeOutput = report.outputs.find((o) => o.is_change);
   const paymentTypes = new Set(report.outputs.filter((o) => !o.is_change).map((o) => o.script_type));
   const changeTypeMismatch = changeOutput != null && !paymentTypes.has(changeOutput.script_type);
@@ -54,6 +85,7 @@ function analyzePrivacy(report: BuildReport): { score: number; checks: PrivacyCh
   });
   if (changeTypeMismatch) score -= 25;
 
+  // Heuristic 3: Single input avoids common-input-ownership heuristic
   const singleInput = report.selected_inputs.length === 1;
   checks.push({
     id: "single_input",
@@ -66,6 +98,7 @@ function analyzePrivacy(report: BuildReport): { score: number; checks: PrivacyCh
   });
   if (!singleInput) score -= 20;
 
+  // Heuristic 4: Large-scale address consolidation
   const manyInputsDifferentAddrs = report.selected_inputs.length > 5 && uniqueAddresses.size > 3;
   checks.push({
     id: "input_merging",
@@ -81,26 +114,18 @@ function analyzePrivacy(report: BuildReport): { score: number; checks: PrivacyCh
   return { score: Math.max(0, score), checks };
 }
 
-function ScoreBar({ score }: { score: number }) {
-  const color =
-    score > 70 ? "bg-green-500" :
-    score > 40 ? "bg-yellow-500" :
-    "bg-red-500";
+// ── Sub-components ─────────────────────────────────────────────────
 
-  const label =
-    score > 70 ? "Good" :
-    score > 40 ? "Fair" :
-    "Poor";
+function ScoreBar({ score }: { score: number }) {
+  const color = score > 70 ? "bg-green-500" : score > 40 ? "bg-yellow-500" : "bg-red-500";
+  const label = score > 70 ? "Good" : score > 40 ? "Fair" : "Poor";
+  const textColor = score > 70 ? "text-green-400" : score > 40 ? "text-yellow-400" : "text-red-400";
 
   return (
     <div className="space-y-1.5">
       <div className="flex items-center justify-between">
         <span className="text-2xl font-mono font-semibold">{score}</span>
-        <span className={`text-sm font-medium ${
-          score > 70 ? "text-green-400" :
-          score > 40 ? "text-yellow-400" :
-          "text-red-400"
-        }`}>{label}</span>
+        <span className={`text-sm font-medium ${textColor}`}>{label}</span>
       </div>
       <div className="w-full h-2 bg-muted rounded-full overflow-hidden">
         <div
@@ -111,6 +136,8 @@ function ScoreBar({ score }: { score: number }) {
     </div>
   );
 }
+
+// ── Main component ─────────────────────────────────────────────────
 
 export function PrivacyMeter({ report }: PrivacyMeterProps) {
   const { score, checks } = useMemo(() => analyzePrivacy(report), [report]);

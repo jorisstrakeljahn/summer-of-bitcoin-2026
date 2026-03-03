@@ -1,3 +1,12 @@
+/**
+ * RBF and locktime information cards.
+ *
+ * Displays the Replace-By-Fee signaling status and nLockTime
+ * configuration with human-readable explanations. The locktime
+ * interpretation (block height vs. unix timestamp vs. none) is
+ * derived from the BIP-65 threshold (500,000,000).
+ */
+
 import { Card, CardContent } from "@/components/ui/card";
 import type { BuildReport } from "@/lib/core";
 
@@ -32,9 +41,7 @@ export function RbfLocktimeInfo({ report }: RbfLocktimeInfoProps) {
           <CardContent className="pt-5 pb-4 px-5 space-y-1.5">
             <p className="text-sm text-muted-foreground">Locktime</p>
             <p className="text-base font-medium font-mono">
-              {report.locktime === 0
-                ? "None"
-                : report.locktime.toLocaleString()}
+              {report.locktime === 0 ? "None" : report.locktime.toLocaleString()}
             </p>
             <p className="text-sm text-muted-foreground">
               {report.locktime_type === "none" && "No time restriction — the transaction is valid immediately."}

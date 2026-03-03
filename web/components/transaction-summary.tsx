@@ -1,3 +1,11 @@
+/**
+ * Transaction summary cards.
+ *
+ * Displays the four key metrics of a built transaction at a glance:
+ * fee (absolute + rate), virtual size, input/output count, and the
+ * coin selection strategy that was used.
+ */
+
 import { Card, CardContent } from "@/components/ui/card";
 import type { BuildReport } from "@/lib/core";
 

@@ -1,8 +1,17 @@
+/**
+ * Selected inputs table.
+ *
+ * Displays the UTXOs chosen by the coin selection algorithm, with
+ * progressive expansion for large input sets (e.g. UTXO consolidation
+ * transactions with 100+ inputs).
+ */
+
 "use client";
 
-import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { CopyableText } from "@/components/copyable-text";
+import { ExpandControls } from "@/components/expand-controls";
+import { useProgressiveList } from "@/hooks/use-progressive-list";
 import {
   Table,
   TableBody,
@@ -24,24 +33,11 @@ interface InputsTableProps {
   inputs: SelectedInput[];
 }
 
-const INITIAL_VISIBLE = 5;
 const LOAD_MORE_STEP = 10;
 
 export function InputsTable({ inputs }: InputsTableProps) {
-  const [visibleCount, setVisibleCount] = useState(INITIAL_VISIBLE);
+  const { visible, remaining, showMore, showAll } = useProgressiveList(inputs);
   const total = inputs.reduce((s, i) => s + i.value_sats, 0);
-
-  const needsExpansion = inputs.length > INITIAL_VISIBLE;
-  const visible = needsExpansion ? inputs.slice(0, visibleCount) : inputs;
-  const remaining = inputs.length - visibleCount;
-
-  function showMore() {
-    setVisibleCount((prev) => Math.min(prev + LOAD_MORE_STEP, inputs.length));
-  }
-
-  function showAll() {
-    setVisibleCount(inputs.length);
-  }
 
   return (
     <div className="space-y-3">
@@ -84,31 +80,13 @@ export function InputsTable({ inputs }: InputsTableProps) {
                 </TableCell>
               </TableRow>
             ))}
-            {remaining > 0 && (
-              <TableRow>
-                <TableCell colSpan={4} className="text-center py-2">
-                  <span className="inline-flex items-center gap-3">
-                    <button
-                      onClick={showMore}
-                      className="text-xs text-primary hover:text-primary/80 transition-colors cursor-pointer font-medium"
-                    >
-                      +{Math.min(LOAD_MORE_STEP, remaining)} more
-                    </button>
-                    {remaining > LOAD_MORE_STEP && (
-                      <>
-                        <span className="text-muted-foreground text-xs">|</span>
-                        <button
-                          onClick={showAll}
-                          className="text-xs text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
-                        >
-                          show all {inputs.length}
-                        </button>
-                      </>
-                    )}
-                  </span>
-                </TableCell>
-              </TableRow>
-            )}
+            <ExpandControls
+              remaining={remaining}
+              total={inputs.length}
+              step={LOAD_MORE_STEP}
+              onShowMore={showMore}
+              onShowAll={showAll}
+            />
             <TableRow className="bg-muted/50">
               <TableCell colSpan={2} className="text-sm font-medium">Total</TableCell>
               <TableCell className="text-right font-mono text-sm font-medium">

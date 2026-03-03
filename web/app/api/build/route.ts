@@ -1,3 +1,11 @@
+/**
+ * POST /api/build — Build a transaction from a fixture.
+ *
+ * Accepts a fixture JSON body, runs the full build pipeline
+ * (including all coin selection strategies), and returns the
+ * result along with a strategy comparison summary.
+ */
+
 import { NextRequest, NextResponse } from "next/server";
 import { buildWithStrategies } from "@/lib/core";
 
