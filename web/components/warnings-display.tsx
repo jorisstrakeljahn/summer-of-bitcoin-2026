@@ -29,12 +29,12 @@ export function WarningsDisplay({ warnings }: WarningsDisplayProps) {
     return (
       <div className="space-y-2">
         <div>
-          <h2 className="text-sm font-medium">Warnings</h2>
-          <p className="text-xs text-muted-foreground">
+          <h2 className="text-base font-medium">Warnings</h2>
+          <p className="text-sm text-muted-foreground">
             Safety checks for unusual or risky transaction properties.
           </p>
         </div>
-        <p className="text-xs text-muted-foreground italic">No warnings — everything looks good.</p>
+        <p className="text-sm text-muted-foreground italic">No warnings — everything looks good.</p>
       </div>
     );
   }
@@ -42,8 +42,8 @@ export function WarningsDisplay({ warnings }: WarningsDisplayProps) {
   return (
     <div className="space-y-2">
       <div>
-        <h2 className="text-sm font-medium">Warnings</h2>
-        <p className="text-xs text-muted-foreground">
+        <h2 className="text-base font-medium">Warnings</h2>
+        <p className="text-sm text-muted-foreground">
           Safety checks for unusual or risky transaction properties. Hover for details.
         </p>
       </div>
@@ -51,11 +51,11 @@ export function WarningsDisplay({ warnings }: WarningsDisplayProps) {
         {warnings.map((w, i) => (
           <Tooltip key={i}>
             <TooltipTrigger>
-              <Badge variant="outline" className="font-mono text-xs cursor-help border-primary/40 text-primary">
+              <Badge variant="outline" className="font-mono text-xs py-1 px-2.5 cursor-help border-primary/40 text-primary">
                 {w.code}
               </Badge>
             </TooltipTrigger>
-            <TooltipContent side="bottom" className="max-w-xs text-xs">
+            <TooltipContent side="bottom" className="max-w-xs text-sm">
               {WARNING_INFO[w.code] ?? "Unknown warning."}
             </TooltipContent>
           </Tooltip>

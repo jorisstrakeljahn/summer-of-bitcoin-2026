@@ -8,10 +8,10 @@ interface TransactionSummaryProps {
 function StatCard({ label, value, sub }: { label: string; value: string; sub?: string }) {
   return (
     <Card>
-      <CardContent className="pt-4 pb-3 px-4">
-        <p className="text-xs text-muted-foreground">{label}</p>
-        <p className="text-lg font-semibold font-mono tracking-tight">{value}</p>
-        {sub && <p className="text-xs text-muted-foreground">{sub}</p>}
+      <CardContent className="pt-5 pb-4 px-5">
+        <p className="text-sm text-muted-foreground">{label}</p>
+        <p className="text-xl font-semibold font-mono tracking-tight mt-1">{value}</p>
+        {sub && <p className="text-sm text-muted-foreground mt-0.5">{sub}</p>}
       </CardContent>
     </Card>
   );
@@ -19,10 +19,10 @@ function StatCard({ label, value, sub }: { label: string; value: string; sub?: s
 
 export function TransactionSummary({ report }: TransactionSummaryProps) {
   return (
-    <div className="space-y-2">
+    <div className="space-y-3">
       <div>
-        <h2 className="text-sm font-medium">Transaction Summary</h2>
-        <p className="text-xs text-muted-foreground">
+        <h2 className="text-base font-medium">Transaction Summary</h2>
+        <p className="text-sm text-muted-foreground">
           Overview of the constructed transaction — fees, size, and strategy used.
         </p>
       </div>

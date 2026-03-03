@@ -7,21 +7,21 @@ interface RbfLocktimeInfoProps {
 
 export function RbfLocktimeInfo({ report }: RbfLocktimeInfoProps) {
   return (
-    <div className="space-y-2">
+    <div className="space-y-3">
       <div>
-        <h2 className="text-sm font-medium">RBF &amp; Locktime</h2>
-        <p className="text-xs text-muted-foreground">
+        <h2 className="text-base font-medium">RBF &amp; Locktime</h2>
+        <p className="text-sm text-muted-foreground">
           Replace-By-Fee signaling and time-lock settings for the unsigned transaction.
         </p>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <Card>
-          <CardContent className="pt-4 pb-3 px-4 space-y-1">
-            <p className="text-xs text-muted-foreground">RBF Signaling</p>
-            <p className="text-sm font-medium">
+          <CardContent className="pt-5 pb-4 px-5 space-y-1.5">
+            <p className="text-sm text-muted-foreground">RBF Signaling</p>
+            <p className="text-base font-medium">
               {report.rbf_signaling ? "Active" : "Inactive"}
             </p>
-            <p className="text-xs text-muted-foreground">
+            <p className="text-sm text-muted-foreground">
               {report.rbf_signaling
                 ? "All inputs set nSequence = 0xFFFFFFFD, allowing fee bumping before confirmation."
                 : "Inputs use final sequence — this transaction cannot be replaced via BIP-125."}
@@ -29,14 +29,14 @@ export function RbfLocktimeInfo({ report }: RbfLocktimeInfoProps) {
           </CardContent>
         </Card>
         <Card>
-          <CardContent className="pt-4 pb-3 px-4 space-y-1">
-            <p className="text-xs text-muted-foreground">Locktime</p>
-            <p className="text-sm font-medium font-mono">
+          <CardContent className="pt-5 pb-4 px-5 space-y-1.5">
+            <p className="text-sm text-muted-foreground">Locktime</p>
+            <p className="text-base font-medium font-mono">
               {report.locktime === 0
                 ? "None"
                 : report.locktime.toLocaleString()}
             </p>
-            <p className="text-xs text-muted-foreground">
+            <p className="text-sm text-muted-foreground">
               {report.locktime_type === "none" && "No time restriction — the transaction is valid immediately."}
               {report.locktime_type === "block_height" &&
                 `Locked until block ${report.locktime.toLocaleString()}. The transaction cannot be mined before this height.`}

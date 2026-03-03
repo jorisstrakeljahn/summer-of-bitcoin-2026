@@ -55,20 +55,20 @@ export function FixtureInput({ value, onChange, onBuild, loading }: FixtureInput
   return (
     <div className="space-y-4">
       <div>
-        <h2 className="text-sm font-medium text-foreground">Fixture JSON</h2>
-        <p className="text-xs text-muted-foreground mt-0.5">
+        <h2 className="text-base font-medium text-foreground">Fixture JSON</h2>
+        <p className="text-sm text-muted-foreground mt-0.5">
           Paste a fixture JSON, upload a file, or pick an example below.
         </p>
       </div>
 
-      <div className="space-y-1.5">
-        <p className="text-xs text-muted-foreground">Examples</p>
-        <div className="flex flex-wrap gap-1.5">
+      <div className="space-y-2">
+        <p className="text-sm text-muted-foreground">Examples</p>
+        <div className="flex flex-wrap gap-2">
           {EXAMPLES.map((ex) => (
             <button
               key={ex.file}
               onClick={() => handleExampleSelect(ex.file)}
-              className="px-2 py-1 text-[11px] font-mono rounded-md border border-border bg-muted/50 text-muted-foreground hover:bg-primary/10 hover:text-primary hover:border-primary/30 transition-colors cursor-pointer"
+              className="px-3 py-1.5 text-xs font-mono rounded-md border border-border bg-muted/50 text-muted-foreground hover:bg-primary/10 hover:text-primary hover:border-primary/30 transition-colors cursor-pointer"
             >
               {ex.label}
             </button>
@@ -81,18 +81,20 @@ export function FixtureInput({ value, onChange, onBuild, loading }: FixtureInput
         onChange={(e) => onChange(e.target.value)}
         onKeyDown={handleKeyDown}
         placeholder='{"network": "mainnet", "utxos": [...], "payments": [...], ...}'
-        className="font-mono text-xs min-h-[160px] resize-y"
+        className="font-mono text-sm min-h-[180px] resize-y"
       />
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-3">
         <Button
           onClick={onBuild}
           disabled={loading || !value.trim()}
+          size="lg"
           className="cursor-pointer"
         >
           {loading ? "Building..." : "Build Transaction"}
         </Button>
         <Button
           variant="outline"
+          size="lg"
           onClick={() => fileInputRef.current?.click()}
           className="cursor-pointer"
         >
@@ -105,7 +107,7 @@ export function FixtureInput({ value, onChange, onBuild, loading }: FixtureInput
           onChange={handleFileUpload}
           className="hidden"
         />
-        <span className="text-xs text-muted-foreground ml-auto hidden sm:inline">
+        <span className="text-sm text-muted-foreground ml-auto hidden sm:inline">
           Cmd+Enter to build
         </span>
       </div>
