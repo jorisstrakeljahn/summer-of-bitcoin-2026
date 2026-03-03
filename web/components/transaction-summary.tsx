@@ -8,10 +8,10 @@ interface TransactionSummaryProps {
 function StatCard({ label, value, sub }: { label: string; value: string; sub?: string }) {
   return (
     <Card>
-      <CardContent className="pt-5 pb-4 px-5">
-        <p className="text-sm text-muted-foreground">{label}</p>
-        <p className="text-xl font-semibold font-mono tracking-tight mt-1">{value}</p>
-        {sub && <p className="text-sm text-muted-foreground mt-0.5">{sub}</p>}
+      <CardContent className="pt-3 pb-2.5 px-4">
+        <p className="text-xs text-muted-foreground">{label}</p>
+        <p className="text-base font-semibold font-mono tracking-tight mt-0.5">{value}</p>
+        {sub && <p className="text-xs text-muted-foreground">{sub}</p>}
       </CardContent>
     </Card>
   );

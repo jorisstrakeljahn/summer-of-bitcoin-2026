@@ -81,7 +81,7 @@ export function FixtureInput({ value, onChange, onBuild, loading }: FixtureInput
         onChange={(e) => onChange(e.target.value)}
         onKeyDown={handleKeyDown}
         placeholder='{"network": "mainnet", "utxos": [...], "payments": [...], ...}'
-        className="font-mono text-sm min-h-[180px] resize-y"
+        className="font-mono text-sm min-h-[120px] max-h-[280px] resize-y overflow-y-auto"
       />
       <div className="flex items-center gap-3">
         <Button
