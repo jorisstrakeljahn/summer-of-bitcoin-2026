@@ -10,6 +10,8 @@ import { OutputsTable } from "@/components/outputs-table";
 import { RbfLocktimeInfo } from "@/components/rbf-locktime-info";
 import { PsbtViewer } from "@/components/psbt-viewer";
 import { StrategyComparison } from "@/components/strategy-comparison";
+import { PrivacyMeter } from "@/components/privacy-meter";
+import { TransactionFlow } from "@/components/transaction-flow";
 import type { BuildResult } from "@/lib/core";
 import type { StrategySummary } from "@/lib/core";
 
@@ -93,12 +95,14 @@ export default function Home() {
           <div className="space-y-8">
             <Separator />
             <TransactionSummary report={report} />
+            <TransactionFlow report={report} />
             {strategies.length > 1 && (
               <StrategyComparison strategies={strategies} selected={report.strategy} />
             )}
             <WarningsDisplay warnings={report.warnings} />
+            <PrivacyMeter report={report} />
             <InputsTable inputs={report.selected_inputs} />
-            <OutputsTable outputs={report.outputs} changeIndex={report.change_index} />
+            <OutputsTable outputs={report.outputs} />
             <RbfLocktimeInfo report={report} />
             <PsbtViewer base64={report.psbt_base64} />
           </div>
