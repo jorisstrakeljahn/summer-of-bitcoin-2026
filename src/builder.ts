@@ -1,6 +1,6 @@
-import type { Fixture, BuildResult } from "./types";
+import type { Fixture, BuildResult, CoinSelectionResult } from "./types";
 import { parseFixture, ValidationError } from "./validation";
-import { selectCoins } from "./coin-selection/index";
+import { selectCoins, selectCoinsAllStrategies } from "./coin-selection/index";
 import { computeRbfLocktime } from "./rbf-locktime";
 import { buildPsbt } from "./psbt-builder";
 import { detectWarnings } from "./warnings";
@@ -86,4 +86,41 @@ export function build(fixtureRaw: unknown): BuildResult {
       error: { code: "BUILD_ERROR", message },
     };
   }
+}
+
+export interface StrategySummary {
+  name: string;
+  fee: number;
+  vbytes: number;
+  inputCount: number;
+  hasChange: boolean;
+}
+
+export function buildWithStrategies(
+  fixtureRaw: unknown,
+): { result: BuildResult; strategies: StrategySummary[] } {
+  const result = build(fixtureRaw);
+
+  let strategies: StrategySummary[] = [];
+  try {
+    const fixture = parseFixture(fixtureRaw);
+    const allResults = selectCoinsAllStrategies({
+      utxos: fixture.utxos,
+      payments: fixture.payments,
+      change: fixture.change,
+      feeRate: fixture.fee_rate_sat_vb,
+      maxInputs: fixture.policy?.max_inputs,
+    });
+    strategies = allResults.map((r) => ({
+      name: r.strategyName,
+      fee: r.fee,
+      vbytes: r.vbytes,
+      inputCount: r.selectedUtxos.length,
+      hasChange: r.changeAmount !== null,
+    }));
+  } catch {
+    /* strategies stay empty on error */
+  }
+
+  return { result, strategies };
 }

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { build } from "@/lib/core";
+import { buildWithStrategies } from "@/lib/core";
 
 export async function POST(request: NextRequest) {
   let body: unknown;
@@ -12,6 +12,6 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const result = build(body);
-  return NextResponse.json(result);
+  const { result, strategies } = buildWithStrategies(body);
+  return NextResponse.json({ ...result, strategies });
 }
