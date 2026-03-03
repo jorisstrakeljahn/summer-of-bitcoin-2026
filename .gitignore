@@ -3,3 +3,5 @@ node_modules/
 __pycache__/
 target/
 .env
+AGENTS.md
+PLAN.md
