@@ -5,17 +5,18 @@
  *
  * 1. Script type matching: change output typically matches the input script type
  * 2. Round number analysis: payment amounts tend to be round, change is not
- * 3. Single-match: if exactly one output matches the input script type while
- *    others don't, that output is very likely change
+ * 3. Output position: Bitcoin Core randomizes change position (index 0 or 1),
+ *    so position alone is weak but combined with other signals adds confidence
+ * 4. Value analysis: change is the "leftover" and tends to be non-round
  *
  * Confidence levels:
  * - "high": single unambiguous match via script type + round number agreement
- * - "medium": script type match but multiple candidates
- * - "low": only round number heuristic, no script type signal
+ * - "medium": script type match but multiple candidates or all same type
+ * - "low": only round number or position heuristic, no script type signal
  */
 
 import type { Heuristic, HeuristicResult, TransactionContext } from "./types.js";
-import type { OutputScriptType } from "../lib/types.js";
+import { isRoundAmount, dominantScriptType } from "./utils.js";
 
 export interface ChangeDetectionResult extends HeuristicResult {
   detected: boolean;
@@ -24,43 +25,13 @@ export interface ChangeDetectionResult extends HeuristicResult {
   confidence?: "high" | "medium" | "low";
 }
 
-const ROUND_THRESHOLDS = [
-  100_000_000,  // 1 BTC
-  10_000_000,   // 0.1 BTC
-  1_000_000,    // 0.01 BTC
-  100_000,      // 0.001 BTC
-  10_000,       // 0.0001 BTC
-];
-
-function isRoundAmount(sats: number): boolean {
-  return ROUND_THRESHOLDS.some(t => sats > 0 && sats % t === 0);
-}
-
-function dominantInputType(types: OutputScriptType[]): OutputScriptType | null {
-  const counts = new Map<OutputScriptType, number>();
-  for (const t of types) {
-    counts.set(t, (counts.get(t) ?? 0) + 1);
-  }
-
-  let best: OutputScriptType | null = null;
-  let bestCount = 0;
-  for (const [type, count] of counts) {
-    if (count > bestCount) {
-      best = type;
-      bestCount = count;
-    }
-  }
-  return best;
-}
-
 function analyze(ctx: TransactionContext): ChangeDetectionResult {
   if (ctx.isCoinbase || ctx.tx.outputs.length < 2) {
     return { detected: false };
   }
 
-  const inputType = dominantInputType(ctx.inputScriptTypes);
+  const inputType = dominantScriptType(ctx.inputScriptTypes);
 
-  // Find outputs matching the dominant input script type (excluding op_return)
   const scriptMatches: number[] = [];
   for (let i = 0; i < ctx.outputScriptTypes.length; i++) {
     if (ctx.outputScriptTypes[i] === inputType && ctx.outputScriptTypes[i] !== "op_return") {
@@ -68,7 +39,6 @@ function analyze(ctx: TransactionContext): ChangeDetectionResult {
     }
   }
 
-  // Find non-round outputs (candidates for change by round number heuristic)
   const nonRoundIndices: number[] = [];
   for (let i = 0; i < ctx.outputValues.length; i++) {
     if (ctx.outputScriptTypes[i] === "op_return") continue;
@@ -79,17 +49,14 @@ function analyze(ctx: TransactionContext): ChangeDetectionResult {
 
   // Strategy 1: Single script type match among differently-typed outputs
   if (scriptMatches.length === 1) {
-    const idx = scriptMatches[0];
     const allSameType = ctx.outputScriptTypes.every(
-      (t, i) => t === "op_return" || t === ctx.outputScriptTypes[0]
+      t => t === "op_return" || t === ctx.outputScriptTypes[0]
     );
-    const confidence = allSameType ? "medium" : "high";
-
     return {
       detected: true,
-      likely_change_index: idx,
+      likely_change_index: scriptMatches[0],
       method: "script_type_match",
-      confidence,
+      confidence: allSameType ? "medium" : "high",
     };
   }
 
@@ -106,8 +73,6 @@ function analyze(ctx: TransactionContext): ChangeDetectionResult {
       };
     }
 
-    // Multiple script matches, pick the one with the smallest non-round value
-    // (change tends to be the "leftover" amount)
     if (nonRoundScriptMatches.length > 1) {
       return {
         detected: true,
@@ -125,12 +90,30 @@ function analyze(ctx: TransactionContext): ChangeDetectionResult {
     };
   }
 
-  // Strategy 3: No script type signal, fall back to round number only
+  // Strategy 3: Round number only — the non-round output is likely change
   if (nonRoundIndices.length === 1) {
     return {
       detected: true,
       likely_change_index: nonRoundIndices[0],
       method: "round_number_analysis",
+      confidence: "low",
+    };
+  }
+
+  // Strategy 4: Output position heuristic for 2-output transactions
+  // When no other signal is available, the smaller output in a 2-output
+  // tx is more likely the payment (users think in round-ish amounts).
+  const realOutputs = ctx.outputValues
+    .map((v, i) => ({ index: i, value: v, type: ctx.outputScriptTypes[i] }))
+    .filter(o => o.type !== "op_return" && o.value > 0);
+
+  if (realOutputs.length === 2) {
+    const [a, b] = realOutputs;
+    const largerIdx = a.value >= b.value ? a.index : b.index;
+    return {
+      detected: true,
+      likely_change_index: largerIdx,
+      method: "output_value_analysis",
       confidence: "low",
     };
   }

@@ -7,22 +7,11 @@
  */
 
 import type { Heuristic, HeuristicResult, TransactionContext } from "./types.js";
+import { isRoundAmount } from "./utils.js";
 
 export interface RoundNumberResult extends HeuristicResult {
   detected: boolean;
   round_outputs?: number[];
-}
-
-const ROUND_THRESHOLDS = [
-  100_000_000,  // 1 BTC
-  10_000_000,   // 0.1 BTC
-  1_000_000,    // 0.01 BTC
-  100_000,      // 0.001 BTC
-  10_000,       // 0.0001 BTC
-];
-
-function isRoundAmount(sats: number): boolean {
-  return ROUND_THRESHOLDS.some(t => sats > 0 && sats % t === 0);
 }
 
 function analyze(ctx: TransactionContext): RoundNumberResult {

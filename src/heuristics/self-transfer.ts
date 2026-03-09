@@ -7,23 +7,15 @@
  * - All non-OP_RETURN outputs match the dominant input script type
  * - 1-2 outputs (no batch payment pattern)
  * - No round-number outputs suggesting external payments
+ * - Total output value is close to total input value (high fee ratio
+ *   would be unusual for a self-transfer)
  */
 
 import type { Heuristic, HeuristicResult, TransactionContext } from "./types.js";
-import type { OutputScriptType } from "../lib/types.js";
+import { isRoundAmount, dominantScriptType } from "./utils.js";
 
 export interface SelfTransferResult extends HeuristicResult {
   detected: boolean;
-}
-
-const ROUND_THRESHOLDS = [
-  100_000_000,
-  10_000_000,
-  1_000_000,
-];
-
-function isRoundAmount(sats: number): boolean {
-  return ROUND_THRESHOLDS.some(t => sats > 0 && sats % t === 0);
 }
 
 function analyze(ctx: TransactionContext): SelfTransferResult {
@@ -40,26 +32,23 @@ function analyze(ctx: TransactionContext): SelfTransferResult {
     return { detected: false };
   }
 
-  // Find dominant input type
-  const inputTypeCounts = new Map<OutputScriptType, number>();
-  for (const t of ctx.inputScriptTypes) {
-    inputTypeCounts.set(t, (inputTypeCounts.get(t) ?? 0) + 1);
-  }
-  let dominantType: OutputScriptType = ctx.inputScriptTypes[0];
-  let maxCount = 0;
-  for (const [t, c] of inputTypeCounts) {
-    if (c > maxCount) { dominantType = t; maxCount = c; }
-  }
-
-  // All real outputs must match the dominant input type
-  const allMatch = realOutputTypes.every(t => t === dominantType);
-  if (!allMatch) {
+  const dominant = dominantScriptType(ctx.inputScriptTypes);
+  if (!dominant) {
     return { detected: false };
   }
 
-  // If any output is a round amount, it looks more like a payment
-  const hasRound = realOutputValues.some(v => isRoundAmount(v));
-  if (hasRound) {
+  if (!realOutputTypes.every(t => t === dominant)) {
+    return { detected: false };
+  }
+
+  if (realOutputValues.some(v => isRoundAmount(v))) {
+    return { detected: false };
+  }
+
+  // Fee sanity check: self-transfers don't typically overpay fees.
+  // If fee is more than 5% of total input, it's suspicious.
+  const totalIn = ctx.inputValues.reduce((s, v) => s + v, 0);
+  if (totalIn > 0 && ctx.fee / totalIn > 0.05) {
     return { detected: false };
   }
 
