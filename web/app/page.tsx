@@ -8,12 +8,14 @@ import { FeeRateChart } from "@/components/charts/fee-rate-chart";
 import { HeuristicChart } from "@/components/charts/heuristic-chart";
 import { ScriptTypeChart } from "@/components/charts/script-type-chart";
 import { TransactionExplorer } from "@/components/explorer/transaction-explorer";
+import { FlowModal } from "@/components/flow/flow-modal";
 import { useFiles, useAnalysis, useStats } from "@/lib/hooks/use-analysis";
 
 export default function Dashboard() {
   const { files } = useFiles();
   const [activeStem, setActiveStem] = useState<string | null>(null);
   const [activeBlockIdx, setActiveBlockIdx] = useState<number | null>(null);
+  const [flowTxid, setFlowTxid] = useState<string | null>(null);
 
   useEffect(() => {
     if (files.length > 0 && !activeStem) {
@@ -132,6 +134,7 @@ export default function Dashboard() {
                     <TransactionExplorer
                       stem={activeStem}
                       blockIdx={activeBlockIdx}
+                      onViewGraph={(txid) => setFlowTxid(txid)}
                     />
                   </>
                 )}
@@ -140,6 +143,14 @@ export default function Dashboard() {
           </div>
         </main>
       </div>
+
+      {flowTxid && activeStem && (
+        <FlowModal
+          stem={activeStem}
+          txid={flowTxid}
+          onClose={() => setFlowTxid(null)}
+        />
+      )}
     </div>
   );
 }
