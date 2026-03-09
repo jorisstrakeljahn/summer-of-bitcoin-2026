@@ -39,7 +39,7 @@ export function parseBlockUndo(reader: BufferReader): BlockUndo {
 
 function readUndoCoin(reader: BufferReader): UndoPrevout {
   const nCode = readCoreVarInt(reader);
-  const height = nCode >>> 1;
+  const height = Math.floor(nCode / 2);
 
   if (height > 0) {
     readCoreVarInt(reader);
@@ -60,7 +60,8 @@ function readCoreVarInt(reader: BufferReader): number {
   let n = 0;
   for (;;) {
     const b = reader.readUInt8();
-    n = (n << 7) | (b & 0x7f);
+    // Use arithmetic instead of bitwise shift to avoid 32-bit overflow
+    n = n * 128 + (b & 0x7f);
     if ((b & 0x80) === 0) return n;
     n++;
   }
