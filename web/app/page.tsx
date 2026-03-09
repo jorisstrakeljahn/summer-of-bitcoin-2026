@@ -7,6 +7,7 @@ import { ClassificationChart } from "@/components/charts/classification-chart";
 import { FeeRateChart } from "@/components/charts/fee-rate-chart";
 import { HeuristicChart } from "@/components/charts/heuristic-chart";
 import { ScriptTypeChart } from "@/components/charts/script-type-chart";
+import { TransactionExplorer } from "@/components/explorer/transaction-explorer";
 import { useFiles, useAnalysis, useStats } from "@/lib/hooks/use-analysis";
 
 export default function Dashboard() {
@@ -118,18 +119,21 @@ export default function Dashboard() {
                   </>
                 )}
 
-                {activeBlockIdx !== null && activeBlock && (
-                  <div className="rounded-xl border bg-card p-5">
-                    <h3 className="text-sm font-semibold">
-                      Block #{activeBlock.block_height.toLocaleString()}
-                    </h3>
-                    <p className="mt-1 font-mono text-xs text-muted-foreground">
-                      {activeBlock.block_hash}
-                    </p>
-                    <p className="mt-2 text-sm text-muted-foreground">
-                      Transaction explorer loading below...
-                    </p>
-                  </div>
+                {activeBlockIdx !== null && activeBlock && activeStem && (
+                  <>
+                    <div className="rounded-xl border bg-card p-5">
+                      <h3 className="text-sm font-semibold">
+                        Block #{activeBlock.block_height.toLocaleString()}
+                      </h3>
+                      <p className="mt-1 font-mono text-xs text-muted-foreground break-all">
+                        {activeBlock.block_hash}
+                      </p>
+                    </div>
+                    <TransactionExplorer
+                      stem={activeStem}
+                      blockIdx={activeBlockIdx}
+                    />
+                  </>
                 )}
               </>
             )}
