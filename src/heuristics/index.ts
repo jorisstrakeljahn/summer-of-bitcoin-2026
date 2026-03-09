@@ -92,6 +92,8 @@ export function buildTransactionContext(
   };
 }
 
+const DETECTED_TRUE: HeuristicResult = { detected: true };
+
 export function analyzeTransaction(ctx: TransactionContext): TransactionAnalysis {
   const allResults: Record<string, HeuristicResult> = {};
   const compactResults: Record<string, HeuristicResult> = {};
@@ -100,7 +102,7 @@ export function analyzeTransaction(ctx: TransactionContext): TransactionAnalysis
     const result = heuristic.analyze(ctx);
     allResults[heuristic.id] = result;
     if (result.detected) {
-      compactResults[heuristic.id] = result;
+      compactResults[heuristic.id] = DETECTED_TRUE;
     }
   }
 
