@@ -77,6 +77,7 @@ function analyzeBlock(
   const blockAnalysis: BlockAnalysis = {
     block_hash: block.header.blockHash,
     block_height: height,
+    block_timestamp: block.header.timestamp,
     tx_count: block.transactions.length,
     analysis_summary: {
       total_transactions_analyzed: block.transactions.length,

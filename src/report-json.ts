@@ -15,6 +15,7 @@ import {
 export interface BlockAnalysis {
   block_hash: string;
   block_height: number;
+  block_timestamp: number;
   tx_count: number;
   analysis_summary: AnalysisSummary;
   transactions: TransactionAnalysis[];
