@@ -3,6 +3,8 @@
 import { useState, useEffect } from "react";
 import { X } from "lucide-react";
 import { TransactionFlow } from "./transaction-flow";
+import { InfoButton } from "@/components/info-panel";
+import { INFO } from "@/lib/info-content";
 import type { TxDetailResponse } from "@/lib/block-cache-types";
 import { truncateTxid } from "@/lib/utils";
 
@@ -40,13 +42,18 @@ export function FlowModal({ stem, txid, onClose }: Props) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-      <div className="relative mx-4 flex h-[80vh] w-full max-w-5xl flex-col rounded-2xl border bg-background shadow-2xl">
+      <div className="relative mx-4 flex h-[80vh] w-full max-w-5xl flex-col rounded-lg border bg-background shadow-2xl">
         <div className="flex items-center justify-between border-b px-5 py-3">
-          <div>
-            <h2 className="text-sm font-semibold">Transaction Graph</h2>
-            <p className="font-mono text-xs text-muted-foreground">
-              {truncateTxid(txid, 16)}
-            </p>
+          <div className="flex items-center gap-2">
+            <div>
+              <h2 className="text-sm font-semibold">Transaction Graph</h2>
+              <p className="font-mono text-xs text-muted-foreground">
+                {truncateTxid(txid, 16)}
+              </p>
+            </div>
+            <InfoButton title={INFO.transactionGraph.title}>
+              {INFO.transactionGraph.body}
+            </InfoButton>
           </div>
           <button
             onClick={onClose}

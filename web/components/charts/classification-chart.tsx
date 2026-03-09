@@ -8,6 +8,8 @@ import {
   Tooltip,
 } from "recharts";
 import { CLASSIFICATION_COLORS, CLASSIFICATION_LABELS } from "@/lib/constants";
+import { InfoButton } from "@/components/info-panel";
+import { INFO } from "@/lib/info-content";
 import type { ClassificationDistribution, TransactionClassification } from "@/lib/types";
 
 interface Props {
@@ -28,8 +30,13 @@ export function ClassificationChart({ data }: Props) {
   }));
 
   return (
-    <div className="rounded-xl border bg-card p-5">
-      <h3 className="text-sm font-semibold">Classification Distribution</h3>
+    <div className="rounded-lg border bg-card p-5">
+      <div className="flex items-center gap-2">
+        <h3 className="flex-1 text-sm font-semibold">Classification Distribution</h3>
+        <InfoButton title={INFO.classificationDistribution.title}>
+          {INFO.classificationDistribution.body}
+        </InfoButton>
+      </div>
       <div className="mt-4 flex items-center gap-4">
         <div className="relative h-48 w-48 shrink-0">
           <ResponsiveContainer width="100%" height="100%">
@@ -52,7 +59,7 @@ export function ClassificationChart({ data }: Props) {
                 contentStyle={{
                   backgroundColor: "var(--card)",
                   border: "1px solid var(--border)",
-                  borderRadius: "8px",
+                  borderRadius: "6px",
                   fontSize: "12px",
                 }}
                 formatter={(value: number) => [

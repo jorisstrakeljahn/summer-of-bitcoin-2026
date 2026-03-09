@@ -6,6 +6,8 @@ import { TransactionRow } from "./transaction-row";
 import { useTransactions } from "@/lib/hooks/use-analysis";
 import { useDebounce } from "@/lib/hooks/use-debounce";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { InfoButton } from "@/components/info-panel";
+import { INFO } from "@/lib/info-content";
 
 interface Props {
   stem: string;
@@ -38,9 +40,14 @@ export function TransactionExplorer({ stem, blockIdx, onViewGraph }: Props) {
   };
 
   return (
-    <div className="rounded-xl border bg-card">
+    <div className="rounded-lg border bg-card">
       <div className="border-b px-4 py-3">
-        <h3 className="text-sm font-semibold">Transaction Explorer</h3>
+        <div className="flex items-center gap-2">
+          <h3 className="flex-1 text-sm font-semibold">Transaction Explorer</h3>
+          <InfoButton title={INFO.transactionExplorer.title}>
+            {INFO.transactionExplorer.body}
+          </InfoButton>
+        </div>
         <div className="mt-3">
           <FilterBar
             classificationFilter={classificationFilter}

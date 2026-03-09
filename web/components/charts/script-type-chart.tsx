@@ -7,6 +7,8 @@ import {
   ResponsiveContainer,
   Tooltip,
 } from "recharts";
+import { InfoButton } from "@/components/info-panel";
+import { INFO } from "@/lib/info-content";
 
 const SCRIPT_COLORS: Record<string, string> = {
   p2wpkh: "#3b82f6",
@@ -46,8 +48,13 @@ export function ScriptTypeChart({ distribution }: Props) {
   }));
 
   return (
-    <div className="rounded-xl border bg-card p-5">
-      <h3 className="text-sm font-semibold">Script Type Distribution</h3>
+    <div className="rounded-lg border bg-card p-5">
+      <div className="flex items-center gap-2">
+        <h3 className="flex-1 text-sm font-semibold">Script Type Distribution</h3>
+        <InfoButton title={INFO.scriptTypeDistribution.title}>
+          {INFO.scriptTypeDistribution.body}
+        </InfoButton>
+      </div>
       <div className="mt-4 flex items-center gap-4">
         <div className="h-48 w-48 shrink-0">
           <ResponsiveContainer width="100%" height="100%">
@@ -70,7 +77,7 @@ export function ScriptTypeChart({ distribution }: Props) {
                 contentStyle={{
                   backgroundColor: "var(--card)",
                   border: "1px solid var(--border)",
-                  borderRadius: "8px",
+                  borderRadius: "6px",
                   fontSize: "12px",
                 }}
                 formatter={(value: number) => [

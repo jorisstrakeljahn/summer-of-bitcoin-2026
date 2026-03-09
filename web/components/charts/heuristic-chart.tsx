@@ -10,6 +10,8 @@ import {
   Cell,
 } from "recharts";
 import { HEURISTIC_COLORS, HEURISTIC_LABELS } from "@/lib/constants";
+import { InfoButton } from "@/components/info-panel";
+import { INFO } from "@/lib/info-content";
 import type { HeuristicId } from "@/lib/types";
 
 interface Props {
@@ -27,8 +29,13 @@ export function HeuristicChart({ detections }: Props) {
     }));
 
   return (
-    <div className="rounded-xl border bg-card p-5">
-      <h3 className="text-sm font-semibold">Heuristic Detections</h3>
+    <div className="rounded-lg border bg-card p-5">
+      <div className="flex items-center gap-2">
+        <h3 className="flex-1 text-sm font-semibold">Heuristic Detections</h3>
+        <InfoButton title={INFO.heuristicDetections.title}>
+          {INFO.heuristicDetections.body}
+        </InfoButton>
+      </div>
       <div className="mt-4 h-56">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={chartData} layout="vertical">
@@ -50,7 +57,7 @@ export function HeuristicChart({ detections }: Props) {
               contentStyle={{
                 backgroundColor: "var(--card)",
                 border: "1px solid var(--border)",
-                borderRadius: "8px",
+                borderRadius: "6px",
                 fontSize: "12px",
               }}
               formatter={(value: number) => [

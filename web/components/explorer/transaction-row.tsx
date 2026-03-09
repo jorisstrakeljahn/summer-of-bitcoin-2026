@@ -117,7 +117,7 @@ export function TransactionRow({ tx, stem, onViewGraph }: Props) {
                 {heuristicIds.map((h) => (
                   <div
                     key={h}
-                    className="rounded-lg border bg-card p-3"
+                    className="rounded-md border bg-card p-3"
                   >
                     <p className="text-xs font-semibold">
                       {HEURISTIC_LABELS[h as HeuristicId] ?? h}

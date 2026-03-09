@@ -2,6 +2,8 @@
 
 import { useState, useEffect } from "react";
 import { Activity, AlertTriangle, Gauge, Layers } from "lucide-react";
+import { InfoButton } from "@/components/info-panel";
+import { INFO } from "@/lib/info-content";
 import { Header } from "@/components/layout/header";
 import { Sidebar } from "@/components/layout/sidebar";
 import { ClassificationChart } from "@/components/charts/classification-chart";
@@ -85,7 +87,7 @@ export default function Dashboard() {
             {summary && !analysisLoading && (
               <>
                 {activeBlock && (
-                  <div className="rounded-xl border bg-card p-5">
+                  <div className="rounded-lg border bg-card p-5">
                     <div className="flex items-center justify-between">
                       <h2 className="text-sm font-semibold">
                         Block #{activeBlock.block_height.toLocaleString()}
@@ -105,18 +107,21 @@ export default function Dashboard() {
                     icon={<Activity className="h-4 w-4 text-primary" />}
                     label="Total Transactions"
                     value={summary.total_tx.toLocaleString()}
+                    info={INFO.totalTransactions}
                   />
                   <StatCard
                     icon={<AlertTriangle className="h-4 w-4 text-amber-500" />}
                     label="Flagged"
                     value={summary.flagged.toLocaleString()}
                     subtitle={`${((summary.flagged / summary.total_tx) * 100).toFixed(1)}%`}
+                    info={INFO.flaggedTransactions}
                   />
                   <StatCard
                     icon={<Gauge className="h-4 w-4 text-cyan-500" />}
                     label="Median Fee Rate"
                     value={`${summary.fee_rate.median_sat_vb}`}
                     subtitle="sat/vB"
+                    info={INFO.medianFeeRate}
                   />
                   <StatCard
                     icon={<Layers className="h-4 w-4 text-purple-500" />}
@@ -126,6 +131,7 @@ export default function Dashboard() {
                         ? `#${summary.height.toLocaleString()}`
                         : `${analysis?.block_count ?? 0}`
                     }
+                    info={INFO.blockCount}
                   />
                 </div>
 
@@ -185,17 +191,24 @@ function StatCard({
   label,
   value,
   subtitle,
+  info,
 }: {
   icon: React.ReactNode;
   label: string;
   value: string;
   subtitle?: string;
+  info?: { title: string; body: React.ReactNode };
 }) {
   return (
-    <div className="rounded-xl border bg-card p-4 transition-all hover:border-primary/30 hover:shadow-sm md:p-5">
+    <div className="rounded-lg border bg-card p-4 transition-all hover:border-primary/30 hover:shadow-sm md:p-5">
       <div className="flex items-center gap-2">
         {icon}
-        <p className="text-xs font-medium text-muted-foreground">{label}</p>
+        <p className="flex-1 text-xs font-medium text-muted-foreground">
+          {label}
+        </p>
+        {info && (
+          <InfoButton title={info.title}>{info.body}</InfoButton>
+        )}
       </div>
       <p className="mt-2 text-2xl font-bold tracking-tight">{value}</p>
       {subtitle && (

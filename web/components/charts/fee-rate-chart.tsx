@@ -9,6 +9,8 @@ import {
   ResponsiveContainer,
   ReferenceLine,
 } from "recharts";
+import { InfoButton } from "@/components/info-panel";
+import { INFO } from "@/lib/info-content";
 import type { FeeRateStats } from "@/lib/types";
 
 interface Props {
@@ -20,8 +22,13 @@ export function FeeRateChart({ histogram, stats }: Props) {
   const maxCount = Math.max(...histogram.map((h) => h.count), 1);
 
   return (
-    <div className="rounded-xl border bg-card p-5">
-      <h3 className="text-sm font-semibold">Fee Rate Distribution</h3>
+    <div className="rounded-lg border bg-card p-5">
+      <div className="flex items-center gap-2">
+        <h3 className="flex-1 text-sm font-semibold">Fee Rate Distribution</h3>
+        <InfoButton title={INFO.feeRateDistribution.title}>
+          {INFO.feeRateDistribution.body}
+        </InfoButton>
+      </div>
       {stats && (
         <p className="mt-1 text-xs text-muted-foreground">
           Min: {stats.min_sat_vb} · Median: {stats.median_sat_vb} · Max:{" "}
@@ -47,7 +54,7 @@ export function FeeRateChart({ histogram, stats }: Props) {
               contentStyle={{
                 backgroundColor: "var(--card)",
                 border: "1px solid var(--border)",
-                borderRadius: "8px",
+                borderRadius: "6px",
                 fontSize: "12px",
               }}
               formatter={(value: number) => [

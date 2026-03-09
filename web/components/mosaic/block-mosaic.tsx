@@ -2,6 +2,8 @@
 
 import { useState, useEffect, useMemo } from "react";
 import { CLASSIFICATION_COLORS, CLASSIFICATION_LABELS } from "@/lib/constants";
+import { InfoButton } from "@/components/info-panel";
+import { INFO } from "@/lib/info-content";
 import type { TransactionClassification } from "@/lib/types";
 import { truncateTxid } from "@/lib/utils";
 
@@ -74,7 +76,7 @@ export function BlockMosaic({ stem, blockIdx, onTxClick }: Props) {
 
   if (loading) {
     return (
-      <div className="rounded-xl border bg-card p-5">
+      <div className="rounded-lg border bg-card p-5">
         <h3 className="text-sm font-semibold">Block Mosaic</h3>
         <div className="mt-4 flex items-center justify-center py-8">
           <div className="h-6 w-6 animate-spin rounded-full border-2 border-primary border-t-transparent" />
@@ -84,11 +86,16 @@ export function BlockMosaic({ stem, blockIdx, onTxClick }: Props) {
   }
 
   return (
-    <div className="rounded-xl border bg-card p-5">
-      <div className="flex items-center justify-between">
-        <h3 className="text-sm font-semibold">
-          Block Mosaic — {transactions.length.toLocaleString()} transactions
-        </h3>
+    <div className="rounded-lg border bg-card p-5">
+      <div className="flex items-center justify-between gap-2">
+        <div className="flex items-center gap-2">
+          <h3 className="text-sm font-semibold">
+            Block Mosaic — {transactions.length.toLocaleString()} transactions
+          </h3>
+          <InfoButton title={INFO.blockMosaic.title}>
+            {INFO.blockMosaic.body}
+          </InfoButton>
+        </div>
         {hoveredTx && (
           <span className="text-xs text-muted-foreground">
             <span className="font-mono">{truncateTxid(hoveredTx.txid)}</span>
