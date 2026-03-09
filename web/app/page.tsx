@@ -9,6 +9,7 @@ import { HeuristicChart } from "@/components/charts/heuristic-chart";
 import { ScriptTypeChart } from "@/components/charts/script-type-chart";
 import { TransactionExplorer } from "@/components/explorer/transaction-explorer";
 import { FlowModal } from "@/components/flow/flow-modal";
+import { BlockMosaic } from "@/components/mosaic/block-mosaic";
 import { useFiles, useAnalysis, useStats } from "@/lib/hooks/use-analysis";
 
 export default function Dashboard() {
@@ -131,6 +132,13 @@ export default function Dashboard() {
                         {activeBlock.block_hash}
                       </p>
                     </div>
+
+                    <BlockMosaic
+                      stem={activeStem}
+                      blockIdx={activeBlockIdx}
+                      onTxClick={(txid) => setFlowTxid(txid)}
+                    />
+
                     <TransactionExplorer
                       stem={activeStem}
                       blockIdx={activeBlockIdx}
