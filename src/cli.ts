@@ -3,12 +3,15 @@
  *
  * Usage:
  *   npx tsx src/cli.ts --block <blk.dat> <rev.dat> <xor.dat>
+ *
+ * Outputs:
+ *   out/<blk_stem>.json  — machine-readable analysis report
+ *   out/<blk_stem>.md    — human-readable Markdown report (Phase 4)
  */
 
 import { readFileSync, writeFileSync, mkdirSync } from "fs";
 import { basename } from "path";
-import { iterateBlocks, extractBip34Height } from "./lib/block-parser.js";
-import { computeTxid } from "./lib/tx-serializer.js";
+import { analyzeBlockFile } from "./chain-analyzer.js";
 import type { ErrorReport } from "./lib/types.js";
 
 function errorJson(code: string, message: string): ErrorReport {
@@ -50,30 +53,26 @@ function main(): void {
     const blkFilename = basename(blkPath);
     const blkStem = blkFilename.replace(/\.dat$/, "");
 
-    let blockCount = 0;
-    let totalTx = 0;
+    process.stderr.write(`Analyzing ${blkFilename}...\n`);
 
-    for (const { block, undo } of iterateBlocks(blkData, revData, xorKey)) {
-      blockCount++;
-      const height = extractBip34Height(block);
-      const txCount = block.transactions.length;
-      totalTx += txCount;
+    const report = analyzeBlockFile(blkData, revData, xorKey, blkFilename);
 
-      const firstTxid = computeTxid(block.transactions[0]);
-      process.stderr.write(
-        `Block ${blockCount}: hash=${block.header.blockHash.slice(0, 16)}... ` +
-        `height=${height} txs=${txCount} coinbase=${firstTxid.slice(0, 16)}...\n`
-      );
-    }
+    process.stderr.write(
+      `Analyzed ${report.block_count} blocks, ` +
+      `${report.analysis_summary.total_transactions_analyzed} transactions, ` +
+      `${report.analysis_summary.flagged_transactions} flagged\n`
+    );
 
-    process.stderr.write(`\nParsed ${blockCount} blocks, ${totalTx} total transactions from ${blkFilename}\n`);
+    const jsonPath = `out/${blkStem}.json`;
+    writeFileSync(jsonPath, JSON.stringify(report, null, 2));
+    process.stderr.write(`Wrote ${jsonPath}\n`);
 
-    // TODO: Replace with full chain analysis pipeline
-    console.log(JSON.stringify(errorJson("NOT_IMPLEMENTED", "Chain analysis pipeline not yet complete")));
-    process.exit(1);
+    // TODO: Phase 4 — Markdown report generation
+    // const mdPath = `out/${blkStem}.md`;
+    // writeFileSync(mdPath, generateMarkdownReport(report));
   } catch (e) {
     const message = e instanceof Error ? e.message : String(e);
-    console.log(JSON.stringify(errorJson("BLOCK_PARSE_ERROR", message)));
+    console.log(JSON.stringify(errorJson("ANALYSIS_ERROR", message)));
     process.exit(1);
   }
 }
