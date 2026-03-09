@@ -26,7 +26,7 @@ export function Header({
       <div className="flex items-center gap-3">
         <button
           onClick={onToggleSidebar}
-          className="rounded-md p-1.5 hover:bg-accent transition-colors lg:hidden"
+          className="rounded-md p-2.5 hover:bg-accent transition-colors lg:hidden"
           aria-label="Toggle sidebar"
         >
           {sidebarOpen ? (
@@ -47,7 +47,7 @@ export function Header({
         <select
           value={activeStem ?? ""}
           onChange={(e) => onStemChange(e.target.value)}
-          className="rounded-md border bg-card px-3 py-1.5 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary"
+          className="max-w-[160px] truncate rounded-md border bg-card px-3 py-2 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary sm:max-w-none"
         >
           {files.length === 0 && <option value="">Loading...</option>}
           {files.map((f) => (
@@ -59,7 +59,7 @@ export function Header({
 
         <button
           onClick={toggleTheme}
-          className="rounded-md p-2 hover:bg-accent transition-colors"
+          className="rounded-md p-2.5 hover:bg-accent transition-colors"
           aria-label="Toggle theme"
         >
           {theme === "dark" ? (

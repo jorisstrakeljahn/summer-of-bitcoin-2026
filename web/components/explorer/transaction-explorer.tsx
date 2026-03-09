@@ -98,7 +98,7 @@ export function TransactionExplorer({ stem, blockIdx, onViewGraph }: Props) {
                 <button
                   onClick={() => setPage((p) => Math.max(1, p - 1))}
                   disabled={page <= 1}
-                  className="rounded p-1 hover:bg-accent disabled:opacity-30 transition-colors"
+                  className="rounded p-2.5 hover:bg-accent disabled:opacity-30 transition-colors"
                 >
                   <ChevronLeft className="h-4 w-4" />
                 </button>
@@ -110,7 +110,7 @@ export function TransactionExplorer({ stem, blockIdx, onViewGraph }: Props) {
                     setPage((p) => Math.min(data.total_pages, p + 1))
                   }
                   disabled={page >= data.total_pages}
-                  className="rounded p-1 hover:bg-accent disabled:opacity-30 transition-colors"
+                  className="rounded p-2.5 hover:bg-accent disabled:opacity-30 transition-colors"
                 >
                   <ChevronRight className="h-4 w-4" />
                 </button>

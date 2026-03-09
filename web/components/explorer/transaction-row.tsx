@@ -49,33 +49,35 @@ export function TransactionRow({ tx, stem, onViewGraph }: Props) {
     <div className="border-b last:border-b-0">
       <button
         onClick={() => setExpanded(!expanded)}
-        className="flex w-full items-center gap-3 px-4 py-2.5 text-left hover:bg-accent/50 transition-colors"
+        className="flex w-full items-start gap-2 px-3 py-3 text-left hover:bg-accent/50 transition-colors sm:items-center sm:gap-3 sm:px-4 sm:py-2.5"
       >
         {expanded ? (
-          <ChevronDown className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
+          <ChevronDown className="mt-0.5 h-3.5 w-3.5 shrink-0 text-muted-foreground sm:mt-0" />
         ) : (
-          <ChevronRight className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
+          <ChevronRight className="mt-0.5 h-3.5 w-3.5 shrink-0 text-muted-foreground sm:mt-0" />
         )}
 
-        <span className="w-36 shrink-0 font-mono text-xs">
-          {truncateTxid(tx.txid)}
-        </span>
+        <div className="flex min-w-0 flex-1 flex-col gap-1.5 sm:flex-row sm:items-center sm:gap-3">
+          <span className="shrink-0 font-mono text-xs sm:w-36">
+            {truncateTxid(tx.txid)}
+          </span>
 
-        <span className="w-32 shrink-0">
-          <ClassificationBadge
-            classification={tx.classification as TransactionClassification}
-          />
-        </span>
+          <span className="shrink-0 sm:w-32">
+            <ClassificationBadge
+              classification={tx.classification as TransactionClassification}
+            />
+          </span>
 
-        <div className="flex flex-1 flex-wrap gap-1">
-          {heuristicIds.slice(0, 4).map((h) => (
-            <HeuristicBadge key={h} id={h} />
-          ))}
-          {heuristicIds.length > 4 && (
-            <span className="text-[10px] text-muted-foreground">
-              +{heuristicIds.length - 4}
-            </span>
-          )}
+          <div className="flex flex-wrap gap-1">
+            {heuristicIds.slice(0, 4).map((h) => (
+              <HeuristicBadge key={h} id={h} />
+            ))}
+            {heuristicIds.length > 4 && (
+              <span className="text-[10px] text-muted-foreground">
+                +{heuristicIds.length - 4}
+              </span>
+            )}
+          </div>
         </div>
       </button>
 
@@ -88,7 +90,7 @@ export function TransactionRow({ tx, stem, onViewGraph }: Props) {
             </code>
             <button
               onClick={handleCopy}
-              className="shrink-0 rounded p-1 hover:bg-accent transition-colors"
+              className="shrink-0 rounded p-2 hover:bg-accent transition-colors"
               aria-label="Copy TXID"
             >
               {copied ? (
@@ -101,7 +103,7 @@ export function TransactionRow({ tx, stem, onViewGraph }: Props) {
               href={`https://mempool.space/tx/${tx.txid}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="shrink-0 rounded p-1 hover:bg-accent transition-colors"
+              className="shrink-0 rounded p-2 hover:bg-accent transition-colors"
               aria-label="View on mempool.space"
             >
               <ExternalLink className="h-3.5 w-3.5 text-muted-foreground" />
@@ -134,7 +136,7 @@ export function TransactionRow({ tx, stem, onViewGraph }: Props) {
           {onViewGraph && (
             <button
               onClick={() => onViewGraph(tx.txid)}
-              className="mt-3 rounded-md bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground hover:bg-primary/90 transition-colors"
+              className="mt-3 rounded-md bg-primary px-4 py-2.5 text-xs font-medium text-primary-foreground hover:bg-primary/90 transition-colors"
             >
               View Transaction Graph
             </button>

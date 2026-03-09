@@ -57,18 +57,21 @@ export function InfoPanelProvider({ children }: { children: ReactNode }) {
               "lg:inset-0 lg:max-h-none",
             )}
           >
-            <div className="sticky top-0 z-10 flex items-center justify-between border-b bg-background/95 backdrop-blur-sm px-5 py-3">
+            <div className="flex justify-center pt-2 pb-0 lg:hidden">
+              <div className="h-1 w-10 rounded-full bg-muted-foreground/30" />
+            </div>
+            <div className="sticky top-0 z-10 flex items-center justify-between border-b bg-background/95 backdrop-blur-sm px-4 py-3 sm:px-5">
               <h2 className="text-sm font-semibold">{entry.title}</h2>
               <button
                 onClick={close}
-                className="rounded-md p-1.5 hover:bg-accent transition-colors"
+                className="rounded-md p-2.5 hover:bg-accent transition-colors"
                 aria-label="Close info panel"
               >
                 <X className="h-4 w-4" />
               </button>
             </div>
 
-            <div className="px-5 py-4 text-sm leading-relaxed text-foreground/90 space-y-4">
+            <div className="px-4 py-4 text-sm leading-relaxed text-foreground/90 space-y-4 sm:px-5">
               {entry.body}
             </div>
           </div>
@@ -94,7 +97,7 @@ export function InfoButton({ title, children, className }: InfoButtonProps) {
         open({ title, body: children });
       }}
       className={cn(
-        "inline-flex items-center justify-center rounded-full p-0.5 text-muted-foreground hover:text-foreground hover:bg-accent transition-colors",
+        "relative inline-flex items-center justify-center rounded-full p-1 text-muted-foreground hover:text-foreground hover:bg-accent transition-colors after:absolute after:inset-[-6px] after:content-['']",
         className,
       )}
       aria-label={`Info: ${title}`}

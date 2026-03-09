@@ -45,7 +45,7 @@ export function Sidebar({
             <button
               onClick={() => handleSelect(null)}
               className={cn(
-                "w-full rounded-md px-2 py-1.5 text-left text-sm font-medium transition-colors",
+                "w-full rounded-md px-2 py-2.5 text-left text-sm font-medium transition-colors",
                 activeBlockIdx === null
                   ? "bg-primary text-primary-foreground"
                   : "hover:bg-accent",
@@ -70,7 +70,7 @@ export function Sidebar({
                   key={block.index}
                   onClick={() => handleSelect(block.index)}
                   className={cn(
-                    "mb-1 w-full rounded-md px-2 py-1.5 text-left transition-all",
+                    "mb-1 w-full rounded-md px-2 py-2.5 text-left transition-all",
                     activeBlockIdx === block.index
                       ? "bg-primary/10 ring-1 ring-primary"
                       : "hover:bg-accent",

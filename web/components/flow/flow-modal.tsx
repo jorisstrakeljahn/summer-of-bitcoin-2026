@@ -42,7 +42,7 @@ export function FlowModal({ stem, txid, onClose }: Props) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-      <div className="relative mx-4 flex h-[80vh] w-full max-w-5xl flex-col rounded-lg border bg-background shadow-2xl">
+      <div className="relative mx-0 flex h-[100dvh] w-full flex-col border bg-background shadow-2xl sm:mx-4 sm:h-[80vh] sm:max-w-5xl sm:rounded-lg">
         <div className="flex items-center justify-between border-b px-5 py-3">
           <div className="flex items-center gap-2">
             <div>
@@ -57,7 +57,7 @@ export function FlowModal({ stem, txid, onClose }: Props) {
           </div>
           <button
             onClick={onClose}
-            className="rounded-md p-1.5 hover:bg-accent transition-colors"
+            className="rounded-md p-2.5 hover:bg-accent transition-colors"
             aria-label="Close"
           >
             <X className="h-4 w-4" />
@@ -88,7 +88,7 @@ export function FlowModal({ stem, txid, onClose }: Props) {
         </div>
 
         {txDetail && (
-          <div className="flex items-center gap-4 border-t px-5 py-2.5 text-xs text-muted-foreground">
+          <div className="flex flex-wrap items-center gap-2 border-t px-4 py-2.5 text-xs text-muted-foreground sm:gap-4 sm:px-5">
             <span>
               {txDetail.vin.length} input{txDetail.vin.length !== 1 ? "s" : ""}
             </span>
