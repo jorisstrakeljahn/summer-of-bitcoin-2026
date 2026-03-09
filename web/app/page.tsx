@@ -3,10 +3,14 @@
 import { useState, useEffect } from "react";
 import { Header } from "@/components/layout/header";
 import { Sidebar } from "@/components/layout/sidebar";
+import { ClassificationChart } from "@/components/charts/classification-chart";
+import { FeeRateChart } from "@/components/charts/fee-rate-chart";
+import { HeuristicChart } from "@/components/charts/heuristic-chart";
+import { ScriptTypeChart } from "@/components/charts/script-type-chart";
 import { useFiles, useAnalysis, useStats } from "@/lib/hooks/use-analysis";
 
 export default function Dashboard() {
-  const { files, loading: filesLoading } = useFiles();
+  const { files } = useFiles();
   const [activeStem, setActiveStem] = useState<string | null>(null);
   const [activeBlockIdx, setActiveBlockIdx] = useState<number | null>(null);
 
@@ -17,16 +21,15 @@ export default function Dashboard() {
   }, [files, activeStem]);
 
   const { data: analysis, loading: analysisLoading } = useAnalysis(activeStem);
-  const { stats, loading: statsLoading } = useStats(activeStem);
+  const { stats } = useStats(activeStem);
 
   const handleStemChange = (stem: string) => {
     setActiveStem(stem);
     setActiveBlockIdx(null);
   };
 
-  const activeBlock = activeBlockIdx !== null
-    ? analysis?.blocks[activeBlockIdx] ?? null
-    : null;
+  const activeBlock =
+    activeBlockIdx !== null ? (analysis?.blocks[activeBlockIdx] ?? null) : null;
 
   const summary = activeBlock
     ? {
@@ -62,7 +65,7 @@ export default function Dashboard() {
 
         <main className="flex-1 overflow-y-auto">
           <div className="mx-auto max-w-[1400px] space-y-6 p-6">
-            {(filesLoading || analysisLoading) && (
+            {analysisLoading && (
               <div className="flex items-center justify-center py-20">
                 <div className="h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent" />
               </div>
@@ -95,9 +98,39 @@ export default function Dashboard() {
                   />
                 </div>
 
-                <p className="text-sm text-muted-foreground">
-                  Charts and transaction explorer will appear here.
-                </p>
+                {stats && activeBlockIdx === null && (
+                  <>
+                    <div className="grid gap-4 md:grid-cols-2">
+                      <ClassificationChart
+                        data={stats.classification_distribution}
+                      />
+                      <FeeRateChart
+                        histogram={stats.fee_rate_histogram}
+                        stats={analysis?.summary.fee_rate_stats}
+                      />
+                    </div>
+                    <div className="grid gap-4 md:grid-cols-2">
+                      <HeuristicChart detections={stats.heuristic_detections} />
+                      <ScriptTypeChart
+                        distribution={stats.script_type_distribution}
+                      />
+                    </div>
+                  </>
+                )}
+
+                {activeBlockIdx !== null && activeBlock && (
+                  <div className="rounded-xl border bg-card p-5">
+                    <h3 className="text-sm font-semibold">
+                      Block #{activeBlock.block_height.toLocaleString()}
+                    </h3>
+                    <p className="mt-1 font-mono text-xs text-muted-foreground">
+                      {activeBlock.block_hash}
+                    </p>
+                    <p className="mt-2 text-sm text-muted-foreground">
+                      Transaction explorer loading below...
+                    </p>
+                  </div>
+                )}
               </>
             )}
           </div>
