@@ -22,6 +22,16 @@ export function BlockMosaic({ stem, blockIdx, onTxClick }: Props) {
   const [transactions, setTransactions] = useState<MosaicTx[]>([]);
   const [loading, setLoading] = useState(true);
   const [hoveredTx, setHoveredTx] = useState<MosaicTx | null>(null);
+  const [selectedTx, setSelectedTx] = useState<MosaicTx | null>(null);
+  const [tileSize, setTileSize] = useState(6);
+
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 639px)");
+    setTileSize(mq.matches ? 10 : 6);
+    const handler = (e: MediaQueryListEvent) => setTileSize(e.matches ? 10 : 6);
+    mq.addEventListener("change", handler);
+    return () => mq.removeEventListener("change", handler);
+  }, []);
 
   useEffect(() => {
     setLoading(true);
@@ -97,7 +107,7 @@ export function BlockMosaic({ stem, blockIdx, onTxClick }: Props) {
           </InfoButton>
         </div>
         {hoveredTx && (
-          <span className="text-xs text-muted-foreground">
+          <span className="hidden text-xs text-muted-foreground sm:inline">
             <span className="font-mono">{truncateTxid(hoveredTx.txid)}</span>
             {" · "}
             {CLASSIFICATION_LABELS[hoveredTx.classification as TransactionClassification] ??
@@ -109,7 +119,7 @@ export function BlockMosaic({ stem, blockIdx, onTxClick }: Props) {
       <div
         className="mt-3 grid gap-px"
         style={{
-          gridTemplateColumns: `repeat(auto-fill, minmax(6px, 1fr))`,
+          gridTemplateColumns: `repeat(auto-fill, minmax(${tileSize}px, 1fr))`,
         }}
       >
         {transactions.map((tx) => (
@@ -123,11 +133,23 @@ export function BlockMosaic({ stem, blockIdx, onTxClick }: Props) {
             }}
             onMouseEnter={() => setHoveredTx(tx)}
             onMouseLeave={() => setHoveredTx(null)}
-            onClick={() => onTxClick?.(tx.txid)}
+            onClick={() => {
+              setSelectedTx(tx);
+              onTxClick?.(tx.txid);
+            }}
             title={`${truncateTxid(tx.txid)} — ${tx.classification}`}
           />
         ))}
       </div>
+
+      {selectedTx && (
+        <p className="mt-2 text-xs text-muted-foreground sm:hidden">
+          <span className="font-mono">{truncateTxid(selectedTx.txid)}</span>
+          {" · "}
+          {CLASSIFICATION_LABELS[selectedTx.classification as TransactionClassification] ??
+            selectedTx.classification}
+        </p>
+      )}
 
       <div className="mt-3 flex flex-wrap gap-3">
         {legend.map((l) => (

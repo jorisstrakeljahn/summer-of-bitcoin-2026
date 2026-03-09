@@ -23,9 +23,9 @@ const nodeTypes = {
 const NODE_H = 90;
 const NODE_GAP = 10;
 const INPUT_X = 0;
-const TX_X = 300;
-const OUTPUT_X = 520;
-const FEE_X = 520;
+const TX_X = 220;
+const OUTPUT_X = 380;
+const FEE_X = 380;
 
 function clampThickness(value: number, total: number): number {
   if (total <= 0) return 2;
