@@ -19,7 +19,7 @@ cd "$(dirname "$0")/web"
 
 if [ ! -d ".next" ]; then
   echo "Building web visualizer..."
-  npx next build
+  npx next build --webpack
 fi
 
 echo "http://127.0.0.1:${PORT}"
