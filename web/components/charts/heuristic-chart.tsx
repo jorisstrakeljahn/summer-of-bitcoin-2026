@@ -10,6 +10,7 @@ import {
   ResponsiveContainer,
   Cell,
 } from "recharts";
+import { ChartTooltip } from "./chart-tooltip";
 import { HEURISTIC_COLORS, HEURISTIC_LABELS } from "@/lib/constants";
 import { InfoButton } from "@/components/info-panel";
 import { INFO } from "@/lib/info-content";
@@ -79,16 +80,9 @@ export function HeuristicChart({ detections }: Props) {
               width={compact ? 75 : 110}
             />
             <Tooltip
-              contentStyle={{
-                backgroundColor: "var(--card)",
-                border: "1px solid var(--border)",
-                borderRadius: "6px",
-                fontSize: "12px",
-              }}
-              formatter={(value: number) => [
-                value.toLocaleString(),
-                "Detections",
-              ]}
+              content={<ChartTooltip />}
+              wrapperStyle={{ zIndex: 50 }}
+              cursor={{ fill: "var(--accent)", opacity: 0.5 }}
             />
             <Bar dataKey="count" radius={[0, 4, 4, 0]}>
               {chartData.map((entry) => (

@@ -9,6 +9,7 @@ import {
   ResponsiveContainer,
   ReferenceLine,
 } from "recharts";
+import { ChartTooltip } from "./chart-tooltip";
 import { InfoButton } from "@/components/info-panel";
 import { INFO } from "@/lib/info-content";
 import type { FeeRateStats } from "@/lib/types";
@@ -52,16 +53,9 @@ export function FeeRateChart({ histogram, stats }: Props) {
               width={35}
             />
             <Tooltip
-              contentStyle={{
-                backgroundColor: "var(--card)",
-                border: "1px solid var(--border)",
-                borderRadius: "6px",
-                fontSize: "12px",
-              }}
-              formatter={(value: number) => [
-                value.toLocaleString(),
-                "Blocks",
-              ]}
+              content={<ChartTooltip />}
+              wrapperStyle={{ zIndex: 50 }}
+              cursor={{ fill: "var(--accent)", opacity: 0.5 }}
             />
             {stats && (
               <ReferenceLine

@@ -7,6 +7,7 @@ import {
   ResponsiveContainer,
   Tooltip,
 } from "recharts";
+import { ChartTooltip } from "./chart-tooltip";
 import { CLASSIFICATION_COLORS, CLASSIFICATION_LABELS } from "@/lib/constants";
 import { InfoButton } from "@/components/info-panel";
 import { INFO } from "@/lib/info-content";
@@ -56,16 +57,14 @@ export function ClassificationChart({ data }: Props) {
                 ))}
               </Pie>
               <Tooltip
-                contentStyle={{
-                  backgroundColor: "var(--card)",
-                  border: "1px solid var(--border)",
-                  borderRadius: "6px",
-                  fontSize: "12px",
-                }}
-                formatter={(value: number) => [
-                  `${value.toLocaleString()} (${((value / total) * 100).toFixed(1)}%)`,
-                  "",
-                ]}
+                content={
+                  <ChartTooltip
+                    formatValue={(v) =>
+                      `${v.toLocaleString()} (${((v / total) * 100).toFixed(1)}%)`
+                    }
+                  />
+                }
+                wrapperStyle={{ zIndex: 50 }}
               />
             </PieChart>
           </ResponsiveContainer>
