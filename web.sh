@@ -11,17 +11,16 @@ set -euo pipefail
 #   - Prints the URL (e.g., http://127.0.0.1:3000) to stdout
 #   - Keeps running until terminated (CTRL+C / SIGTERM)
 #   - Must serve GET /api/health -> 200 { "ok": true }
-#
-# TODO: Replace the stub below with your web server start command.
 ###############################################################################
 
 PORT="${PORT:-3000}"
 
-# TODO: Start your web server here, for example:
-#   exec node server.js
-#   exec python -m http.server "$PORT"
-#   exec cargo run --release -- --port "$PORT"
+cd "$(dirname "$0")/web"
 
-echo "Error: Web visualizer is not yet implemented" >&2
-echo "Set up your web server to listen on port $PORT" >&2
-exit 1
+if [ ! -d ".next" ]; then
+  echo "Building web visualizer..."
+  npx next build
+fi
+
+echo "http://127.0.0.1:${PORT}"
+exec npx next start -p "$PORT"

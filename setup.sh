@@ -6,8 +6,11 @@ set -euo pipefail
 ###############################################################################
 
 # Install Node.js dependencies
-echo "Installing dependencies..."
+echo "Installing root dependencies..."
 npm install
+
+echo "Installing web dependencies..."
+(cd web && npm install)
 
 # Decompress block fixtures if not already present
 for gz in fixtures/*.dat.gz; do
