@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { Activity, AlertTriangle, Gauge, Layers } from "lucide-react";
 import { Header } from "@/components/layout/header";
 import { Sidebar } from "@/components/layout/sidebar";
 import { ClassificationChart } from "@/components/charts/classification-chart";
@@ -11,12 +12,14 @@ import { TransactionExplorer } from "@/components/explorer/transaction-explorer"
 import { FlowModal } from "@/components/flow/flow-modal";
 import { BlockMosaic } from "@/components/mosaic/block-mosaic";
 import { useFiles, useAnalysis, useStats } from "@/lib/hooks/use-analysis";
+import { formatTimestamp } from "@/lib/utils";
 
 export default function Dashboard() {
   const { files } = useFiles();
   const [activeStem, setActiveStem] = useState<string | null>(null);
   const [activeBlockIdx, setActiveBlockIdx] = useState<number | null>(null);
   const [flowTxid, setFlowTxid] = useState<string | null>(null);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => {
     if (files.length > 0 && !activeStem) {
@@ -57,6 +60,8 @@ export default function Dashboard() {
         files={files}
         activeStem={activeStem}
         onStemChange={handleStemChange}
+        sidebarOpen={sidebarOpen}
+        onToggleSidebar={() => setSidebarOpen((p) => !p)}
       />
 
       <div className="flex flex-1">
@@ -65,10 +70,12 @@ export default function Dashboard() {
           activeBlockIdx={activeBlockIdx}
           onBlockSelect={setActiveBlockIdx}
           loading={analysisLoading}
+          open={sidebarOpen}
+          onClose={() => setSidebarOpen(false)}
         />
 
         <main className="flex-1 overflow-y-auto">
-          <div className="mx-auto max-w-[1400px] space-y-6 p-6">
+          <div className="mx-auto max-w-[1400px] space-y-6 p-4 md:p-6">
             {analysisLoading && (
               <div className="flex items-center justify-center py-20">
                 <div className="h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent" />
@@ -77,22 +84,42 @@ export default function Dashboard() {
 
             {summary && !analysisLoading && (
               <>
+                {activeBlock && (
+                  <div className="rounded-xl border bg-card p-5">
+                    <div className="flex items-center justify-between">
+                      <h2 className="text-sm font-semibold">
+                        Block #{activeBlock.block_height.toLocaleString()}
+                      </h2>
+                      <span className="text-xs text-muted-foreground">
+                        {formatTimestamp(activeBlock.block_timestamp)}
+                      </span>
+                    </div>
+                    <p className="mt-1 break-all font-mono text-xs text-muted-foreground">
+                      {activeBlock.block_hash}
+                    </p>
+                  </div>
+                )}
+
                 <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
                   <StatCard
+                    icon={<Activity className="h-4 w-4 text-primary" />}
                     label="Total Transactions"
                     value={summary.total_tx.toLocaleString()}
                   />
                   <StatCard
+                    icon={<AlertTriangle className="h-4 w-4 text-amber-500" />}
                     label="Flagged"
                     value={summary.flagged.toLocaleString()}
                     subtitle={`${((summary.flagged / summary.total_tx) * 100).toFixed(1)}%`}
                   />
                   <StatCard
+                    icon={<Gauge className="h-4 w-4 text-cyan-500" />}
                     label="Median Fee Rate"
                     value={`${summary.fee_rate.median_sat_vb}`}
                     subtitle="sat/vB"
                   />
                   <StatCard
+                    icon={<Layers className="h-4 w-4 text-purple-500" />}
                     label={summary.height ? "Block Height" : "Blocks"}
                     value={
                       summary.height
@@ -122,23 +149,13 @@ export default function Dashboard() {
                   </>
                 )}
 
-                {activeBlockIdx !== null && activeBlock && activeStem && (
+                {activeBlockIdx !== null && activeStem && (
                   <>
-                    <div className="rounded-xl border bg-card p-5">
-                      <h3 className="text-sm font-semibold">
-                        Block #{activeBlock.block_height.toLocaleString()}
-                      </h3>
-                      <p className="mt-1 font-mono text-xs text-muted-foreground break-all">
-                        {activeBlock.block_hash}
-                      </p>
-                    </div>
-
                     <BlockMosaic
                       stem={activeStem}
                       blockIdx={activeBlockIdx}
                       onTxClick={(txid) => setFlowTxid(txid)}
                     />
-
                     <TransactionExplorer
                       stem={activeStem}
                       blockIdx={activeBlockIdx}
@@ -164,18 +181,23 @@ export default function Dashboard() {
 }
 
 function StatCard({
+  icon,
   label,
   value,
   subtitle,
 }: {
+  icon: React.ReactNode;
   label: string;
   value: string;
   subtitle?: string;
 }) {
   return (
-    <div className="rounded-xl border bg-card p-5 transition-colors hover:border-primary/30">
-      <p className="text-xs font-medium text-muted-foreground">{label}</p>
-      <p className="mt-1 text-2xl font-bold tracking-tight">{value}</p>
+    <div className="rounded-xl border bg-card p-4 transition-all hover:border-primary/30 hover:shadow-sm md:p-5">
+      <div className="flex items-center gap-2">
+        {icon}
+        <p className="text-xs font-medium text-muted-foreground">{label}</p>
+      </div>
+      <p className="mt-2 text-2xl font-bold tracking-tight">{value}</p>
       {subtitle && (
         <p className="mt-0.5 text-xs text-muted-foreground">{subtitle}</p>
       )}

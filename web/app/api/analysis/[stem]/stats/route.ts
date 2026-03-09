@@ -53,12 +53,14 @@ export function GET(
       }
 
       for (const block of report.blocks) {
-        const stats = block.analysis_summary.fee_rate_stats;
-        const avgFee = stats.mean_sat_vb;
-        for (let i = 0; i < FEE_BUCKETS.length; i++) {
-          if (avgFee >= FEE_BUCKETS[i].min && avgFee < FEE_BUCKETS[i].max) {
-            feeHistogram[i].count++;
-            break;
+        const s = block.analysis_summary.fee_rate_stats;
+        const values = [s.min_sat_vb, s.median_sat_vb, s.mean_sat_vb, s.max_sat_vb];
+        for (const v of values) {
+          for (let i = 0; i < FEE_BUCKETS.length; i++) {
+            if (v >= FEE_BUCKETS[i].min && v < FEE_BUCKETS[i].max) {
+              feeHistogram[i].count++;
+              break;
+            }
           }
         }
       }

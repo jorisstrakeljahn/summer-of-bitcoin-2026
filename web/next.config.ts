@@ -2,7 +2,6 @@ import type { NextConfig } from "next";
 import { resolve } from "path";
 
 const nextConfig: NextConfig = {
-  output: "standalone",
   serverExternalPackages: ["bech32", "bs58check"],
   outputFileTracingIncludes: {
     "/**": ["../src/**/*"],
