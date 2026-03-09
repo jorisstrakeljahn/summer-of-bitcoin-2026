@@ -12,6 +12,7 @@
 import { readFileSync, writeFileSync, mkdirSync } from "fs";
 import { basename } from "path";
 import { analyzeBlockFile } from "./chain-analyzer.js";
+import { generateMarkdownReport } from "./report-markdown.js";
 import type { ErrorReport } from "./lib/types.js";
 
 function errorJson(code: string, message: string): ErrorReport {
@@ -67,9 +68,9 @@ function main(): void {
     writeFileSync(jsonPath, JSON.stringify(report));
     process.stderr.write(`Wrote ${jsonPath}\n`);
 
-    // TODO: Phase 4 — Markdown report generation
-    // const mdPath = `out/${blkStem}.md`;
-    // writeFileSync(mdPath, generateMarkdownReport(report));
+    const mdPath = `out/${blkStem}.md`;
+    writeFileSync(mdPath, generateMarkdownReport(report));
+    process.stderr.write(`Wrote ${mdPath}\n`);
   } catch (e) {
     const message = e instanceof Error ? e.message : String(e);
     console.log(JSON.stringify(errorJson("ANALYSIS_ERROR", message)));
