@@ -35,7 +35,7 @@ export function FeeRateChart({ histogram, stats }: Props) {
           {stats.max_sat_vb} sat/vB
         </p>
       )}
-      <div className="mt-4 h-48">
+      <div className="mt-4 h-40 sm:h-48">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={histogram}>
             <XAxis
@@ -43,12 +43,13 @@ export function FeeRateChart({ histogram, stats }: Props) {
               tick={{ fontSize: 10, fill: "var(--muted-foreground)" }}
               axisLine={false}
               tickLine={false}
+              interval="preserveStartEnd"
             />
             <YAxis
               tick={{ fontSize: 10, fill: "var(--muted-foreground)" }}
               axisLine={false}
               tickLine={false}
-              width={40}
+              width={35}
             />
             <Tooltip
               contentStyle={{

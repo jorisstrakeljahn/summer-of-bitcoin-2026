@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import {
   BarChart,
   Bar,
@@ -14,16 +15,40 @@ import { InfoButton } from "@/components/info-panel";
 import { INFO } from "@/lib/info-content";
 import type { HeuristicId } from "@/lib/types";
 
+const SHORT_LABELS: Record<string, string> = {
+  cioh: "CIOH",
+  change_detection: "Change Det.",
+  address_reuse: "Addr Reuse",
+  coinjoin: "CoinJoin",
+  consolidation: "Consolid.",
+  self_transfer: "Self Xfer",
+  round_number_payment: "Round Num.",
+  op_return: "OP_RETURN",
+  peeling_chain: "Peeling",
+};
+
 interface Props {
   detections: Record<string, number>;
 }
 
 export function HeuristicChart({ detections }: Props) {
+  const [compact, setCompact] = useState(false);
+
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 639px)");
+    setCompact(mq.matches);
+    const handler = (e: MediaQueryListEvent) => setCompact(e.matches);
+    mq.addEventListener("change", handler);
+    return () => mq.removeEventListener("change", handler);
+  }, []);
+
   const chartData = Object.entries(detections)
     .sort(([, a], [, b]) => b - a)
     .map(([id, count]) => ({
       id,
-      name: HEURISTIC_LABELS[id as HeuristicId] ?? id,
+      name: compact
+        ? (SHORT_LABELS[id] ?? id)
+        : (HEURISTIC_LABELS[id as HeuristicId] ?? id),
       count,
       color: HEURISTIC_COLORS[id as HeuristicId] ?? "#6b7280",
     }));
@@ -36,7 +61,7 @@ export function HeuristicChart({ detections }: Props) {
           {INFO.heuristicDetections.body}
         </InfoButton>
       </div>
-      <div className="mt-4 h-56">
+      <div className="mt-4 h-48 sm:h-56">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={chartData} layout="vertical">
             <XAxis
@@ -51,7 +76,7 @@ export function HeuristicChart({ detections }: Props) {
               tick={{ fontSize: 10, fill: "var(--muted-foreground)" }}
               axisLine={false}
               tickLine={false}
-              width={110}
+              width={compact ? 75 : 110}
             />
             <Tooltip
               contentStyle={{

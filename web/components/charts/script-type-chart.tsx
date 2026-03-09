@@ -55,16 +55,16 @@ export function ScriptTypeChart({ distribution }: Props) {
           {INFO.scriptTypeDistribution.body}
         </InfoButton>
       </div>
-      <div className="mt-4 flex items-center gap-4">
-        <div className="h-48 w-48 shrink-0">
+      <div className="mt-4 flex flex-col items-center gap-4 sm:flex-row sm:items-center">
+        <div className="h-36 w-36 shrink-0 sm:h-48 sm:w-48">
           <ResponsiveContainer width="100%" height="100%">
             <PieChart>
               <Pie
                 data={chartData}
                 cx="50%"
                 cy="50%"
-                innerRadius={50}
-                outerRadius={80}
+                innerRadius="40%"
+                outerRadius="65%"
                 paddingAngle={2}
                 dataKey="value"
                 stroke="none"
@@ -89,7 +89,7 @@ export function ScriptTypeChart({ distribution }: Props) {
           </ResponsiveContainer>
         </div>
 
-        <div className="flex-1 space-y-1.5">
+        <div className="w-full flex-1 space-y-1.5">
           {chartData.map((entry) => (
             <div
               key={entry.name}
