@@ -93,17 +93,22 @@ export function buildTransactionContext(
 }
 
 export function analyzeTransaction(ctx: TransactionContext): TransactionAnalysis {
-  const heuristics: Record<string, HeuristicResult> = {};
+  const allResults: Record<string, HeuristicResult> = {};
+  const compactResults: Record<string, HeuristicResult> = {};
 
   for (const heuristic of ALL_HEURISTICS) {
-    heuristics[heuristic.id] = heuristic.analyze(ctx);
+    const result = heuristic.analyze(ctx);
+    allResults[heuristic.id] = result;
+    if (result.detected) {
+      compactResults[heuristic.id] = result;
+    }
   }
 
-  const classification = classifyTransaction(ctx, heuristics);
+  const classification = classifyTransaction(ctx, allResults);
 
   return {
     txid: ctx.txid,
-    heuristics,
+    heuristics: compactResults,
     classification,
   };
 }

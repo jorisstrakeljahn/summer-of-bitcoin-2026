@@ -64,7 +64,7 @@ function main(): void {
     );
 
     const jsonPath = `out/${blkStem}.json`;
-    writeFileSync(jsonPath, JSON.stringify(report, null, 2));
+    writeFileSync(jsonPath, JSON.stringify(report));
     process.stderr.write(`Wrote ${jsonPath}\n`);
 
     // TODO: Phase 4 — Markdown report generation
