@@ -317,11 +317,23 @@ flowchart LR
 
 The most significant trade-off in this project. Each heuristic internally computes rich detail — change index, confidence level, CoinJoin sub-type, consolidation input/output counts, reused addresses, protocol names, etc. However, **serializing all detail for every transaction** produced JSON files of 370+ MB, causing the grader's `jq`-based validation to exceed the 10-minute GitHub Actions timeout.
 
-**Solution:** Per-transaction heuristic results in the JSON output are reduced to `{"detected": true}` for detected heuristics and omitted entirely for non-detected ones. Full detail is still available internally for:
-- The transaction classifier (which uses all heuristic results)
-- The Markdown report generator (which aggregates detection counts)
+**Solution — three cumulative optimizations:**
 
-**Impact:** JSON file sizes dropped from 370 MB → 72 MB (blk04330) and from 260 MB → 53 MB (blk05051), keeping grader validation within the timeout.
+| Stage | Technique | blk04330 Size | blk05051 Size |
+|-------|-----------|---------------|---------------|
+| Baseline | Full heuristic detail, pretty-printed | ~370 MB | ~260 MB |
+| Stage 1 | Compact JSON (`JSON.stringify` without indentation) | ~150 MB | ~110 MB |
+| Stage 2 | Detected heuristics only, reduced to `{"detected": true}` | 72 MB | 53 MB |
+| Stage 3 | Transactions array only for `blocks[0]`, empty `[]` for rest | **705 KB** | **803 KB** |
+
+Stage 3 was enabled by an upstream requirement change: the grader validates the `transactions` array only for the first block. Subsequent blocks may omit transactions or use an empty array. All blocks are still fully analyzed internally — the optimization only affects serialization.
+
+Full heuristic detail is still available internally for:
+- The transaction classifier (which uses all heuristic results to determine classification)
+- The Markdown report generator (which aggregates detection counts across all blocks)
+- The web visualizer (which parses raw block data on-the-fly for per-transaction detail)
+
+**Impact:** JSON file sizes dropped by 99.8% from the initial implementation, eliminating grader timeout issues entirely.
 
 ### TypeScript vs. Systems Languages
 
@@ -330,7 +342,7 @@ TypeScript/Node.js was chosen over C++ or Rust for pragmatic reasons:
 - **Native performance where it matters:** Node.js `Buffer` operations and the `crypto` module (SHA256, RIPEMD160) are backed by native C++ implementations in V8/OpenSSL. The actual byte-level parsing runs at near-native speed.
 - **Development velocity:** TypeScript's type system catches schema and interface errors at compile time, which is critical for the complex JSON output schema.
 
-CLI execution time is approximately 35s for blk04330 (341,792 txs) and 107s for blk05051 (256,523 txs). The asymmetry comes from undo data parsing complexity, not transaction count.
+CLI execution time is approximately 5–6s for blk04330 (341,792 txs) and 3–4s for blk05051 (256,523 txs) on a modern machine. The heuristic analysis adds minimal overhead due to its purely arithmetic/comparison-based logic.
 
 ### Block-Level vs. Chain-Level Analysis
 
