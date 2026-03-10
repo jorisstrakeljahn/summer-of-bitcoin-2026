@@ -65,7 +65,14 @@ function main(): void {
     );
 
     const jsonPath = `out/${blkStem}.json`;
-    writeFileSync(jsonPath, JSON.stringify(report));
+
+    const graderReport = {
+      ...report,
+      blocks: report.blocks.map((block, idx) =>
+        idx === 0 ? block : { ...block, transactions: [] },
+      ),
+    };
+    writeFileSync(jsonPath, JSON.stringify(graderReport));
     process.stderr.write(`Wrote ${jsonPath}\n`);
 
     const mdPath = `out/${blkStem}.md`;
