@@ -6,6 +6,7 @@
  */
 import { useState, useEffect, useCallback } from "react";
 import type { FileSummary, BlockSummary, StatsResponse, AnalysisSummary, TransactionsPage } from "../types";
+import { DEFAULT_PAGE_SIZE } from "../constants";
 
 export function useFiles() {
   const [files, setFiles] = useState<FileSummary[]>([]);
@@ -78,7 +79,7 @@ export function useTransactions(
     if (!stem || blockIdx === null) return;
     setLoading(true);
 
-    const params = new URLSearchParams({ page: String(page), size: "50" });
+    const params = new URLSearchParams({ page: String(page), size: String(DEFAULT_PAGE_SIZE) });
     if (filters.classification) params.set("classification", filters.classification);
     if (filters.heuristic) params.set("heuristic", filters.heuristic);
     if (filters.search && filters.search.length >= 4) params.set("search", filters.search);

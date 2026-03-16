@@ -9,7 +9,7 @@ import { ClassificationBadge } from "@/components/badges/classification-badge";
 import { HeuristicBadge } from "@/components/badges/heuristic-badge";
 import { truncateTxid } from "@/lib/utils";
 import type { TransactionAnalysis, TransactionClassification } from "@/lib/types";
-import { HEURISTIC_LABELS, HEURISTIC_DESCRIPTIONS } from "@/lib/constants";
+import { HEURISTIC_LABELS, HEURISTIC_DESCRIPTIONS, MAX_VISIBLE_HEURISTICS, COPY_FEEDBACK_MS } from "@/lib/constants";
 import type { HeuristicId } from "@/lib/types";
 
 interface Props {
@@ -27,7 +27,7 @@ export function TransactionRow({ tx, stem, onViewGraph }: Props) {
   const handleCopy = () => {
     navigator.clipboard.writeText(tx.txid);
     setCopied(true);
-    setTimeout(() => setCopied(false), 1500);
+    setTimeout(() => setCopied(false), COPY_FEEDBACK_MS);
   };
 
   return (
@@ -54,12 +54,12 @@ export function TransactionRow({ tx, stem, onViewGraph }: Props) {
           </span>
 
           <div className="flex flex-wrap gap-1">
-            {heuristicIds.slice(0, 4).map((h) => (
+            {heuristicIds.slice(0, MAX_VISIBLE_HEURISTICS).map((h) => (
               <HeuristicBadge key={h} id={h} />
             ))}
-            {heuristicIds.length > 4 && (
+            {heuristicIds.length > MAX_VISIBLE_HEURISTICS && (
               <span className="text-[10px] text-muted-foreground">
-                +{heuristicIds.length - 4}
+                +{heuristicIds.length - MAX_VISIBLE_HEURISTICS}
               </span>
             )}
           </div>

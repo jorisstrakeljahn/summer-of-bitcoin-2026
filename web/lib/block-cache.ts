@@ -12,6 +12,7 @@ import type { ParsedBlock } from "@sherlock/lib/block-parser";
 import type { BlockUndo, UndoPrevout } from "@sherlock/lib/undo-parser";
 import type { ParsedTransaction } from "@sherlock/lib/types";
 import type { TxDetailVin, TxDetailVout, TxDetailResponse } from "./block-cache-types";
+import { DUST_THRESHOLD_SATS } from "./constants";
 
 interface TxLocation {
   blockIdx: number;
@@ -121,7 +122,7 @@ function buildTxDetail(
       script_pubkey_hex: scriptHex,
       script_type: scriptType,
       address,
-      is_dust: valueSats < 546 && scriptType !== "op_return",
+      is_dust: valueSats < DUST_THRESHOLD_SATS && scriptType !== "op_return",
       is_op_return: scriptType === "op_return",
     };
   });

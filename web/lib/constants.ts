@@ -115,3 +115,19 @@ export function getFeeBucketLabel(feeRate: number): string {
   }
   return FEE_BUCKETS[FEE_BUCKETS.length - 1].label;
 }
+
+// --- Pagination ---
+
+export const DEFAULT_PAGE_SIZE = 50;
+export const MAX_PAGE_SIZE = 200;
+
+// --- UI limits ---
+
+/** Max heuristic badges shown inline before "+N" overflow indicator. */
+export const MAX_VISIBLE_HEURISTICS = 4;
+
+/** Duration (ms) the "copied" checkmark stays visible after copying a TXID. */
+export const COPY_FEEDBACK_MS = 1500;
+
+/** Dust threshold in satoshis (outputs below this are flagged as dust). */
+export const DUST_THRESHOLD_SATS = 546;

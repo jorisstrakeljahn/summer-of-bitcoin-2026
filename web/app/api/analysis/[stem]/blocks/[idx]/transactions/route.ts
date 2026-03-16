@@ -3,6 +3,7 @@
  */
 import { NextResponse } from "next/server";
 import { getReport } from "@/lib/report-cache";
+import { DEFAULT_PAGE_SIZE, MAX_PAGE_SIZE } from "@/lib/constants";
 
 export function GET(
   req: Request,
@@ -24,8 +25,8 @@ export function GET(
       const url = new URL(req.url);
       const page = Math.max(1, parseInt(url.searchParams.get("page") ?? "1", 10));
       const size = Math.min(
-        200,
-        Math.max(1, parseInt(url.searchParams.get("size") ?? "50", 10)),
+        MAX_PAGE_SIZE,
+        Math.max(1, parseInt(url.searchParams.get("size") ?? String(DEFAULT_PAGE_SIZE), 10)),
       );
       const classificationFilter = url.searchParams.get("classification");
       const heuristicFilter = url.searchParams.get("heuristic");
