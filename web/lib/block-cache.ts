@@ -150,6 +150,11 @@ function buildTxDetail(
   };
 }
 
+/** Remove a stem from the in-memory cache so the next read re-loads from disk. */
+export function invalidateBlockData(stem: string): void {
+  cache.delete(stem);
+}
+
 export function getTxDetail(
   stem: string,
   txid: string,

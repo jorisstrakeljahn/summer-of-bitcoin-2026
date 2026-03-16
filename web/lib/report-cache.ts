@@ -33,3 +33,8 @@ export function listAvailableStems(): string[] {
     return [];
   }
 }
+
+/** Remove a stem from the in-memory cache so the next read re-loads from disk. */
+export function invalidateReport(stem: string): void {
+  cache.delete(stem);
+}
