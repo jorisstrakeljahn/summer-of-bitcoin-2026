@@ -4,9 +4,12 @@
   "description": "Bitcoin chain analysis engine — CLI + Web Visualizer",
   "private": true,
   "type": "module",
+  "engines": {
+    "node": ">=18"
+  },
   "scripts": {
     "cli": "tsx src/cli.ts",
-    "build": "tsc --noEmit"
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "bech32": "^2.0.0",

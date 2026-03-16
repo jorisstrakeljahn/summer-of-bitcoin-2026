@@ -1,7 +1,20 @@
+# Block fixture binaries (decompressed by setup.sh)
 fixtures/*.dat
+
+# Dependencies
 node_modules/
+
+# Build artifacts
+dist/
+.next/
+
+# Environment / secrets
+.env
+
+# Language-specific caches
 __pycache__/
 target/
-.env
+
+# Internal planning notes
 PLAN.md
 WEB-PLAN.md
