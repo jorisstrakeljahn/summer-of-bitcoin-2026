@@ -1,3 +1,7 @@
+/**
+ * Static help content for the analysis UI. Maps info keys (e.g. totalTransactions,
+ * classificationDistribution) to title/body for tooltips and info dialogs.
+ */
 import type { ReactNode } from "react";
 
 interface InfoEntry {

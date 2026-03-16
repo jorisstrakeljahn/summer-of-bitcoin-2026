@@ -1,3 +1,7 @@
+/**
+ * TypeScript interfaces for transaction detail API responses (vin, vout,
+ * fee, script types). Shared by block-cache and API routes.
+ */
 export interface TxDetailVin {
   txid: string;
   vout: number;

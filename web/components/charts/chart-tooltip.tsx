@@ -1,3 +1,6 @@
+/**
+ * Custom tooltip for Recharts that shows formatted labels and values on hover.
+ */
 "use client";
 
 import type { TooltipProps } from "recharts";

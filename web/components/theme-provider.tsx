@@ -1,3 +1,6 @@
+/**
+ * Provides light/dark theme via context with localStorage persistence.
+ */
 "use client";
 
 import {

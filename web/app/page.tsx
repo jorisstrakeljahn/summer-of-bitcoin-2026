@@ -1,3 +1,6 @@
+/**
+ * Main dashboard page for Bitcoin chain analysis: stats, charts, block mosaic, and transaction explorer.
+ */
 "use client";
 
 import { useState, useEffect } from "react";

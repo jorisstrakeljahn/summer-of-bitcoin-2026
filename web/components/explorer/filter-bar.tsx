@@ -1,3 +1,6 @@
+/**
+ * Filter controls for classification, heuristic type, and TXID search.
+ */
 "use client";
 
 import { Search } from "lucide-react";

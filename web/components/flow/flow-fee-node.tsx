@@ -1,3 +1,6 @@
+/**
+ * ReactFlow node that displays the transaction fee amount and rate.
+ */
 "use client";
 
 import { Handle, Position, type NodeProps } from "@xyflow/react";

@@ -1,3 +1,7 @@
+/**
+ * Shared TypeScript types for blockchain analysis: transaction classifications,
+ * heuristics, block/chain reports, and API response shapes.
+ */
 export type TransactionClassification =
   | "simple_payment"
   | "consolidation"

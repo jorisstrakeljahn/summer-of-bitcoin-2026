@@ -1,3 +1,6 @@
+/**
+ * Builds and renders the transaction flow graph (inputs → tx → outputs/fee).
+ */
 "use client";
 
 import { useMemo } from "react";

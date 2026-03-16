@@ -1,3 +1,7 @@
+/**
+ * Color and label mappings for transaction classifications and heuristics.
+ * Used for consistent UI styling across charts, tables, and badges.
+ */
 import type { TransactionClassification, HeuristicId } from "./types";
 
 export const CLASSIFICATION_COLORS: Record<TransactionClassification, string> = {

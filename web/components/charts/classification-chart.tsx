@@ -1,3 +1,6 @@
+/**
+ * Pie chart showing the distribution of transaction classifications in a block.
+ */
 "use client";
 
 import {

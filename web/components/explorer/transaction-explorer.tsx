@@ -1,3 +1,6 @@
+/**
+ * Paginated transaction list with filters and optional graph view.
+ */
 "use client";
 
 import { useState, useMemo } from "react";

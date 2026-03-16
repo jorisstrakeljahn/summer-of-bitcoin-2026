@@ -1,3 +1,6 @@
+/**
+ * Expandable row displaying TXID, classification, heuristics, and link to transaction graph.
+ */
 "use client";
 
 import { ChevronDown, ChevronRight, ExternalLink, Copy, Check } from "lucide-react";

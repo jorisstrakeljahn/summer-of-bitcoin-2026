@@ -1,3 +1,6 @@
+/**
+ * ReactFlow node for a transaction input (address, sats, script type, proportion).
+ */
 "use client";
 
 import { Handle, Position, type NodeProps } from "@xyflow/react";

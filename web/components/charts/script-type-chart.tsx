@@ -1,3 +1,6 @@
+/**
+ * Pie chart showing the distribution of script types (P2WPKH, P2TR, etc.) in a block.
+ */
 "use client";
 
 import {

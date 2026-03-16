@@ -1,3 +1,6 @@
+/**
+ * ReactFlow node for the central transaction card (TXID, SegWit, version).
+ */
 "use client";
 
 import { Handle, Position, type NodeProps } from "@xyflow/react";

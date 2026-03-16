@@ -1,3 +1,6 @@
+/**
+ * Full-screen modal that fetches and displays a transaction flow graph.
+ */
 "use client";
 
 import { useState, useEffect } from "react";

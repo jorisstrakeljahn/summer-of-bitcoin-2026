@@ -1,3 +1,6 @@
+/**
+ * ReactFlow node for a transaction output (address, sats, script type, dust/OP_RETURN flags).
+ */
 "use client";
 
 import { Handle, Position, type NodeProps } from "@xyflow/react";

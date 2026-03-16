@@ -1,3 +1,6 @@
+/**
+ * Root layout: metadata, theme, fonts, and providers for the Bitcoin chain analysis app.
+ */
 import type { Metadata } from "next";
 import { ThemeProvider } from "@/components/theme-provider";
 import { InfoPanelProvider } from "@/components/info-panel";

@@ -1,3 +1,6 @@
+/**
+ * Bar chart visualizing fee rate distribution with optional median reference line.
+ */
 "use client";
 
 import {

@@ -1,3 +1,6 @@
+/**
+ * Returns paginated transactions for a block with optional classification/heuristic/search filters.
+ */
 import { NextResponse } from "next/server";
 import { getReport } from "@/lib/report-cache";
 

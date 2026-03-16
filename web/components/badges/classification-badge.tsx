@@ -1,3 +1,6 @@
+/**
+ * Badge component that displays a transaction classification with a colored label.
+ */
 "use client";
 
 import { CLASSIFICATION_COLORS, CLASSIFICATION_LABELS } from "@/lib/constants";

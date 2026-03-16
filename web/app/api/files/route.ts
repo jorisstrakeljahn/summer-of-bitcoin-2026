@@ -1,3 +1,6 @@
+/**
+ * Lists available analysis files (stems) with block count, total tx, and flagged counts.
+ */
 import { NextResponse } from "next/server";
 import { listAvailableStems, getReport } from "@/lib/report-cache";
 import type { FileSummary } from "@/lib/types";

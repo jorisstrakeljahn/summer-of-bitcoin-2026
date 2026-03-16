@@ -1,3 +1,7 @@
+/**
+ * In-memory cache for chain analysis reports. Loads JSON from out/ and
+ * exposes getReport/listAvailableStems for API routes.
+ */
 import { readFileSync, readdirSync } from "fs";
 import { join } from "path";
 import type { ChainAnalysisReport } from "./types";

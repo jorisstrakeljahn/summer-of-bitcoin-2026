@@ -1,3 +1,6 @@
+/**
+ * Sidebar listing blocks for selection; supports "All Blocks Overview" and per-block view.
+ */
 "use client";
 
 import { cn } from "@/lib/utils";

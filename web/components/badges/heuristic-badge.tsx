@@ -1,3 +1,6 @@
+/**
+ * Badge component that displays a heuristic detection type with a colored label.
+ */
 "use client";
 
 import { HEURISTIC_COLORS, HEURISTIC_LABELS } from "@/lib/constants";

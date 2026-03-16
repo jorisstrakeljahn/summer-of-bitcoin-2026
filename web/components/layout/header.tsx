@@ -1,3 +1,6 @@
+/**
+ * App header with title, file selector, theme toggle, and mobile sidebar trigger.
+ */
 "use client";
 
 import { Search, Sun, Moon, Menu, X } from "lucide-react";

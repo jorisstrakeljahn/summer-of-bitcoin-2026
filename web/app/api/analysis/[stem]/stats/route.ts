@@ -1,3 +1,6 @@
+/**
+ * Returns aggregated stats for a stem: classification, heuristics, fee histogram, script types.
+ */
 import { NextResponse } from "next/server";
 import { getReport } from "@/lib/report-cache";
 import type {

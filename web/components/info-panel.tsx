@@ -1,3 +1,6 @@
+/**
+ * Context and InfoButton for showing contextual help panels across the app.
+ */
 "use client";
 
 import {

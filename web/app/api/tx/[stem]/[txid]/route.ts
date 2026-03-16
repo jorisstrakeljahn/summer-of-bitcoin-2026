@@ -1,3 +1,6 @@
+/**
+ * Returns full transaction detail (inputs, outputs, heuristics) for a given stem and txid.
+ */
 import { NextResponse } from "next/server";
 import { getTxDetail } from "@/lib/block-cache";
 

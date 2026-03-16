@@ -1,3 +1,7 @@
+/**
+ * Loads and caches parsed block data from fixtures. Provides getTxDetail
+ * to resolve full transaction details (vin/vout, fees, script types) by txid.
+ */
 import { readFileSync } from "fs";
 import { join } from "path";
 import { iterateBlocks } from "@sherlock/lib/block-parser";

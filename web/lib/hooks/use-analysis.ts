@@ -1,5 +1,9 @@
 "use client";
 
+/**
+ * React hooks for analysis data: useFiles, useAnalysis, useStats, useTransactions.
+ * Fetch file list, block summaries, stats, and paginated transactions from API.
+ */
 import { useState, useEffect, useCallback } from "react";
 import type { FileSummary, BlockSummary, StatsResponse, AnalysisSummary } from "../types";
 

@@ -1,3 +1,7 @@
+/**
+ * UI utilities: Tailwind class merging (cn), number/timestamp formatting,
+ * and TXID truncation for display.
+ */
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 

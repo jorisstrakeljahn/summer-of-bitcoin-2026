@@ -1,3 +1,6 @@
+/**
+ * Returns full analysis report for a stem: blocks, summary, and block-level stats.
+ */
 import { NextResponse } from "next/server";
 import { getReport } from "@/lib/report-cache";
 import type { BlockSummary } from "@/lib/types";

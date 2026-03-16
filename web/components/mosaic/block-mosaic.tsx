@@ -1,3 +1,6 @@
+/**
+ * Grid of colored tiles representing transactions by classification; clickable for details.
+ */
 "use client";
 
 import { useState, useEffect, useMemo } from "react";

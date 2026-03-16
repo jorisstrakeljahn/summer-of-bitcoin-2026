@@ -1,3 +1,6 @@
+/**
+ * Horizontal bar chart showing heuristic detection counts per type.
+ */
 "use client";
 
 import { useState, useEffect } from "react";
