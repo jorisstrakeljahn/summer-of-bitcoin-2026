@@ -5,15 +5,15 @@
 
 import { Handle, Position, type NodeProps, type Node } from "@xyflow/react";
 
-export interface FlowTxData {
+export interface FlowTxData extends Record<string, unknown> {
   txid: string;
   segwit: boolean;
   version: number;
 }
 
-type FlowTxNode = Node<FlowTxData, "flowTx">;
+type FlowTxNodeType = Node<FlowTxData, "flowTx">;
 
-export function FlowTxNode({ data: d }: NodeProps<FlowTxNode>) {
+export function FlowTxNode({ data: d }: NodeProps<FlowTxNodeType>) {
 
   return (
     <div className="relative rounded-lg border-2 border-primary bg-card px-4 py-3 text-xs shadow-md">

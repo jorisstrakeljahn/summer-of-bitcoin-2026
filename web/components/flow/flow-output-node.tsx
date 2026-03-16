@@ -6,7 +6,7 @@
 import { Handle, Position, type NodeProps, type Node } from "@xyflow/react";
 import { AlertTriangle, FileCode } from "lucide-react";
 
-export interface FlowOutputData {
+export interface FlowOutputData extends Record<string, unknown> {
   label: string;
   address: string | null;
   sats: number;
@@ -16,9 +16,9 @@ export interface FlowOutputData {
   isOpReturn: boolean;
 }
 
-type FlowOutputNode = Node<FlowOutputData, "flowOutput">;
+type FlowOutputNodeType = Node<FlowOutputData, "flowOutput">;
 
-export function FlowOutputNode({ data: d }: NodeProps<FlowOutputNode>) {
+export function FlowOutputNode({ data: d }: NodeProps<FlowOutputNodeType>) {
   const pct = Math.max(4, d.proportion * 100);
 
   return (

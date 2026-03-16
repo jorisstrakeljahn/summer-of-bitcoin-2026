@@ -110,7 +110,7 @@ export function TransactionRow({ tx, stem, onViewGraph }: Props) {
                       {HEURISTIC_LABELS[h as HeuristicId] ?? h}
                     </p>
                     <p className="mt-1 text-xs text-muted-foreground">
-                      {HEURISTIC_DESCRIPTIONS[h] ?? "Heuristic detected."}
+                      {HEURISTIC_DESCRIPTIONS[h as HeuristicId] ?? "Heuristic detected."}
                     </p>
                   </div>
                 ))}

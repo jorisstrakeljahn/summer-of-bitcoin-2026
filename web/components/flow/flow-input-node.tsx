@@ -6,7 +6,7 @@
 import { Handle, Position, type NodeProps, type Node } from "@xyflow/react";
 import { Clock } from "lucide-react";
 
-export interface FlowInputData {
+export interface FlowInputData extends Record<string, unknown> {
   label: string;
   address: string | null;
   sats: number;
@@ -15,9 +15,9 @@ export interface FlowInputData {
   hasTimelock: boolean;
 }
 
-type FlowInputNode = Node<FlowInputData, "flowInput">;
+type FlowInputNodeType = Node<FlowInputData, "flowInput">;
 
-export function FlowInputNode({ data: d }: NodeProps<FlowInputNode>) {
+export function FlowInputNode({ data: d }: NodeProps<FlowInputNodeType>) {
   const pct = Math.max(4, d.proportion * 100);
 
   return (
