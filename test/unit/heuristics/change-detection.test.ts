@@ -60,4 +60,41 @@ describe("Change Detection Heuristic", () => {
     expect(result.likely_change_index).toBe(0);
     expect(result.confidence).toBe("low");
   });
+
+  it("handles op_return as first output without corrupting allSameType check", () => {
+    const ctx = mockCtx({
+      inputScriptTypes: ["p2wpkh"],
+      outputScriptTypes: ["op_return", "p2wpkh", "p2tr"],
+      outputValues: [0, 50_000, 30_123],
+    });
+    const result = changeDetection.analyze(ctx);
+    expect(result.detected).toBe(true);
+    expect(result.likely_change_index).toBe(1);
+    expect(result.method).toBe("script_type_match");
+    expect(result.confidence).toBe("high");
+  });
+
+  it("gives high confidence via script+round when all real outputs share type with op_return", () => {
+    const ctx = mockCtx({
+      inputScriptTypes: ["p2wpkh"],
+      outputScriptTypes: ["op_return", "p2wpkh", "p2wpkh"],
+      outputValues: [0, 100_000_000, 12_345],
+    });
+    const result = changeDetection.analyze(ctx);
+    expect(result.detected).toBe(true);
+    expect(result.likely_change_index).toBe(2);
+    expect(result.method).toBe("script_type_and_round_number");
+    expect(result.confidence).toBe("high");
+  });
+
+  it("ignores op_return outputs when computing non-round indices", () => {
+    const ctx = mockCtx({
+      inputScriptTypes: ["p2sh"],
+      outputScriptTypes: ["p2wpkh", "op_return", "p2sh"],
+      outputValues: [100_000_000, 0, 42_317],
+    });
+    const result = changeDetection.analyze(ctx);
+    expect(result.detected).toBe(true);
+    expect(result.likely_change_index).toBe(2);
+  });
 });
