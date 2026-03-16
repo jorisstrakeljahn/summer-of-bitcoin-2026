@@ -64,6 +64,7 @@ export function mergeScriptTypeDistributions(
   return merged;
 }
 
+/** Rounds to 2 decimal places for human-readable sat/vB display values. */
 function round2(n: number): number {
   return Math.round(n * 100) / 100;
 }

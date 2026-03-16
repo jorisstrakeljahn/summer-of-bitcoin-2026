@@ -116,13 +116,10 @@ function readCompressedScript(reader: BufferReader): string {
     const hash = reader.readSlice(20).toString("hex");
     return `a914${hash}87`;
   }
-  if (nSize === 2 || nSize === 3) {
+  if (nSize >= 2 && nSize <= 5) {
     const x = reader.readSlice(32).toString("hex");
-    return `21${nSize === 2 ? "02" : "03"}${x}ac`;
-  }
-  if (nSize === 4 || nSize === 5) {
-    const x = reader.readSlice(32).toString("hex");
-    return `21${nSize === 4 ? "02" : "03"}${x}ac`;
+    const prefix = nSize % 2 === 0 ? "02" : "03";
+    return `21${prefix}${x}ac`;
   }
 
   const len = nSize - 6;

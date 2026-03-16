@@ -14,6 +14,9 @@
 import type { Heuristic, HeuristicResult, TransactionContext } from "./types.js";
 import { isRoundAmount, dominantScriptType } from "./utils.js";
 
+/** Self-transfers don't typically overpay fees — reject if fee exceeds this ratio of total input. */
+const MAX_FEE_RATIO = 0.05;
+
 export interface SelfTransferResult extends HeuristicResult {
   detected: boolean;
 }
@@ -45,10 +48,8 @@ function analyze(ctx: TransactionContext): SelfTransferResult {
     return { detected: false };
   }
 
-  // Fee sanity check: self-transfers don't typically overpay fees.
-  // If fee is more than 5% of total input, it's suspicious.
   const totalIn = ctx.inputValues.reduce((s, v) => s + v, 0);
-  if (totalIn > 0 && ctx.fee / totalIn > 0.05) {
+  if (totalIn > 0 && ctx.fee / totalIn > MAX_FEE_RATIO) {
     return { detected: false };
   }
 

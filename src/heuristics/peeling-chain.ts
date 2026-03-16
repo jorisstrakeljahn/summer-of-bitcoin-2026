@@ -17,11 +17,13 @@
  */
 
 import type { Heuristic, HeuristicResult, TransactionContext } from "./types.js";
+import { dominantScriptType } from "./utils.js";
 
 export interface PeelingChainResult extends HeuristicResult {
   detected: boolean;
 }
 
+/** Minimum ratio between the larger and smaller output to qualify as a peel (10:1). */
 const SIZE_RATIO_THRESHOLD = 10;
 
 function analyze(ctx: TransactionContext): PeelingChainResult {
@@ -54,11 +56,10 @@ function analyze(ctx: TransactionContext): PeelingChainResult {
     return { detected: false };
   }
 
-  // The larger output should match the dominant input script type
   const larger = a.value > b.value ? a : b;
-  const dominantInputType = ctx.inputScriptTypes[0];
+  const dominantInputType = dominantScriptType(ctx.inputScriptTypes);
 
-  if (larger.type !== dominantInputType) {
+  if (!dominantInputType || larger.type !== dominantInputType) {
     return { detected: false };
   }
 
