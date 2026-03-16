@@ -367,6 +367,32 @@ Both JSON and Markdown outputs are fully deterministic: the same input files alw
 
 ---
 
+## Testing
+
+The project includes a comprehensive test suite built with **Vitest**, chosen for its native ESM support (the project uses `"type": "module"`), first-class TypeScript integration, and fast execution. Tests are organized into three layers:
+
+```
+test/
+  helpers/mock-tx.ts            — TransactionContext builder with sensible defaults
+  unit/heuristics/*.test.ts     — 9 heuristic tests + classifier (64 test cases)
+  unit/lib/*.test.ts            — Script classification, address derivation, hashing, BufferReader
+  unit/stats.test.ts            — Fee rate statistics and script type distribution
+  unit/report-json.test.ts      — Report builder and flagged transaction counting
+  integration/chain-analyzer.test.ts — Full pipeline test with real fixture data
+```
+
+**Unit tests** verify each heuristic in isolation using a `mockCtx()` helper that constructs `TransactionContext` objects from partial inputs. Every heuristic is tested for coinbase exclusion, positive detection, negative cases, and boundary conditions (e.g., round-number thresholds, fee ratio limits, script type mismatches). Library tests cover script classification for all standard output types (P2PKH, P2SH, P2WPKH, P2WSH, P2TR, OP_RETURN), address derivation across mainnet and testnet, cryptographic hashing (SHA256, SHA256d, HASH160), and the binary reader's CompactSize decoding.
+
+**Integration tests** load the real `blk04330.dat` / `rev04330.dat` / `xor.dat` fixtures, run the full analysis pipeline, and verify structural properties: correct block count (84), all 9 heuristics applied, all 6 classification types present, ascending block height order, valid fee rate statistics, and coinbase handling.
+
+Run the full suite with:
+
+```bash
+npm test
+```
+
+---
+
 ## References
 
 ### Academic Papers
