@@ -6,12 +6,12 @@
 import type { TransactionClassification, HeuristicId } from "./types";
 
 export const CLASSIFICATION_COLORS: Record<TransactionClassification, string> = {
-  simple_payment: "#94a3b8",
-  batch_payment: "#3b82f6",
-  consolidation: "#06b6d4",
-  coinjoin: "#f43f5e",
-  self_transfer: "#a855f7",
-  unknown: "#6b7280",
+  simple_payment: "#7c8e9e",
+  batch_payment: "#38a3a5",
+  consolidation: "#57cc99",
+  coinjoin: "#e07a5f",
+  self_transfer: "#8e7cc3",
+  unknown: "#8896a4",
 };
 
 export const CLASSIFICATION_LABELS: Record<TransactionClassification, string> = {
@@ -24,15 +24,15 @@ export const CLASSIFICATION_LABELS: Record<TransactionClassification, string> = 
 };
 
 export const HEURISTIC_COLORS: Record<HeuristicId, string> = {
-  cioh: "#10b981",
-  change_detection: "#14b8a6",
-  address_reuse: "#f59e0b",
-  coinjoin: "#f43f5e",
-  consolidation: "#06b6d4",
-  self_transfer: "#a855f7",
-  round_number_payment: "#6366f1",
-  op_return: "#f97316",
-  peeling_chain: "#84cc16",
+  cioh: "#2d9f6f",
+  change_detection: "#38a3a5",
+  address_reuse: "#e9c46a",
+  coinjoin: "#e07a5f",
+  consolidation: "#57cc99",
+  self_transfer: "#8e7cc3",
+  round_number_payment: "#4a90d9",
+  op_return: "#c77dba",
+  peeling_chain: "#95d45a",
 };
 
 export const HEURISTIC_LABELS: Record<HeuristicId, string> = {
@@ -72,13 +72,13 @@ export const HEURISTIC_DESCRIPTIONS: Record<HeuristicId, string> = {
 };
 
 export const SCRIPT_TYPE_COLORS: Record<string, string> = {
-  p2wpkh: "#3b82f6",
-  p2tr: "#8b5cf6",
-  p2sh: "#f59e0b",
-  p2wsh: "#06b6d4",
-  p2pkh: "#10b981",
-  op_return: "#f43f5e",
-  unknown: "#6b7280",
+  p2wpkh: "#2d9f6f",
+  p2tr: "#8e7cc3",
+  p2sh: "#e9c46a",
+  p2wsh: "#38a3a5",
+  p2pkh: "#4a90d9",
+  op_return: "#c77dba",
+  unknown: "#8896a4",
 };
 
 export const SCRIPT_TYPE_LABELS: Record<string, string> = {
