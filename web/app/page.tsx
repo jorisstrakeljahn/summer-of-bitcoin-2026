@@ -35,8 +35,8 @@ export default function Dashboard() {
     }
   }, [files, activeStem]);
 
-  const { data: analysis, loading: analysisLoading } = useAnalysis(activeStem);
-  const { stats } = useStats(activeStem);
+  const { data: analysis, loading: analysisLoading, error: analysisError } = useAnalysis(activeStem);
+  const { stats, error: statsError } = useStats(activeStem);
 
   const handleStemChange = (stem: string) => {
     setActiveStem(stem);
@@ -95,6 +95,12 @@ export default function Dashboard() {
             {analysisLoading && (
               <div className="flex items-center justify-center py-20">
                 <Spinner size="lg" />
+              </div>
+            )}
+
+            {(analysisError || statsError) && (
+              <div className="rounded-xl bg-destructive/10 px-4 py-3 text-sm text-destructive">
+                Failed to load analysis data. Please try again.
               </div>
             )}
 

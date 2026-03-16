@@ -3,27 +3,36 @@
 /**
  * React hooks for analysis data: useFiles, useAnalysis, useStats, useTransactions.
  * Fetch file list, block summaries, stats, and paginated transactions from API.
+ * All hooks include error state handling and response validation.
  */
 import { useState, useEffect, useCallback } from "react";
 import type { FileSummary, BlockSummary, StatsResponse, AnalysisSummary, TransactionsPage } from "../types";
 import { DEFAULT_PAGE_SIZE } from "../constants";
 
+async function fetchJson<T>(url: string): Promise<T> {
+  const r = await fetch(url);
+  if (!r.ok) throw new Error(`${r.status} ${r.statusText}`);
+  return r.json();
+}
+
 export function useFiles() {
   const [files, setFiles] = useState<FileSummary[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [tick, setTick] = useState(0);
 
   useEffect(() => {
     setLoading(true);
-    fetch("/api/files")
-      .then((r) => r.json())
+    setError(null);
+    fetchJson<FileSummary[]>("/api/files")
       .then(setFiles)
+      .catch((e) => setError(e.message))
       .finally(() => setLoading(false));
   }, [tick]);
 
   const refetch = useCallback(() => setTick((t) => t + 1), []);
 
-  return { files, loading, refetch };
+  return { files, loading, error, refetch };
 }
 
 interface AnalysisData {
@@ -37,33 +46,37 @@ interface AnalysisData {
 export function useAnalysis(stem: string | null) {
   const [data, setData] = useState<AnalysisData | null>(null);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!stem) return;
     setLoading(true);
-    fetch(`/api/analysis/${stem}`)
-      .then((r) => r.json())
+    setError(null);
+    fetchJson<AnalysisData>(`/api/analysis/${stem}`)
       .then(setData)
+      .catch((e) => setError(e.message))
       .finally(() => setLoading(false));
   }, [stem]);
 
-  return { data, loading };
+  return { data, loading, error };
 }
 
 export function useStats(stem: string | null) {
   const [stats, setStats] = useState<StatsResponse | null>(null);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!stem) return;
     setLoading(true);
-    fetch(`/api/analysis/${stem}/stats`)
-      .then((r) => r.json())
+    setError(null);
+    fetchJson<StatsResponse>(`/api/analysis/${stem}/stats`)
       .then(setStats)
+      .catch((e) => setError(e.message))
       .finally(() => setLoading(false));
   }, [stem]);
 
-  return { stats, loading };
+  return { stats, loading, error };
 }
 
 export function useTransactions(
@@ -78,19 +91,21 @@ export function useTransactions(
 ) {
   const [data, setData] = useState<TransactionsPage | null>(null);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const fetchPage = useCallback(() => {
     if (!stem || blockIdx === null) return;
     setLoading(true);
+    setError(null);
 
     const params = new URLSearchParams({ page: String(page), size: String(DEFAULT_PAGE_SIZE) });
     if (filters.classification) params.set("classification", filters.classification);
     if (filters.heuristic) params.set("heuristic", filters.heuristic);
     if (filters.search && filters.search.length >= 4) params.set("search", filters.search);
 
-    fetch(`/api/analysis/${stem}/blocks/${blockIdx}/transactions?${params}`)
-      .then((r) => r.json())
+    fetchJson<TransactionsPage>(`/api/analysis/${stem}/blocks/${blockIdx}/transactions?${params}`)
       .then(setData)
+      .catch((e) => setError(e.message))
       .finally(() => setLoading(false));
   }, [stem, blockIdx, page, filters.classification, filters.heuristic, filters.search]);
 
@@ -98,5 +113,5 @@ export function useTransactions(
     fetchPage();
   }, [fetchPage]);
 
-  return { data, loading };
+  return { data, loading, error };
 }

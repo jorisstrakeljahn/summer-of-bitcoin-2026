@@ -36,7 +36,7 @@ export function TransactionExplorer({ stem, blockIdx, onViewGraph }: Props) {
     [classificationFilter, heuristicFilter, debouncedSearch],
   );
 
-  const { data, loading } = useTransactions(stem, blockIdx, page, filters);
+  const { data, loading, error } = useTransactions(stem, blockIdx, page, filters);
 
   const handleFilterChange = (setter: (v: string) => void) => (val: string) => {
     setter(val);
@@ -73,7 +73,13 @@ export function TransactionExplorer({ stem, blockIdx, onViewGraph }: Props) {
         </div>
       )}
 
-      {!loading && data && (
+      {error && !loading && (
+        <p className="px-4 py-8 text-center text-sm text-destructive">
+          Failed to load transactions. Please try again.
+        </p>
+      )}
+
+      {!loading && !error && data && (
         <>
           <div className="divide-y">
             {data.transactions.length === 0 && (

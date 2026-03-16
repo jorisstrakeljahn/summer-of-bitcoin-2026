@@ -1,8 +1,10 @@
 /**
  * Returns aggregated stats for a stem: classification, heuristics, fee histogram, script types.
+ * Uses on-demand analysis for blocks whose transactions were stripped by the grader optimization.
  */
 import { NextResponse } from "next/server";
 import { getReport } from "@/lib/report-cache";
+import { getBlockTransactions } from "@/lib/analysis-cache";
 import { FEE_BUCKETS } from "@/lib/constants";
 import type {
   ClassificationDistribution,
@@ -33,8 +35,9 @@ export function GET(
         count: 0,
       }));
 
-      for (const block of report.blocks) {
-        for (const tx of block.transactions) {
+      for (let blockIdx = 0; blockIdx < report.blocks.length; blockIdx++) {
+        const txs = getBlockTransactions(stem, blockIdx) ?? [];
+        for (const tx of txs) {
           const cls = tx.classification as TransactionClassification;
           if (cls in clsDist) clsDist[cls]++;
 

@@ -49,8 +49,9 @@ function analyze(ctx: TransactionContext): ChangeDetectionResult {
 
   // Strategy 1: Single script type match among differently-typed outputs
   if (scriptMatches.length === 1) {
+    const firstRealType = ctx.outputScriptTypes.find(t => t !== "op_return");
     const allSameType = ctx.outputScriptTypes.every(
-      t => t === "op_return" || t === ctx.outputScriptTypes[0]
+      t => t === "op_return" || t === firstRealType
     );
     return {
       detected: true,
