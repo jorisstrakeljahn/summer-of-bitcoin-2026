@@ -155,6 +155,16 @@ export function invalidateBlockData(stem: string): void {
   cache.delete(stem);
 }
 
+/** Return parsed block + undo data for a single block by index. */
+export function getRawBlock(
+  stem: string,
+  blockIdx: number,
+): { block: ParsedBlock; undo: BlockUndo } | null {
+  const data = loadBlockData(stem);
+  if (blockIdx < 0 || blockIdx >= data.blocks.length) return null;
+  return { block: data.blocks[blockIdx], undo: data.undos[blockIdx] };
+}
+
 export function getTxDetail(
   stem: string,
   txid: string,
