@@ -20,6 +20,7 @@ interface Props {
 export function BlockMosaic({ stem, blockIdx, onTxClick }: Props) {
   const [transactions, setTransactions] = useState<MosaicTx[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
   const [hoveredTx, setHoveredTx] = useState<MosaicTx | null>(null);
   const [selectedTx, setSelectedTx] = useState<MosaicTx | null>(null);
   const [tileSize, setTileSize] = useState(6);
@@ -34,10 +35,14 @@ export function BlockMosaic({ stem, blockIdx, onTxClick }: Props) {
 
   useEffect(() => {
     setLoading(true);
+    setError(false);
     fetch(
       `/api/analysis/${stem}/blocks/${blockIdx}/transactions?page=1&size=200`,
     )
-      .then((r) => r.json())
+      .then((r) => {
+        if (!r.ok) throw new Error("fetch failed");
+        return r.json();
+      })
       .then((data) => {
         const allTxs: MosaicTx[] = [];
         const fetchAll = async () => {
@@ -52,6 +57,7 @@ export function BlockMosaic({ stem, blockIdx, onTxClick }: Props) {
             const res = await fetch(
               `/api/analysis/${stem}/blocks/${blockIdx}/transactions?page=${p}&size=200`,
             );
+            if (!res.ok) throw new Error("fetch failed");
             const page = await res.json();
             allTxs.push(
               ...page.transactions.map((t: MosaicTx) => ({
@@ -63,9 +69,15 @@ export function BlockMosaic({ stem, blockIdx, onTxClick }: Props) {
           setTransactions(allTxs);
           setLoading(false);
         };
-        fetchAll();
+        fetchAll().catch(() => {
+          setError(true);
+          setLoading(false);
+        });
       })
-      .catch(() => setLoading(false));
+      .catch(() => {
+        setError(true);
+        setLoading(false);
+      });
   }, [stem, blockIdx]);
 
   const legend = useMemo(() => {
@@ -90,6 +102,28 @@ export function BlockMosaic({ stem, blockIdx, onTxClick }: Props) {
         <div className="mt-4 flex items-center justify-center py-8">
           <Spinner />
         </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="rounded-xl bg-card p-5">
+        <h3 className="text-sm font-semibold">Block Mosaic</h3>
+        <p className="mt-4 py-8 text-center text-sm text-destructive">
+          Failed to load transactions. Please try again.
+        </p>
+      </div>
+    );
+  }
+
+  if (transactions.length === 0) {
+    return (
+      <div className="rounded-xl bg-card p-5">
+        <h3 className="text-sm font-semibold">Block Mosaic</h3>
+        <p className="mt-4 py-8 text-center text-sm text-muted-foreground">
+          No transactions in this block.
+        </p>
       </div>
     );
   }

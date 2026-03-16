@@ -39,7 +39,7 @@ export function Sidebar({
 
       <aside
         className={cn(
-          "fixed left-0 top-14 z-40 h-[calc(100vh-3.5rem)] w-56 shrink-0 border-r bg-sidebar transition-transform lg:static lg:translate-x-0",
+          "fixed left-0 top-14 z-40 h-[calc(100vh-3.5rem)] w-56 shrink-0 border-r bg-sidebar transition-transform lg:sticky lg:top-14 lg:max-h-[calc(100vh-3.5rem)] lg:self-start lg:translate-x-0",
           open ? "translate-x-0" : "-translate-x-full",
         )}
       >
@@ -67,11 +67,19 @@ export function Sidebar({
                 />
               ))}
 
+            {!loading && blocks.length === 0 && (
+              <p className="px-2 py-4 text-center text-xs text-muted-foreground">
+                No blocks available.
+              </p>
+            )}
+
             {!loading &&
               blocks.map((block) => (
                 <button
                   key={block.index}
                   onClick={() => handleSelect(block.index)}
+                  aria-label={`Block #${block.block_height}, ${block.tx_count} transactions`}
+                  aria-pressed={activeBlockIdx === block.index}
                   className={cn(
                     "mb-1 w-full rounded-md px-2 py-2.5 text-left transition-all",
                     activeBlockIdx === block.index

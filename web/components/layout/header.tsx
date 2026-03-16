@@ -43,8 +43,10 @@ export function Header({
         </button>
 
         <Search className="h-5 w-5 text-primary" />
-        <h1 className="text-lg font-bold tracking-tight">Sherlock</h1>
-        <span className="hidden text-xs text-muted-foreground sm:inline">
+        <h1 className="text-lg font-bold tracking-tight">
+          <span className="text-primary">Sherlock</span>
+        </h1>
+        <span className="hidden text-xs font-medium text-muted-foreground sm:inline">
           Bitcoin Chain Analysis
         </span>
       </div>

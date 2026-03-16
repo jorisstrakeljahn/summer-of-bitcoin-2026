@@ -90,7 +90,7 @@ export default function Dashboard() {
           onClose={() => setSidebarOpen(false)}
         />
 
-        <main className="flex-1 overflow-y-auto">
+        <main className="flex-1 min-w-0">
           <div className="mx-auto max-w-[1400px] space-y-6 p-4 md:p-6">
             {analysisLoading && (
               <div className="flex items-center justify-center py-20">

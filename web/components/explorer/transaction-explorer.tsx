@@ -108,11 +108,12 @@ export function TransactionExplorer({ stem, blockIdx, onViewGraph }: Props) {
                 <button
                   onClick={() => setPage((p) => Math.max(1, p - 1))}
                   disabled={page <= 1}
+                  aria-label="Previous page"
                   className="rounded p-2.5 hover:bg-accent disabled:opacity-30 transition-colors"
                 >
                   <ChevronLeft className="h-4 w-4" />
                 </button>
-                <span className="text-xs font-medium">
+                <span className="text-xs font-medium" aria-live="polite">
                   {data.page} / {data.total_pages}
                 </span>
                 <button
@@ -120,6 +121,7 @@ export function TransactionExplorer({ stem, blockIdx, onViewGraph }: Props) {
                     setPage((p) => Math.min(data.total_pages, p + 1))
                   }
                   disabled={page >= data.total_pages}
+                  aria-label="Next page"
                   className="rounded p-2.5 hover:bg-accent disabled:opacity-30 transition-colors"
                 >
                   <ChevronRight className="h-4 w-4" />
