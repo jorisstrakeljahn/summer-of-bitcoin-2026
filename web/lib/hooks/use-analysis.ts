@@ -11,15 +11,19 @@ import { DEFAULT_PAGE_SIZE } from "../constants";
 export function useFiles() {
   const [files, setFiles] = useState<FileSummary[]>([]);
   const [loading, setLoading] = useState(true);
+  const [tick, setTick] = useState(0);
 
   useEffect(() => {
+    setLoading(true);
     fetch("/api/files")
       .then((r) => r.json())
       .then(setFiles)
       .finally(() => setLoading(false));
-  }, []);
+  }, [tick]);
 
-  return { files, loading };
+  const refetch = useCallback(() => setTick((t) => t + 1), []);
+
+  return { files, loading, refetch };
 }
 
 interface AnalysisData {

@@ -17,15 +17,17 @@ import { ScriptTypeChart } from "@/components/charts/script-type-chart";
 import { TransactionExplorer } from "@/components/explorer/transaction-explorer";
 import { FlowModal } from "@/components/flow/flow-modal";
 import { BlockMosaic } from "@/components/mosaic/block-mosaic";
+import { UploadModal } from "@/components/upload/upload-modal";
 import { useFiles, useAnalysis, useStats } from "@/lib/hooks/use-analysis";
 import { formatTimestamp } from "@/lib/utils";
 
 export default function Dashboard() {
-  const { files } = useFiles();
+  const { files, refetch: refetchFiles } = useFiles();
   const [activeStem, setActiveStem] = useState<string | null>(null);
   const [activeBlockIdx, setActiveBlockIdx] = useState<number | null>(null);
   const [flowTxid, setFlowTxid] = useState<string | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [uploadOpen, setUploadOpen] = useState(false);
 
   useEffect(() => {
     if (files.length > 0 && !activeStem) {
@@ -37,6 +39,13 @@ export default function Dashboard() {
   const { stats } = useStats(activeStem);
 
   const handleStemChange = (stem: string) => {
+    setActiveStem(stem);
+    setActiveBlockIdx(null);
+  };
+
+  const handleUploadSuccess = (stem: string) => {
+    setUploadOpen(false);
+    refetchFiles();
     setActiveStem(stem);
     setActiveBlockIdx(null);
   };
@@ -68,6 +77,7 @@ export default function Dashboard() {
         onStemChange={handleStemChange}
         sidebarOpen={sidebarOpen}
         onToggleSidebar={() => setSidebarOpen((p) => !p)}
+        onUploadClick={() => setUploadOpen(true)}
       />
 
       <div className="flex flex-1">
@@ -184,6 +194,13 @@ export default function Dashboard() {
           stem={activeStem}
           txid={flowTxid}
           onClose={() => setFlowTxid(null)}
+        />
+      )}
+
+      {uploadOpen && (
+        <UploadModal
+          onClose={() => setUploadOpen(false)}
+          onSuccess={handleUploadSuccess}
         />
       )}
     </div>

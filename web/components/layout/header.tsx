@@ -1,9 +1,10 @@
 /**
- * App header with title, file selector, theme toggle, and mobile sidebar trigger.
+ * App header with title, file selector, upload trigger, theme toggle,
+ * and mobile sidebar trigger.
  */
 "use client";
 
-import { Search, Sun, Moon, Menu, X } from "lucide-react";
+import { Search, Sun, Moon, Menu, X, Upload } from "lucide-react";
 import { useTheme } from "@/components/theme-provider";
 import type { FileSummary } from "@/lib/types";
 
@@ -13,6 +14,7 @@ interface HeaderProps {
   onStemChange: (stem: string) => void;
   sidebarOpen: boolean;
   onToggleSidebar: () => void;
+  onUploadClick: () => void;
 }
 
 export function Header({
@@ -21,6 +23,7 @@ export function Header({
   onStemChange,
   sidebarOpen,
   onToggleSidebar,
+  onUploadClick,
 }: HeaderProps) {
   const { theme, toggleTheme } = useTheme();
 
@@ -46,11 +49,11 @@ export function Header({
         </span>
       </div>
 
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-2 sm:gap-3">
         <select
           value={activeStem ?? ""}
           onChange={(e) => onStemChange(e.target.value)}
-          className="max-w-[160px] truncate rounded-md border bg-card px-3 py-2 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary sm:max-w-none"
+          className="max-w-[120px] truncate rounded-md border bg-card px-2 py-2 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary sm:max-w-none sm:px-3"
         >
           {files.length === 0 && <option value="">Loading...</option>}
           {files.map((f) => (
@@ -59,6 +62,15 @@ export function Header({
             </option>
           ))}
         </select>
+
+        <button
+          onClick={onUploadClick}
+          className="flex items-center gap-1.5 rounded-md border px-2.5 py-2 text-sm font-medium hover:bg-accent transition-colors sm:px-3"
+          aria-label="Upload files"
+        >
+          <Upload className="h-4 w-4" />
+          <span className="hidden sm:inline">Upload</span>
+        </button>
 
         <button
           onClick={toggleTheme}
