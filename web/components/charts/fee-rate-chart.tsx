@@ -6,6 +6,7 @@
 import {
   BarChart,
   Bar,
+  Cell,
   XAxis,
   YAxis,
   Tooltip,
@@ -27,7 +28,7 @@ export function FeeRateChart({ histogram, stats }: Props) {
   const maxCount = Math.max(...histogram.map((h) => h.count), 1);
 
   return (
-    <div className="rounded-lg border bg-card p-5">
+    <div className="rounded-xl bg-card p-5">
       <div className="flex items-center gap-2">
         <h3 className="flex-1 text-sm font-semibold">Fee Rate Distribution</h3>
         <InfoButton title={INFO.feeRateDistribution.title}>
@@ -75,12 +76,12 @@ export function FeeRateChart({ histogram, stats }: Props) {
               />
             )}
             <Bar dataKey="count" radius={[4, 4, 0, 0]}>
-              {histogram.map((_, i) => {
+              {histogram.map((entry, i) => {
                 const ratio = histogram[i].count / maxCount;
                 const hue = 160 - ratio * 85;
                 return (
-                  <rect
-                    key={i}
+                  <Cell
+                    key={entry.range}
                     fill={`oklch(0.65 0.18 ${hue})`}
                   />
                 );

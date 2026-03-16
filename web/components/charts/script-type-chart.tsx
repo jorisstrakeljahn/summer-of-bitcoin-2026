@@ -33,7 +33,7 @@ export function ScriptTypeChart({ distribution }: Props) {
   }));
 
   return (
-    <div className="rounded-lg border bg-card p-5">
+    <div className="rounded-xl bg-card p-5">
       <div className="flex items-center gap-2">
         <h3 className="flex-1 text-sm font-semibold">Script Type Distribution</h3>
         <InfoButton title={INFO.scriptTypeDistribution.title}>

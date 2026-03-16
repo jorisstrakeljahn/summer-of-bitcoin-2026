@@ -85,7 +85,7 @@ export function BlockMosaic({ stem, blockIdx, onTxClick }: Props) {
 
   if (loading) {
     return (
-      <div className="rounded-lg border bg-card p-5">
+      <div className="rounded-xl bg-card p-5">
         <h3 className="text-sm font-semibold">Block Mosaic</h3>
         <div className="mt-4 flex items-center justify-center py-8">
           <Spinner />
@@ -95,7 +95,7 @@ export function BlockMosaic({ stem, blockIdx, onTxClick }: Props) {
   }
 
   return (
-    <div className="rounded-lg border bg-card p-5">
+    <div className="rounded-xl bg-card p-5">
       <div className="flex items-center justify-between gap-2">
         <div className="flex items-center gap-2">
           <h3 className="text-sm font-semibold">

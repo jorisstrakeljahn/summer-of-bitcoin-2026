@@ -44,8 +44,8 @@ export function TransactionExplorer({ stem, blockIdx, onViewGraph }: Props) {
   };
 
   return (
-    <div className="rounded-lg border bg-card">
-      <div className="border-b px-4 py-3">
+    <div className="rounded-xl bg-card">
+      <div className="border-b border-border/50 px-4 py-3">
         <div className="flex items-center gap-2">
           <h3 className="flex-1 text-sm font-semibold">Transaction Explorer</h3>
           <InfoButton title={INFO.transactionExplorer.title}>
@@ -92,7 +92,7 @@ export function TransactionExplorer({ stem, blockIdx, onViewGraph }: Props) {
           </div>
 
           {data.total_pages > 1 && (
-            <div className="flex items-center justify-between border-t px-4 py-3">
+            <div className="flex items-center justify-between border-t border-border/50 px-4 py-3">
               <p className="text-xs text-muted-foreground">
                 Showing {(data.page - 1) * data.size + 1}–
                 {Math.min(data.page * data.size, data.total)} of{" "}

@@ -19,7 +19,7 @@ export function ChartTooltip({ active, payload, label, formatValue }: Props) {
   if (!active || !payload?.length) return null;
 
   return (
-    <div className="rounded-md border bg-popover px-3 py-2 text-xs text-popover-foreground shadow-lg">
+    <div className="rounded-md bg-popover px-3 py-2 text-xs text-popover-foreground shadow-lg">
       {label && (
         <p className="mb-1.5 font-medium text-foreground">{label}</p>
       )}

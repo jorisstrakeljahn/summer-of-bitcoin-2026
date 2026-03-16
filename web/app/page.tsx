@@ -101,7 +101,7 @@ export default function Dashboard() {
             {summary && !analysisLoading && (
               <>
                 {activeBlock && (
-                  <div className="rounded-lg border bg-card p-5">
+                  <div className="rounded-xl bg-card p-5">
                     <div className="flex items-center justify-between">
                       <h2 className="text-sm font-semibold">
                         Block #{activeBlock.block_height.toLocaleString()}

@@ -53,7 +53,7 @@ export function Header({
         <select
           value={activeStem ?? ""}
           onChange={(e) => onStemChange(e.target.value)}
-          className="max-w-[120px] truncate rounded-md border bg-card px-2 py-2 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary sm:max-w-none sm:px-3"
+          className="max-w-[120px] truncate rounded-md bg-muted/50 px-2 py-2 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary sm:max-w-none sm:px-3"
         >
           {files.length === 0 && <option value="">Loading...</option>}
           {files.map((f) => (
@@ -65,7 +65,7 @@ export function Header({
 
         <button
           onClick={onUploadClick}
-          className="flex items-center gap-1.5 rounded-md border px-2.5 py-2 text-sm font-medium hover:bg-accent transition-colors sm:px-3"
+          className="flex items-center gap-1.5 rounded-md bg-muted/50 px-2.5 py-2 text-sm font-medium hover:bg-accent transition-colors sm:px-3"
           aria-label="Upload files"
         >
           <Upload className="h-4 w-4" />

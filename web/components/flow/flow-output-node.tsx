@@ -22,7 +22,7 @@ export function FlowOutputNode({ data: d }: NodeProps<FlowOutputNodeType>) {
   const pct = Math.max(4, d.proportion * 100);
 
   return (
-    <div className="relative w-44 rounded-lg border bg-card px-2.5 py-2 text-xs shadow-sm">
+    <div className="relative w-44 rounded-lg border bg-card px-2.5 py-2 text-xs">
       <div className="flex items-center justify-between">
         <span className="font-semibold text-foreground">{d.label}</span>
         <div className="flex gap-1">

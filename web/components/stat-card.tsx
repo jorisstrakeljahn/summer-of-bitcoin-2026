@@ -13,7 +13,7 @@ interface StatCardProps {
 
 export function StatCard({ icon, label, value, subtitle, info }: StatCardProps) {
   return (
-    <div className="rounded-lg border bg-card p-4 transition-all hover:border-primary/30 hover:shadow-sm md:p-5">
+    <div className="rounded-xl bg-card p-4 transition-all md:p-5">
       <div className="flex items-center gap-2">
         {icon}
         <p className="flex-1 text-xs font-medium text-muted-foreground">

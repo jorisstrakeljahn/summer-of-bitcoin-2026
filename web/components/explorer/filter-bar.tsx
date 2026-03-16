@@ -33,7 +33,7 @@ export function FilterBar({
         <select
           value={classificationFilter}
           onChange={(e) => onClassificationChange(e.target.value)}
-          className="flex-1 rounded-md border bg-card px-2.5 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-primary sm:flex-none"
+          className="flex-1 rounded-md bg-muted/50 px-2.5 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-primary sm:flex-none"
         >
           <option value="">All Classifications</option>
           {CLASSIFICATIONS.map((c) => (
@@ -46,7 +46,7 @@ export function FilterBar({
         <select
           value={heuristicFilter}
           onChange={(e) => onHeuristicChange(e.target.value)}
-          className="flex-1 rounded-md border bg-card px-2.5 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-primary sm:flex-none"
+          className="flex-1 rounded-md bg-muted/50 px-2.5 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-primary sm:flex-none"
         >
           <option value="">All Heuristics</option>
           {HEURISTICS.map((h) => (
@@ -64,7 +64,7 @@ export function FilterBar({
           value={search}
           onChange={(e) => onSearchChange(e.target.value)}
           placeholder="Search by TXID (min 4 chars)..."
-          className="w-full rounded-md border bg-card py-2 pl-8 pr-3 text-xs placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+          className="w-full rounded-md bg-muted/50 py-2 pl-8 pr-3 text-xs placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
         />
       </div>
     </div>

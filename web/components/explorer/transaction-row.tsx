@@ -31,7 +31,7 @@ export function TransactionRow({ tx, stem, onViewGraph }: Props) {
   };
 
   return (
-    <div className="border-b last:border-b-0">
+    <div className="border-b border-border/30 last:border-b-0">
       <button
         onClick={() => setExpanded(!expanded)}
         className="flex w-full items-start gap-2 px-3 py-3 text-left hover:bg-accent/50 transition-colors sm:items-center sm:gap-3 sm:px-4 sm:py-2.5"
@@ -67,7 +67,7 @@ export function TransactionRow({ tx, stem, onViewGraph }: Props) {
       </button>
 
       {expanded && (
-        <div className="border-t bg-muted/30 px-4 py-4">
+        <div className="border-t border-border/30 bg-muted/30 px-4 py-4">
           <div className="flex items-center gap-2">
             <span className="text-xs text-muted-foreground">TXID:</span>
             <code className="flex-1 break-all font-mono text-xs">
@@ -104,7 +104,7 @@ export function TransactionRow({ tx, stem, onViewGraph }: Props) {
                 {heuristicIds.map((h) => (
                   <div
                     key={h}
-                    className="rounded-md border bg-card p-3"
+                    className="rounded-lg bg-muted/40 p-3"
                   >
                     <p className="text-xs font-semibold">
                       {HEURISTIC_LABELS[h as HeuristicId] ?? h}
