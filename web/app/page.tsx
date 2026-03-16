@@ -5,9 +5,10 @@
 
 import { useState, useEffect } from "react";
 import { Activity, AlertTriangle, Gauge, Layers } from "lucide-react";
-import { InfoButton } from "@/components/info-panel";
 import { INFO } from "@/lib/info-content";
 import { Header } from "@/components/layout/header";
+import { StatCard } from "@/components/stat-card";
+import { Spinner } from "@/components/spinner";
 import { Sidebar } from "@/components/layout/sidebar";
 import { ClassificationChart } from "@/components/charts/classification-chart";
 import { FeeRateChart } from "@/components/charts/fee-rate-chart";
@@ -83,7 +84,7 @@ export default function Dashboard() {
           <div className="mx-auto max-w-[1400px] space-y-6 p-4 md:p-6">
             {analysisLoading && (
               <div className="flex items-center justify-center py-20">
-                <div className="h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+                <Spinner size="lg" />
               </div>
             )}
 
@@ -184,38 +185,6 @@ export default function Dashboard() {
           txid={flowTxid}
           onClose={() => setFlowTxid(null)}
         />
-      )}
-    </div>
-  );
-}
-
-function StatCard({
-  icon,
-  label,
-  value,
-  subtitle,
-  info,
-}: {
-  icon: React.ReactNode;
-  label: string;
-  value: string;
-  subtitle?: string;
-  info?: { title: string; body: React.ReactNode };
-}) {
-  return (
-    <div className="rounded-lg border bg-card p-4 transition-all hover:border-primary/30 hover:shadow-sm md:p-5">
-      <div className="flex items-center gap-2">
-        {icon}
-        <p className="flex-1 text-xs font-medium text-muted-foreground">
-          {label}
-        </p>
-        {info && (
-          <InfoButton title={info.title}>{info.body}</InfoButton>
-        )}
-      </div>
-      <p className="mt-2 text-2xl font-bold tracking-tight">{value}</p>
-      {subtitle && (
-        <p className="mt-0.5 text-xs text-muted-foreground">{subtitle}</p>
       )}
     </div>
   );

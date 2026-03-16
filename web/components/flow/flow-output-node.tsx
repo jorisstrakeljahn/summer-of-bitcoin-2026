@@ -3,7 +3,7 @@
  */
 "use client";
 
-import { Handle, Position, type NodeProps } from "@xyflow/react";
+import { Handle, Position, type NodeProps, type Node } from "@xyflow/react";
 import { AlertTriangle, FileCode } from "lucide-react";
 
 export interface FlowOutputData {
@@ -16,8 +16,9 @@ export interface FlowOutputData {
   isOpReturn: boolean;
 }
 
-export function FlowOutputNode({ data }: NodeProps) {
-  const d = data as unknown as FlowOutputData;
+type FlowOutputNode = Node<FlowOutputData, "flowOutput">;
+
+export function FlowOutputNode({ data: d }: NodeProps<FlowOutputNode>) {
   const pct = Math.max(4, d.proportion * 100);
 
   return (
@@ -50,7 +51,7 @@ export function FlowOutputNode({ data }: NodeProps) {
           style={{ width: `${pct}%` }}
         />
       </div>
-      <Handle type="target" position={Position.Left} className="!bg-primary" />
+      <Handle type="target" position={Position.Left} className="bg-primary!" />
     </div>
   );
 }

@@ -5,6 +5,7 @@
 
 import { useState, useEffect, useMemo } from "react";
 import { CLASSIFICATION_COLORS, CLASSIFICATION_LABELS } from "@/lib/constants";
+import { Spinner } from "@/components/spinner";
 import { InfoButton } from "@/components/info-panel";
 import { INFO } from "@/lib/info-content";
 import type { TransactionClassification, MosaicTx } from "@/lib/types";
@@ -87,7 +88,7 @@ export function BlockMosaic({ stem, blockIdx, onTxClick }: Props) {
       <div className="rounded-lg border bg-card p-5">
         <h3 className="text-sm font-semibold">Block Mosaic</h3>
         <div className="mt-4 flex items-center justify-center py-8">
-          <div className="h-6 w-6 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+          <Spinner />
         </div>
       </div>
     );

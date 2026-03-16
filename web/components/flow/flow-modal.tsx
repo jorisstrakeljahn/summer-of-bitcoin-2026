@@ -6,6 +6,7 @@
 import { useState, useEffect } from "react";
 import { X } from "lucide-react";
 import { TransactionFlow } from "./transaction-flow";
+import { Spinner } from "@/components/spinner";
 import { InfoButton } from "@/components/info-panel";
 import { INFO } from "@/lib/info-content";
 import type { TxDetailResponse } from "@/lib/block-cache-types";
@@ -45,7 +46,7 @@ export function FlowModal({ stem, txid, onClose }: Props) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-      <div className="relative mx-0 flex h-[100dvh] w-full flex-col border bg-background shadow-2xl sm:mx-4 sm:h-[80vh] sm:max-w-5xl sm:rounded-lg">
+      <div className="relative mx-0 flex h-dvh w-full flex-col border bg-background shadow-2xl sm:mx-4 sm:h-[80vh] sm:max-w-5xl sm:rounded-lg">
         <div className="flex items-center justify-between border-b px-5 py-3">
           <div className="flex items-center gap-2">
             <div>
@@ -71,7 +72,7 @@ export function FlowModal({ stem, txid, onClose }: Props) {
           {loading && (
             <div className="flex h-full items-center justify-center">
               <div className="text-center">
-                <div className="mx-auto h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+                <Spinner size="lg" className="mx-auto" />
                 <p className="mt-3 text-sm text-muted-foreground">
                   Parsing transaction from raw block data...
                 </p>

@@ -55,8 +55,8 @@ export function ClassificationChart({ data }: Props) {
                 dataKey="value"
                 stroke="none"
               >
-                {chartData.map((entry, i) => (
-                  <Cell key={i} fill={entry.color} />
+                {chartData.map((entry) => (
+                  <Cell key={entry.name} fill={entry.color} />
                 ))}
               </Pie>
               <Tooltip

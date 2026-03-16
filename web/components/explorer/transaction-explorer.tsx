@@ -11,6 +11,7 @@ import { useDebounce } from "@/lib/hooks/use-debounce";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { InfoButton } from "@/components/info-panel";
 import { INFO } from "@/lib/info-content";
+import { Spinner } from "@/components/spinner";
 
 interface Props {
   stem: string;
@@ -68,7 +69,7 @@ export function TransactionExplorer({ stem, blockIdx, onViewGraph }: Props) {
 
       {loading && (
         <div className="flex items-center justify-center py-12">
-          <div className="h-6 w-6 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+          <Spinner />
         </div>
       )}
 

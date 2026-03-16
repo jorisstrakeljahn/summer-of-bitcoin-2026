@@ -3,7 +3,7 @@
  */
 "use client";
 
-import { Handle, Position, type NodeProps } from "@xyflow/react";
+import { Handle, Position, type NodeProps, type Node } from "@xyflow/react";
 
 export interface FlowTxData {
   txid: string;
@@ -11,8 +11,9 @@ export interface FlowTxData {
   version: number;
 }
 
-export function FlowTxNode({ data }: NodeProps) {
-  const d = data as unknown as FlowTxData;
+type FlowTxNode = Node<FlowTxData, "flowTx">;
+
+export function FlowTxNode({ data: d }: NodeProps<FlowTxNode>) {
 
   return (
     <div className="relative rounded-lg border-2 border-primary bg-card px-4 py-3 text-xs shadow-md">
@@ -30,8 +31,8 @@ export function FlowTxNode({ data }: NodeProps) {
           v{d.version}
         </span>
       </div>
-      <Handle type="target" position={Position.Left} className="!bg-primary" />
-      <Handle type="source" position={Position.Right} className="!bg-primary" />
+      <Handle type="target" position={Position.Left} className="bg-primary!" />
+      <Handle type="source" position={Position.Right} className="bg-primary!" />
     </div>
   );
 }

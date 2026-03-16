@@ -3,7 +3,7 @@
  */
 "use client";
 
-import { Handle, Position, type NodeProps } from "@xyflow/react";
+import { Handle, Position, type NodeProps, type Node } from "@xyflow/react";
 import { Clock } from "lucide-react";
 
 export interface FlowInputData {
@@ -15,8 +15,9 @@ export interface FlowInputData {
   hasTimelock: boolean;
 }
 
-export function FlowInputNode({ data }: NodeProps) {
-  const d = data as unknown as FlowInputData;
+type FlowInputNode = Node<FlowInputData, "flowInput">;
+
+export function FlowInputNode({ data: d }: NodeProps<FlowInputNode>) {
   const pct = Math.max(4, d.proportion * 100);
 
   return (
@@ -42,7 +43,7 @@ export function FlowInputNode({ data }: NodeProps) {
           style={{ width: `${pct}%` }}
         />
       </div>
-      <Handle type="source" position={Position.Right} className="!bg-primary" />
+      <Handle type="source" position={Position.Right} className="bg-primary!" />
     </div>
   );
 }
