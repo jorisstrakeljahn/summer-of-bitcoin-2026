@@ -14,22 +14,10 @@ import {
   Cell,
 } from "recharts";
 import { ChartTooltip } from "./chart-tooltip";
-import { HEURISTIC_COLORS, HEURISTIC_LABELS } from "@/lib/constants";
+import { HEURISTIC_COLORS, HEURISTIC_LABELS, HEURISTIC_SHORT_LABELS } from "@/lib/constants";
 import { InfoButton } from "@/components/info-panel";
 import { INFO } from "@/lib/info-content";
 import type { HeuristicId } from "@/lib/types";
-
-const SHORT_LABELS: Record<string, string> = {
-  cioh: "CIOH",
-  change_detection: "Change Det.",
-  address_reuse: "Addr Reuse",
-  coinjoin: "CoinJoin",
-  consolidation: "Consolid.",
-  self_transfer: "Self Xfer",
-  round_number_payment: "Round Num.",
-  op_return: "OP_RETURN",
-  peeling_chain: "Peeling",
-};
 
 interface Props {
   detections: Record<string, number>;
@@ -51,7 +39,7 @@ export function HeuristicChart({ detections }: Props) {
     .map(([id, count]) => ({
       id,
       name: compact
-        ? (SHORT_LABELS[id] ?? id)
+        ? (HEURISTIC_SHORT_LABELS[id as HeuristicId] ?? id)
         : (HEURISTIC_LABELS[id as HeuristicId] ?? id),
       count,
       color: HEURISTIC_COLORS[id as HeuristicId] ?? "#6b7280",

@@ -8,33 +8,15 @@ import { useState } from "react";
 import { ClassificationBadge } from "@/components/badges/classification-badge";
 import { HeuristicBadge } from "@/components/badges/heuristic-badge";
 import { truncateTxid } from "@/lib/utils";
-import type { TransactionClassification } from "@/lib/types";
-import { HEURISTIC_LABELS } from "@/lib/constants";
+import type { TransactionAnalysis, TransactionClassification } from "@/lib/types";
+import { HEURISTIC_LABELS, HEURISTIC_DESCRIPTIONS } from "@/lib/constants";
 import type { HeuristicId } from "@/lib/types";
 
-interface Transaction {
-  txid: string;
-  heuristics: Record<string, { detected: boolean }>;
-  classification: string;
-}
-
 interface Props {
-  tx: Transaction;
+  tx: TransactionAnalysis;
   stem: string;
   onViewGraph?: (txid: string) => void;
 }
-
-const HEURISTIC_DESCRIPTIONS: Record<string, string> = {
-  cioh: "Multiple inputs likely belong to the same entity (Common Input Ownership).",
-  change_detection: "Identified a likely change output based on script type or value analysis.",
-  address_reuse: "Same address appears in both inputs and outputs, weakening privacy.",
-  coinjoin: "Multiple users combine inputs with equal-value outputs to obscure ownership.",
-  consolidation: "Many inputs combined into few outputs — typical wallet maintenance.",
-  self_transfer: "All outputs match input script patterns — likely same-entity transfer.",
-  round_number_payment: "Output value is a round BTC amount, suggesting it is a payment.",
-  op_return: "Contains OP_RETURN output with embedded data (e.g., timestamps, protocols).",
-  peeling_chain: "Pattern of large input split into small payment and large change.",
-};
 
 export function TransactionRow({ tx, stem, onViewGraph }: Props) {
   const [expanded, setExpanded] = useState(false);
@@ -67,7 +49,7 @@ export function TransactionRow({ tx, stem, onViewGraph }: Props) {
 
           <span className="shrink-0 sm:w-32">
             <ClassificationBadge
-              classification={tx.classification as TransactionClassification}
+              classification={tx.classification}
             />
           </span>
 

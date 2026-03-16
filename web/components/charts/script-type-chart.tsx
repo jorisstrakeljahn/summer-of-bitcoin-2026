@@ -13,26 +13,7 @@ import {
 import { ChartTooltip } from "./chart-tooltip";
 import { InfoButton } from "@/components/info-panel";
 import { INFO } from "@/lib/info-content";
-
-const SCRIPT_COLORS: Record<string, string> = {
-  p2wpkh: "#3b82f6",
-  p2tr: "#8b5cf6",
-  p2sh: "#f59e0b",
-  p2wsh: "#06b6d4",
-  p2pkh: "#10b981",
-  op_return: "#f43f5e",
-  unknown: "#6b7280",
-};
-
-const SCRIPT_LABELS: Record<string, string> = {
-  p2wpkh: "P2WPKH",
-  p2tr: "P2TR",
-  p2sh: "P2SH",
-  p2wsh: "P2WSH",
-  p2pkh: "P2PKH",
-  op_return: "OP_RETURN",
-  unknown: "Unknown",
-};
+import { SCRIPT_TYPE_COLORS, SCRIPT_TYPE_LABELS } from "@/lib/constants";
 
 interface Props {
   distribution: Record<string, number>;
@@ -46,9 +27,9 @@ export function ScriptTypeChart({ distribution }: Props) {
   const total = entries.reduce((s, [, v]) => s + v, 0);
 
   const chartData = entries.map(([type, count]) => ({
-    name: SCRIPT_LABELS[type] ?? type,
+    name: SCRIPT_TYPE_LABELS[type] ?? type,
     value: count,
-    color: SCRIPT_COLORS[type] ?? "#6b7280",
+    color: SCRIPT_TYPE_COLORS[type] ?? "#6b7280",
   }));
 
   return (

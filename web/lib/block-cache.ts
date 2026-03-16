@@ -11,6 +11,7 @@ import { deriveAddress } from "@sherlock/lib/address";
 import type { ParsedBlock } from "@sherlock/lib/block-parser";
 import type { BlockUndo, UndoPrevout } from "@sherlock/lib/undo-parser";
 import type { ParsedTransaction } from "@sherlock/lib/types";
+import type { TxDetailVin, TxDetailVout, TxDetailResponse } from "./block-cache-types";
 
 interface TxLocation {
   blockIdx: number;
@@ -59,43 +60,6 @@ function loadBlockData(stem: string): CachedBlockData {
   const data: CachedBlockData = { blocks, undos, txIndex };
   cache.set(stem, data);
   return data;
-}
-
-export interface TxDetailVin {
-  txid: string;
-  vout: number;
-  sequence: number;
-  script_sig_hex: string;
-  script_type: string;
-  address: string | null;
-  value_sats: number;
-  has_timelock: boolean;
-}
-
-export interface TxDetailVout {
-  n: number;
-  value_sats: number;
-  script_pubkey_hex: string;
-  script_type: string;
-  address: string | null;
-  is_dust: boolean;
-  is_op_return: boolean;
-}
-
-export interface TxDetailResponse {
-  txid: string;
-  version: number;
-  segwit: boolean;
-  locktime: number;
-  size_bytes: number;
-  weight: number;
-  vbytes: number;
-  fee_sats: number;
-  fee_rate_sat_vb: number;
-  total_input_sats: number;
-  total_output_sats: number;
-  vin: TxDetailVin[];
-  vout: TxDetailVout[];
 }
 
 function hasRelativeTimelock(sequence: number): boolean {

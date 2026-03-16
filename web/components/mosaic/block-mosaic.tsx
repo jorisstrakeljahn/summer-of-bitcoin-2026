@@ -7,13 +7,8 @@ import { useState, useEffect, useMemo } from "react";
 import { CLASSIFICATION_COLORS, CLASSIFICATION_LABELS } from "@/lib/constants";
 import { InfoButton } from "@/components/info-panel";
 import { INFO } from "@/lib/info-content";
-import type { TransactionClassification } from "@/lib/types";
+import type { TransactionClassification, MosaicTx } from "@/lib/types";
 import { truncateTxid } from "@/lib/utils";
-
-interface MosaicTx {
-  txid: string;
-  classification: string;
-}
 
 interface Props {
   stem: string;

@@ -15,6 +15,7 @@ import {
 import { ChartTooltip } from "./chart-tooltip";
 import { InfoButton } from "@/components/info-panel";
 import { INFO } from "@/lib/info-content";
+import { getFeeBucketLabel } from "@/lib/constants";
 import type { FeeRateStats } from "@/lib/types";
 
 interface Props {
@@ -62,7 +63,7 @@ export function FeeRateChart({ histogram, stats }: Props) {
             />
             {stats && (
               <ReferenceLine
-                x={getMedianBucket(stats.median_sat_vb)}
+                x={getFeeBucketLabel(stats.median_sat_vb)}
                 stroke="var(--primary)"
                 strokeDasharray="3 3"
                 label={{
@@ -90,15 +91,4 @@ export function FeeRateChart({ histogram, stats }: Props) {
       </div>
     </div>
   );
-}
-
-function getMedianBucket(median: number): string {
-  if (median < 5) return "0-5";
-  if (median < 10) return "5-10";
-  if (median < 20) return "10-20";
-  if (median < 50) return "20-50";
-  if (median < 100) return "50-100";
-  if (median < 200) return "100-200";
-  if (median < 500) return "200-500";
-  return "500+";
 }

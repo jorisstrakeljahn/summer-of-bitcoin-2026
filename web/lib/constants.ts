@@ -1,6 +1,7 @@
 /**
- * Color and label mappings for transaction classifications and heuristics.
- * Used for consistent UI styling across charts, tables, and badges.
+ * Color and label mappings for transaction classifications, heuristics,
+ * script types, and fee rate buckets. Single source of truth for all
+ * display constants used across charts, tables, badges, and API routes.
  */
 import type { TransactionClassification, HeuristicId } from "./types";
 
@@ -45,3 +46,72 @@ export const HEURISTIC_LABELS: Record<HeuristicId, string> = {
   op_return: "OP_RETURN",
   peeling_chain: "Peeling Chain",
 };
+
+export const HEURISTIC_SHORT_LABELS: Record<HeuristicId, string> = {
+  cioh: "CIOH",
+  change_detection: "Change Det.",
+  address_reuse: "Addr Reuse",
+  coinjoin: "CoinJoin",
+  consolidation: "Consolid.",
+  self_transfer: "Self Xfer",
+  round_number_payment: "Round Num.",
+  op_return: "OP_RETURN",
+  peeling_chain: "Peeling",
+};
+
+export const HEURISTIC_DESCRIPTIONS: Record<HeuristicId, string> = {
+  cioh: "Multiple inputs likely belong to the same entity (Common Input Ownership).",
+  change_detection: "Identified a likely change output based on script type or value analysis.",
+  address_reuse: "Same address appears in both inputs and outputs, weakening privacy.",
+  coinjoin: "Multiple users combine inputs with equal-value outputs to obscure ownership.",
+  consolidation: "Many inputs combined into few outputs — typical wallet maintenance.",
+  self_transfer: "All outputs match input script patterns — likely same-entity transfer.",
+  round_number_payment: "Output value is a round BTC amount, suggesting it is a payment.",
+  op_return: "Contains OP_RETURN output with embedded data (e.g., timestamps, protocols).",
+  peeling_chain: "Pattern of large input split into small payment and large change.",
+};
+
+export const SCRIPT_TYPE_COLORS: Record<string, string> = {
+  p2wpkh: "#3b82f6",
+  p2tr: "#8b5cf6",
+  p2sh: "#f59e0b",
+  p2wsh: "#06b6d4",
+  p2pkh: "#10b981",
+  op_return: "#f43f5e",
+  unknown: "#6b7280",
+};
+
+export const SCRIPT_TYPE_LABELS: Record<string, string> = {
+  p2wpkh: "P2WPKH",
+  p2tr: "P2TR",
+  p2sh: "P2SH",
+  p2wsh: "P2WSH",
+  p2pkh: "P2PKH",
+  op_return: "OP_RETURN",
+  unknown: "Unknown",
+};
+
+export interface FeeBucket {
+  min: number;
+  max: number;
+  label: string;
+}
+
+export const FEE_BUCKETS: FeeBucket[] = [
+  { min: 0, max: 5, label: "0-5" },
+  { min: 5, max: 10, label: "5-10" },
+  { min: 10, max: 20, label: "10-20" },
+  { min: 20, max: 50, label: "20-50" },
+  { min: 50, max: 100, label: "50-100" },
+  { min: 100, max: 200, label: "100-200" },
+  { min: 200, max: 500, label: "200-500" },
+  { min: 500, max: Infinity, label: "500+" },
+];
+
+/** Maps a fee rate value to the label of the matching bucket. */
+export function getFeeBucketLabel(feeRate: number): string {
+  for (const b of FEE_BUCKETS) {
+    if (feeRate >= b.min && feeRate < b.max) return b.label;
+  }
+  return FEE_BUCKETS[FEE_BUCKETS.length - 1].label;
+}

@@ -5,7 +5,7 @@
  * Fetch file list, block summaries, stats, and paginated transactions from API.
  */
 import { useState, useEffect, useCallback } from "react";
-import type { FileSummary, BlockSummary, StatsResponse, AnalysisSummary } from "../types";
+import type { FileSummary, BlockSummary, StatsResponse, AnalysisSummary, TransactionsPage } from "../types";
 
 export function useFiles() {
   const [files, setFiles] = useState<FileSummary[]>([]);
@@ -59,21 +59,6 @@ export function useStats(stem: string | null) {
   }, [stem]);
 
   return { stats, loading };
-}
-
-interface TransactionsPage {
-  block_hash: string;
-  block_height: number;
-  block_timestamp: number;
-  total: number;
-  page: number;
-  size: number;
-  total_pages: number;
-  transactions: Array<{
-    txid: string;
-    heuristics: Record<string, { detected: boolean }>;
-    classification: string;
-  }>;
 }
 
 export function useTransactions(

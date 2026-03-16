@@ -104,3 +104,19 @@ export interface StatsResponse {
     timestamp: number;
   }[];
 }
+
+export interface TransactionsPage {
+  block_hash: string;
+  block_height: number;
+  block_timestamp: number;
+  total: number;
+  page: number;
+  size: number;
+  total_pages: number;
+  transactions: TransactionAnalysis[];
+}
+
+export interface MosaicTx {
+  txid: string;
+  classification: string;
+}

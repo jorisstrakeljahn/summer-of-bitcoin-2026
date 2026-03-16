@@ -3,22 +3,12 @@
  */
 import { NextResponse } from "next/server";
 import { getReport } from "@/lib/report-cache";
+import { FEE_BUCKETS } from "@/lib/constants";
 import type {
   ClassificationDistribution,
   StatsResponse,
   TransactionClassification,
 } from "@/lib/types";
-
-const FEE_BUCKETS = [
-  { min: 0, max: 5, label: "0-5" },
-  { min: 5, max: 10, label: "5-10" },
-  { min: 10, max: 20, label: "10-20" },
-  { min: 20, max: 50, label: "20-50" },
-  { min: 50, max: 100, label: "50-100" },
-  { min: 100, max: 200, label: "100-200" },
-  { min: 200, max: 500, label: "200-500" },
-  { min: 500, max: Infinity, label: "500+" },
-];
 
 export function GET(
   _req: Request,
