@@ -75,10 +75,18 @@ export function* iterateBlocks(
  * Example: [03 00 35 0c] → pushLen=3, height = 0x0c3500 = 800000
  */
 export function extractBip34Height(block: ParsedBlock): number {
-  const scriptSig = block.transactions[0].inputs[0].scriptSig;
+  if (block.transactions.length === 0) return 0;
+  const coinbase = block.transactions[0];
+  if (coinbase.inputs.length === 0) return 0;
+
+  const scriptSig = coinbase.inputs[0].scriptSig;
+  if (scriptSig.length < 2) return 0;
+
   const pushLen = scriptSig[0];
+  if (pushLen === 0 || pushLen > 4) return 0;
+
   let height = 0;
-  for (let i = 0; i < pushLen && i < scriptSig.length - 1; i++) {
+  for (let i = 0; i < pushLen && i + 1 < scriptSig.length; i++) {
     height |= scriptSig[1 + i] << (8 * i);
   }
   return height;

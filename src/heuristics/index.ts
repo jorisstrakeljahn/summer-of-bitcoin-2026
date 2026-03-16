@@ -69,7 +69,7 @@ export function buildTransactionContext(
 
   const totalIn = inputValues.reduce((s, v) => s + v, 0);
   const totalOut = outputValues.reduce((s, v) => s + v, 0);
-  const fee = isCoinbase ? 0 : totalIn - totalOut;
+  const fee = isCoinbase ? 0 : Math.max(0, totalIn - totalOut);
 
   const weight = tx.nonWitnessBytes * 4 + tx.witnessBytes;
   const vbytes = Math.ceil(weight / 4);
