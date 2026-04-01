@@ -80,7 +80,7 @@ export function UploadModal({ onClose, onSuccess }: UploadModalProps) {
       formData.append("rev", files.rev!);
       formData.append("xor", files.xor!);
 
-      const res = await fetch("/api/analyze", { method: "POST", body: formData });
+      const res = await fetch("/api/sherlock/analyze", { method: "POST", body: formData });
       const result = await res.json();
 
       if (result.ok) {

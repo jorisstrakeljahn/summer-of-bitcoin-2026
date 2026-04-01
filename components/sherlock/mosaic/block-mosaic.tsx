@@ -37,7 +37,7 @@ export function BlockMosaic({ stem, blockIdx, onTxClick }: Props) {
     setLoading(true);
     setError(false);
     fetch(
-      `/api/analysis/${stem}/blocks/${blockIdx}/transactions?page=1&size=200`,
+      `/api/sherlock/analysis/${stem}/blocks/${blockIdx}/transactions?page=1&size=200`,
     )
       .then((r) => {
         if (!r.ok) throw new Error("fetch failed");
@@ -55,7 +55,7 @@ export function BlockMosaic({ stem, blockIdx, onTxClick }: Props) {
 
           for (let p = 2; p <= Math.min(data.total_pages, 30); p++) {
             const res = await fetch(
-              `/api/analysis/${stem}/blocks/${blockIdx}/transactions?page=${p}&size=200`,
+              `/api/sherlock/analysis/${stem}/blocks/${blockIdx}/transactions?page=${p}&size=200`,
             );
             if (!res.ok) throw new Error("fetch failed");
             const page = await res.json();

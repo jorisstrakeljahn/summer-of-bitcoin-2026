@@ -26,7 +26,7 @@ export function FlowModal({ stem, txid, onClose }: Props) {
   useEffect(() => {
     setLoading(true);
     setError(null);
-    fetch(`/api/tx/${stem}/${txid}`)
+    fetch(`/api/sherlock/tx/${stem}/${txid}`)
       .then((r) => {
         if (!r.ok) throw new Error("Transaction not found");
         return r.json();

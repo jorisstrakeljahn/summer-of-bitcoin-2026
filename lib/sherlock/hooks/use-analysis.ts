@@ -24,7 +24,7 @@ export function useFiles() {
   useEffect(() => {
     setLoading(true);
     setError(null);
-    fetchJson<FileSummary[]>("/api/files")
+    fetchJson<FileSummary[]>("/api/sherlock/files")
       .then(setFiles)
       .catch((e) => setError(e.message))
       .finally(() => setLoading(false));
@@ -52,7 +52,7 @@ export function useAnalysis(stem: string | null) {
     if (!stem) return;
     setLoading(true);
     setError(null);
-    fetchJson<AnalysisData>(`/api/analysis/${stem}`)
+    fetchJson<AnalysisData>(`/api/sherlock/analysis/${stem}`)
       .then(setData)
       .catch((e) => setError(e.message))
       .finally(() => setLoading(false));
@@ -70,7 +70,7 @@ export function useStats(stem: string | null) {
     if (!stem) return;
     setLoading(true);
     setError(null);
-    fetchJson<StatsResponse>(`/api/analysis/${stem}/stats`)
+    fetchJson<StatsResponse>(`/api/sherlock/analysis/${stem}/stats`)
       .then(setStats)
       .catch((e) => setError(e.message))
       .finally(() => setLoading(false));
@@ -103,7 +103,7 @@ export function useTransactions(
     if (filters.heuristic) params.set("heuristic", filters.heuristic);
     if (filters.search && filters.search.length >= 4) params.set("search", filters.search);
 
-    fetchJson<TransactionsPage>(`/api/analysis/${stem}/blocks/${blockIdx}/transactions?${params}`)
+    fetchJson<TransactionsPage>(`/api/sherlock/analysis/${stem}/blocks/${blockIdx}/transactions?${params}`)
       .then(setData)
       .catch((e) => setError(e.message))
       .finally(() => setLoading(false));
