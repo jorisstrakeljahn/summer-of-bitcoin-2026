@@ -1,25 +1,49 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="900" height="300" viewBox="0 0 900 300">
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#0a0a0f"/>
-      <stop offset="100%" stop-color="#111118"/>
+      <stop offset="0%" stop-color="#0c0c14"/>
+      <stop offset="50%" stop-color="#110f1a"/>
+      <stop offset="100%" stop-color="#0e0a12"/>
     </linearGradient>
     <linearGradient id="accent" x1="0" y1="0" x2="1" y2="0">
       <stop offset="0%" stop-color="#f7931a"/>
-      <stop offset="100%" stop-color="#ffb84d"/>
+      <stop offset="50%" stop-color="#ffb84d"/>
+      <stop offset="100%" stop-color="#f7931a"/>
     </linearGradient>
-    <linearGradient id="line" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0%" stop-color="#f7931a" stop-opacity="0"/>
-      <stop offset="50%" stop-color="#f7931a" stop-opacity="0.6"/>
+    <linearGradient id="glow" x1="0.5" y1="0" x2="0.5" y2="1">
+      <stop offset="0%" stop-color="#f7931a" stop-opacity="0.15"/>
+      <stop offset="60%" stop-color="#f7931a" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="glowBottom" x1="0.5" y1="1" x2="0.5" y2="0">
+      <stop offset="0%" stop-color="#f7931a" stop-opacity="0.08"/>
+      <stop offset="50%" stop-color="#f7931a" stop-opacity="0"/>
+    </linearGradient>
+    <radialGradient id="spotLeft" cx="0.15" cy="0.3" r="0.4">
+      <stop offset="0%" stop-color="#f7931a" stop-opacity="0.07"/>
       <stop offset="100%" stop-color="#f7931a" stop-opacity="0"/>
-    </linearGradient>
+    </radialGradient>
+    <radialGradient id="spotRight" cx="0.85" cy="0.7" r="0.4">
+      <stop offset="0%" stop-color="#f7931a" stop-opacity="0.05"/>
+      <stop offset="100%" stop-color="#f7931a" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="spotCenter" cx="0.5" cy="0.35" r="0.35">
+      <stop offset="0%" stop-color="#f7931a" stop-opacity="0.06"/>
+      <stop offset="100%" stop-color="#f7931a" stop-opacity="0"/>
+    </radialGradient>
   </defs>
 
   <!-- Background -->
   <rect width="900" height="300" fill="url(#bg)"/>
 
-  <!-- Subtle grid pattern -->
-  <g opacity="0.04" stroke="#f7931a" stroke-width="0.5" fill="none">
+  <!-- Ambient glow layers -->
+  <rect width="900" height="300" fill="url(#glow)"/>
+  <rect width="900" height="300" fill="url(#glowBottom)"/>
+  <rect width="900" height="300" fill="url(#spotLeft)"/>
+  <rect width="900" height="300" fill="url(#spotRight)"/>
+  <rect width="900" height="300" fill="url(#spotCenter)"/>
+
+  <!-- Grid pattern -->
+  <g opacity="0.07" stroke="#f7931a" stroke-width="0.5" fill="none">
     <line x1="0" y1="50" x2="900" y2="50"/>
     <line x1="0" y1="100" x2="900" y2="100"/>
     <line x1="0" y1="150" x2="900" y2="150"/>
@@ -32,70 +56,94 @@
     <line x1="750" y1="0" x2="750" y2="300"/>
   </g>
 
-  <!-- Decorative hex blocks (representing Bitcoin blocks) -->
-  <g opacity="0.06" fill="#f7931a">
-    <rect x="60" y="40" width="24" height="24" rx="4"/>
-    <rect x="90" y="40" width="24" height="24" rx="4"/>
-    <rect x="120" y="40" width="24" height="24" rx="4"/>
-    <rect x="75" y="70" width="24" height="24" rx="4"/>
-    <rect x="105" y="70" width="24" height="24" rx="4"/>
-
-    <rect x="740" y="200" width="24" height="24" rx="4"/>
-    <rect x="770" y="200" width="24" height="24" rx="4"/>
-    <rect x="800" y="200" width="24" height="24" rx="4"/>
-    <rect x="755" y="230" width="24" height="24" rx="4"/>
-    <rect x="785" y="230" width="24" height="24" rx="4"/>
+  <!-- Decorative blocks — left cluster -->
+  <g fill="#f7931a">
+    <rect x="55" y="35" width="26" height="26" rx="5" opacity="0.14"/>
+    <rect x="87" y="35" width="26" height="26" rx="5" opacity="0.10"/>
+    <rect x="119" y="35" width="26" height="26" rx="5" opacity="0.07"/>
+    <rect x="71" y="67" width="26" height="26" rx="5" opacity="0.11"/>
+    <rect x="103" y="67" width="26" height="26" rx="5" opacity="0.08"/>
+    <rect x="55" y="99" width="26" height="26" rx="5" opacity="0.05"/>
   </g>
 
-  <!-- Connecting lines (representing transaction flows) -->
-  <g opacity="0.08" stroke="#f7931a" stroke-width="1" fill="none">
-    <path d="M 50 150 Q 200 80 350 150 Q 500 220 650 150 Q 750 100 850 150"/>
-    <path d="M 50 170 Q 200 240 350 170 Q 500 100 650 170 Q 750 220 850 170"/>
+  <!-- Decorative blocks — right cluster -->
+  <g fill="#f7931a">
+    <rect x="750" y="195" width="26" height="26" rx="5" opacity="0.07"/>
+    <rect x="782" y="195" width="26" height="26" rx="5" opacity="0.11"/>
+    <rect x="814" y="195" width="26" height="26" rx="5" opacity="0.14"/>
+    <rect x="766" y="227" width="26" height="26" rx="5" opacity="0.09"/>
+    <rect x="798" y="227" width="26" height="26" rx="5" opacity="0.12"/>
+    <rect x="814" y="259" width="26" height="26" rx="5" opacity="0.06"/>
   </g>
 
-  <!-- Bitcoin symbol -->
-  <g transform="translate(108, 120)" opacity="0.12" fill="#f7931a">
-    <circle cx="30" cy="30" r="28" fill="none" stroke="#f7931a" stroke-width="2"/>
-    <text x="30" y="42" font-family="Arial, sans-serif" font-size="36" font-weight="700" text-anchor="middle" fill="#f7931a">&#x20bf;</text>
+  <!-- Transaction flow curves -->
+  <g fill="none" stroke="#f7931a" stroke-width="1.2">
+    <path d="M 30 145 Q 180 60 330 145 Q 480 230 630 145 Q 730 85 870 145" opacity="0.14"/>
+    <path d="M 30 165 Q 180 250 330 165 Q 480 80 630 165 Q 730 225 870 165" opacity="0.10"/>
+    <path d="M 80 155 Q 250 110 400 155 Q 550 200 700 155 Q 800 120 860 155" opacity="0.06" stroke-dasharray="4 6"/>
   </g>
 
-  <!-- Accent line -->
-  <rect x="0" y="296" width="900" height="4" fill="url(#accent)"/>
+  <!-- Node dots along the flow -->
+  <g fill="#f7931a">
+    <circle cx="180" cy="100" r="2.5" opacity="0.25"/>
+    <circle cx="330" cy="145" r="3" opacity="0.30"/>
+    <circle cx="480" cy="190" r="2.5" opacity="0.25"/>
+    <circle cx="630" cy="145" r="3" opacity="0.30"/>
+    <circle cx="780" cy="115" r="2.5" opacity="0.20"/>
+    <circle cx="180" cy="210" r="2" opacity="0.18"/>
+    <circle cx="480" cy="115" r="2" opacity="0.18"/>
+    <circle cx="730" cy="195" r="2" opacity="0.15"/>
+  </g>
 
-  <!-- Top line -->
-  <rect x="100" y="0" width="700" height="1" fill="url(#line)"/>
+  <!-- Bitcoin symbol — larger, more visible -->
+  <g transform="translate(90, 108)" opacity="0.18">
+    <circle cx="32" cy="32" r="30" fill="none" stroke="#f7931a" stroke-width="2.5"/>
+    <text x="32" y="46" font-family="Arial, sans-serif" font-size="40" font-weight="700" text-anchor="middle" fill="#f7931a">&#x20bf;</text>
+  </g>
+
+  <!-- Second Bitcoin symbol — far right, subtle -->
+  <g transform="translate(740, 140)" opacity="0.08">
+    <circle cx="22" cy="22" r="20" fill="none" stroke="#f7931a" stroke-width="1.5"/>
+    <text x="22" y="33" font-family="Arial, sans-serif" font-size="28" font-weight="700" text-anchor="middle" fill="#f7931a">&#x20bf;</text>
+  </g>
+
+  <!-- Accent bar bottom -->
+  <rect x="0" y="295" width="900" height="5" fill="url(#accent)"/>
+
+  <!-- Top glow line -->
+  <rect x="0" y="0" width="900" height="2" fill="url(#accent)" opacity="0.4"/>
 
   <!-- Title -->
-  <text x="450" y="115" font-family="'Segoe UI', system-ui, -apple-system, sans-serif" font-size="42" font-weight="700" fill="#ffffff" text-anchor="middle" letter-spacing="-1">
+  <text x="450" y="115" font-family="'Segoe UI', system-ui, -apple-system, sans-serif" font-size="44" font-weight="700" fill="#ffffff" text-anchor="middle" letter-spacing="-1">
     Summer of Bitcoin 2026
   </text>
 
   <!-- Subtitle -->
-  <text x="450" y="155" font-family="'Segoe UI', system-ui, -apple-system, sans-serif" font-size="18" fill="#9ca3af" text-anchor="middle" letter-spacing="0.5">
+  <text x="450" y="155" font-family="'Segoe UI', system-ui, -apple-system, sans-serif" font-size="18" fill="#a1a1aa" text-anchor="middle" letter-spacing="0.5">
     Three Bitcoin Development Challenges
   </text>
 
   <!-- Divider dots -->
-  <g fill="#f7931a" opacity="0.5">
-    <circle cx="390" cy="185" r="2"/>
-    <circle cx="450" cy="185" r="2"/>
-    <circle cx="510" cy="185" r="2"/>
+  <g fill="#f7931a" opacity="0.6">
+    <circle cx="390" cy="182" r="2.5"/>
+    <circle cx="450" cy="182" r="2.5"/>
+    <circle cx="510" cy="182" r="2.5"/>
   </g>
 
   <!-- Tags -->
-  <g font-family="'Segoe UI', system-ui, -apple-system, sans-serif" font-size="12" text-anchor="middle">
-    <rect x="248" y="200" width="120" height="26" rx="13" fill="#f7931a" fill-opacity="0.1" stroke="#f7931a" stroke-opacity="0.25" stroke-width="1"/>
-    <text x="308" y="217" fill="#f7931a">Transaction Parser</text>
+  <g font-family="'Segoe UI', system-ui, -apple-system, sans-serif" font-size="12" font-weight="500" text-anchor="middle">
+    <rect x="248" y="197" width="120" height="28" rx="14" fill="#f7931a" fill-opacity="0.12" stroke="#f7931a" stroke-opacity="0.35" stroke-width="1"/>
+    <text x="308" y="215" fill="#f7931a">Transaction Parser</text>
 
-    <rect x="390" y="200" width="120" height="26" rx="13" fill="#f7931a" fill-opacity="0.1" stroke="#f7931a" stroke-opacity="0.25" stroke-width="1"/>
-    <text x="450" y="217" fill="#f7931a">PSBT Builder</text>
+    <rect x="390" y="197" width="120" height="28" rx="14" fill="#f7931a" fill-opacity="0.12" stroke="#f7931a" stroke-opacity="0.35" stroke-width="1"/>
+    <text x="450" y="215" fill="#f7931a">PSBT Builder</text>
 
-    <rect x="532" y="200" width="120" height="26" rx="13" fill="#f7931a" fill-opacity="0.1" stroke="#f7931a" stroke-opacity="0.25" stroke-width="1"/>
-    <text x="592" y="217" fill="#f7931a">Chain Analysis</text>
+    <rect x="532" y="197" width="120" height="28" rx="14" fill="#f7931a" fill-opacity="0.12" stroke="#f7931a" stroke-opacity="0.35" stroke-width="1"/>
+    <text x="592" y="215" fill="#f7931a">Chain Analysis</text>
   </g>
 
   <!-- Stats bar -->
-  <g font-family="'SF Mono', 'Cascadia Code', monospace" font-size="12" fill="#6b7280" text-anchor="middle">
+  <g font-family="'SF Mono', 'Cascadia Code', monospace" font-size="12" fill="#71717a" text-anchor="middle">
     <text x="330" y="262">170+ commits</text>
     <text x="410" y="262" fill="#3f3f46">|</text>
     <text x="450" y="262">57 source files</text>
