@@ -109,10 +109,6 @@ export default function LandingPage() {
         <div className="absolute inset-0 bg-gradient-to-b from-primary/5 via-transparent to-transparent" />
         <div className="relative mx-auto max-w-5xl px-6 pb-16 pt-24">
           <div className="flex flex-col items-center text-center">
-            <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-4 py-1.5 text-sm text-primary">
-              <span className="h-1.5 w-1.5 rounded-full bg-primary" />
-              Summer of Bitcoin 2026
-            </div>
             <h1 className="text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl">
               Three Bitcoin
               <br />
@@ -259,6 +255,80 @@ export default function LandingPage() {
               </div>
             );
           })}
+        </div>
+      </section>
+
+      {/* About Summer of Bitcoin */}
+      <section className="border-t border-border">
+        <div className="mx-auto max-w-3xl px-6 py-20">
+          <h2 className="text-2xl font-bold tracking-tight sm:text-3xl">
+            What is Summer of Bitcoin?
+          </h2>
+          <div className="mt-6 space-y-4 text-[15px] leading-relaxed text-muted-foreground">
+            <p>
+              <a
+                href="https://www.summerofbitcoin.org/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-foreground underline underline-offset-4 hover:text-primary"
+              >
+                Summer of Bitcoin
+              </a>{" "}
+              is a global, open-source internship program that introduces
+              university students to Bitcoin development. Each year, hundreds of
+              applicants go through a multi-round selection process that tests
+              their ability to work with Bitcoin at the protocol level — not
+              through high-level APIs, but by parsing raw transactions, building
+              PSBTs from scratch, and analyzing on-chain data with real heuristics.
+            </p>
+            <p>
+              The program is structured around a series of increasingly difficult
+              coding challenges. Only those who pass all rounds are matched with a
+              Bitcoin open-source project for a paid summer internship. The
+              challenges are designed to mirror real contributions to projects like
+              Bitcoin Core, LND, and other critical infrastructure.
+            </p>
+            <p>
+              The three projects on this page represent my completed challenge
+              submissions for the 2026 cohort. Each one was built from the ground
+              up — starting with a specification, writing the core logic as a CLI
+              tool, adding comprehensive test suites, and finally building
+              interactive web visualizers to make the results explorable.
+            </p>
+          </div>
+
+          <div className="mt-10 grid gap-6 sm:grid-cols-3">
+            <div className="rounded-xl border border-border bg-card p-5">
+              <div className="mb-2 text-sm font-semibold text-foreground">
+                Round 1
+              </div>
+              <p className="text-sm text-muted-foreground">
+                Parse raw Bitcoin transactions and blocks from hex. Classify
+                scripts, compute fees, detect timelocks, and visualize
+                everything as an interactive flow graph.
+              </p>
+            </div>
+            <div className="rounded-xl border border-border bg-card p-5">
+              <div className="mb-2 text-sm font-semibold text-foreground">
+                Round 2
+              </div>
+              <p className="text-sm text-muted-foreground">
+                Build unsigned Bitcoin transactions from scratch. Implement
+                coin selection algorithms, estimate fees, handle RBF and
+                locktime, and export valid PSBTs.
+              </p>
+            </div>
+            <div className="rounded-xl border border-border bg-card p-5">
+              <div className="mb-2 text-sm font-semibold text-foreground">
+                Round 3
+              </div>
+              <p className="text-sm text-muted-foreground">
+                Build a chain analysis engine with 9 heuristics to classify
+                transactions, detect CoinJoin, peeling chains, address reuse,
+                and generate detailed reports.
+              </p>
+            </div>
+          </div>
         </div>
       </section>
 
