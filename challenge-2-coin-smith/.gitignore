@@ -1,0 +1,8 @@
+out/
+node_modules/
+__pycache__/
+target/
+.next/
+.env
+AGENTS.md
+PLAN.md
