@@ -11,7 +11,7 @@
 import { Badge } from "@/components/ui/badge";
 import { CopyableText } from "@/components/coin-smith/copyable-text";
 import { ExpandControls } from "@/components/coin-smith/expand-controls";
-import { useProgressiveList } from "@/hooks/use-progressive-list";
+import { useProgressiveList } from "@/lib/coin-smith/use-progressive-list";
 import {
   Table,
   TableBody,

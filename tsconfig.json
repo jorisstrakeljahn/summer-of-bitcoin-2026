@@ -31,7 +31,13 @@
   "exclude": [
     "node_modules",
     "challenge-1-chain-lens/web",
+    "challenge-1-chain-lens/tests",
+    "challenge-1-chain-lens/vitest.config.ts",
     "challenge-2-coin-smith/web",
-    "challenge-3-sherlock/web"
+    "challenge-2-coin-smith/tests",
+    "challenge-2-coin-smith/vitest.config.ts",
+    "challenge-3-sherlock/web",
+    "challenge-3-sherlock/test",
+    "challenge-3-sherlock/vitest.config.ts"
   ]
 }

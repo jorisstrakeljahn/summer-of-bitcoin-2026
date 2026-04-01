@@ -15,6 +15,7 @@ const nextConfig: NextConfig = {
     "/api/coin-smith/**": ["./challenge-2-coin-smith/src/**/*", "./challenge-2-coin-smith/fixtures/**/*"],
     "/api/sherlock/**": ["./challenge-3-sherlock/src/**/*", "./challenge-3-sherlock/fixtures/**/*", "./challenge-3-sherlock/out/**/*"],
   },
+  turbopack: {},
   webpack: (config) => {
     config.resolve = config.resolve ?? {};
     config.resolve.alias = {

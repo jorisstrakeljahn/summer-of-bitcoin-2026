@@ -22,7 +22,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { useProgressiveList } from "@/hooks/use-progressive-list";
+import { useProgressiveList } from "@/lib/coin-smith/use-progressive-list";
 import type { DecodedPsbt, DecodedInput, DecodedOutput } from "@/lib/coin-smith/types";
 
 // ── Constants ──────────────────────────────────────────────────────
