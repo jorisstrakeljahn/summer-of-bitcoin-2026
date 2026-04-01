@@ -1,0 +1,105 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="300" viewBox="0 0 900 300">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0a0a0f"/>
+      <stop offset="100%" stop-color="#111118"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#f7931a"/>
+      <stop offset="100%" stop-color="#ffb84d"/>
+    </linearGradient>
+    <linearGradient id="line" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#f7931a" stop-opacity="0"/>
+      <stop offset="50%" stop-color="#f7931a" stop-opacity="0.6"/>
+      <stop offset="100%" stop-color="#f7931a" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="900" height="300" fill="url(#bg)"/>
+
+  <!-- Subtle grid pattern -->
+  <g opacity="0.04" stroke="#f7931a" stroke-width="0.5" fill="none">
+    <line x1="0" y1="50" x2="900" y2="50"/>
+    <line x1="0" y1="100" x2="900" y2="100"/>
+    <line x1="0" y1="150" x2="900" y2="150"/>
+    <line x1="0" y1="200" x2="900" y2="200"/>
+    <line x1="0" y1="250" x2="900" y2="250"/>
+    <line x1="150" y1="0" x2="150" y2="300"/>
+    <line x1="300" y1="0" x2="300" y2="300"/>
+    <line x1="450" y1="0" x2="450" y2="300"/>
+    <line x1="600" y1="0" x2="600" y2="300"/>
+    <line x1="750" y1="0" x2="750" y2="300"/>
+  </g>
+
+  <!-- Decorative hex blocks (representing Bitcoin blocks) -->
+  <g opacity="0.06" fill="#f7931a">
+    <rect x="60" y="40" width="24" height="24" rx="4"/>
+    <rect x="90" y="40" width="24" height="24" rx="4"/>
+    <rect x="120" y="40" width="24" height="24" rx="4"/>
+    <rect x="75" y="70" width="24" height="24" rx="4"/>
+    <rect x="105" y="70" width="24" height="24" rx="4"/>
+
+    <rect x="740" y="200" width="24" height="24" rx="4"/>
+    <rect x="770" y="200" width="24" height="24" rx="4"/>
+    <rect x="800" y="200" width="24" height="24" rx="4"/>
+    <rect x="755" y="230" width="24" height="24" rx="4"/>
+    <rect x="785" y="230" width="24" height="24" rx="4"/>
+  </g>
+
+  <!-- Connecting lines (representing transaction flows) -->
+  <g opacity="0.08" stroke="#f7931a" stroke-width="1" fill="none">
+    <path d="M 50 150 Q 200 80 350 150 Q 500 220 650 150 Q 750 100 850 150"/>
+    <path d="M 50 170 Q 200 240 350 170 Q 500 100 650 170 Q 750 220 850 170"/>
+  </g>
+
+  <!-- Bitcoin symbol -->
+  <g transform="translate(108, 120)" opacity="0.12" fill="#f7931a">
+    <circle cx="30" cy="30" r="28" fill="none" stroke="#f7931a" stroke-width="2"/>
+    <text x="30" y="42" font-family="Arial, sans-serif" font-size="36" font-weight="700" text-anchor="middle" fill="#f7931a">&#x20bf;</text>
+  </g>
+
+  <!-- Accent line -->
+  <rect x="0" y="296" width="900" height="4" fill="url(#accent)"/>
+
+  <!-- Top line -->
+  <rect x="100" y="0" width="700" height="1" fill="url(#line)"/>
+
+  <!-- Title -->
+  <text x="450" y="115" font-family="'Segoe UI', system-ui, -apple-system, sans-serif" font-size="42" font-weight="700" fill="#ffffff" text-anchor="middle" letter-spacing="-1">
+    Summer of Bitcoin 2026
+  </text>
+
+  <!-- Subtitle -->
+  <text x="450" y="155" font-family="'Segoe UI', system-ui, -apple-system, sans-serif" font-size="18" fill="#9ca3af" text-anchor="middle" letter-spacing="0.5">
+    Three Bitcoin Development Challenges
+  </text>
+
+  <!-- Divider dots -->
+  <g fill="#f7931a" opacity="0.5">
+    <circle cx="390" cy="185" r="2"/>
+    <circle cx="450" cy="185" r="2"/>
+    <circle cx="510" cy="185" r="2"/>
+  </g>
+
+  <!-- Tags -->
+  <g font-family="'Segoe UI', system-ui, -apple-system, sans-serif" font-size="12" text-anchor="middle">
+    <rect x="248" y="200" width="120" height="26" rx="13" fill="#f7931a" fill-opacity="0.1" stroke="#f7931a" stroke-opacity="0.25" stroke-width="1"/>
+    <text x="308" y="217" fill="#f7931a">Transaction Parser</text>
+
+    <rect x="390" y="200" width="120" height="26" rx="13" fill="#f7931a" fill-opacity="0.1" stroke="#f7931a" stroke-opacity="0.25" stroke-width="1"/>
+    <text x="450" y="217" fill="#f7931a">PSBT Builder</text>
+
+    <rect x="532" y="200" width="120" height="26" rx="13" fill="#f7931a" fill-opacity="0.1" stroke="#f7931a" stroke-opacity="0.25" stroke-width="1"/>
+    <text x="592" y="217" fill="#f7931a">Chain Analysis</text>
+  </g>
+
+  <!-- Stats bar -->
+  <g font-family="'SF Mono', 'Cascadia Code', monospace" font-size="12" fill="#6b7280" text-anchor="middle">
+    <text x="330" y="262">170+ commits</text>
+    <text x="410" y="262" fill="#3f3f46">|</text>
+    <text x="450" y="262">57 source files</text>
+    <text x="530" y="262" fill="#3f3f46">|</text>
+    <text x="585" y="262">38 tests</text>
+  </g>
+</svg>
