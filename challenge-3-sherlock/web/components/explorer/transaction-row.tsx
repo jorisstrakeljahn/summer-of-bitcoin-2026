@@ -1,0 +1,133 @@
+/**
+ * Expandable row displaying TXID, classification, heuristics, and link to transaction graph.
+ */
+"use client";
+
+import { ChevronDown, ChevronRight, ExternalLink, Copy, Check } from "lucide-react";
+import { useState } from "react";
+import { ClassificationBadge } from "@/components/badges/classification-badge";
+import { HeuristicBadge } from "@/components/badges/heuristic-badge";
+import { truncateTxid } from "@/lib/utils";
+import type { TransactionAnalysis, TransactionClassification } from "@/lib/types";
+import { HEURISTIC_LABELS, HEURISTIC_DESCRIPTIONS, MAX_VISIBLE_HEURISTICS, COPY_FEEDBACK_MS } from "@/lib/constants";
+import type { HeuristicId } from "@/lib/types";
+
+interface Props {
+  tx: TransactionAnalysis;
+  stem: string;
+  onViewGraph?: (txid: string) => void;
+}
+
+export function TransactionRow({ tx, stem, onViewGraph }: Props) {
+  const [expanded, setExpanded] = useState(false);
+  const [copied, setCopied] = useState(false);
+
+  const heuristicIds = Object.keys(tx.heuristics);
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(tx.txid);
+    setCopied(true);
+    setTimeout(() => setCopied(false), COPY_FEEDBACK_MS);
+  };
+
+  return (
+    <div className="border-b border-border/30 last:border-b-0">
+      <button
+        onClick={() => setExpanded(!expanded)}
+        className="flex w-full items-start gap-2 px-3 py-3 text-left hover:bg-accent/50 transition-colors sm:items-center sm:gap-3 sm:px-4 sm:py-2.5"
+      >
+        {expanded ? (
+          <ChevronDown className="mt-0.5 h-3.5 w-3.5 shrink-0 text-muted-foreground sm:mt-0" />
+        ) : (
+          <ChevronRight className="mt-0.5 h-3.5 w-3.5 shrink-0 text-muted-foreground sm:mt-0" />
+        )}
+
+        <div className="flex min-w-0 flex-1 flex-col gap-1.5 sm:flex-row sm:items-center sm:gap-3">
+          <span className="shrink-0 font-mono text-xs sm:w-36">
+            {truncateTxid(tx.txid)}
+          </span>
+
+          <span className="shrink-0 sm:w-32">
+            <ClassificationBadge
+              classification={tx.classification}
+            />
+          </span>
+
+          <div className="flex flex-wrap gap-1">
+            {heuristicIds.slice(0, MAX_VISIBLE_HEURISTICS).map((h) => (
+              <HeuristicBadge key={h} id={h} />
+            ))}
+            {heuristicIds.length > MAX_VISIBLE_HEURISTICS && (
+              <span className="text-[10px] text-muted-foreground">
+                +{heuristicIds.length - MAX_VISIBLE_HEURISTICS}
+              </span>
+            )}
+          </div>
+        </div>
+      </button>
+
+      {expanded && (
+        <div className="border-t border-border/30 bg-muted/30 px-4 py-4">
+          <div className="flex items-center gap-2">
+            <span className="text-xs text-muted-foreground">TXID:</span>
+            <code className="flex-1 break-all font-mono text-xs">
+              {tx.txid}
+            </code>
+            <button
+              onClick={handleCopy}
+              className="shrink-0 rounded p-2 hover:bg-accent transition-colors"
+              aria-label="Copy TXID"
+            >
+              {copied ? (
+                <Check className="h-3.5 w-3.5 text-primary" />
+              ) : (
+                <Copy className="h-3.5 w-3.5 text-muted-foreground" />
+              )}
+            </button>
+            <a
+              href={`https://mempool.space/tx/${tx.txid}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="shrink-0 rounded p-2 hover:bg-accent transition-colors"
+              aria-label="View on mempool.space"
+            >
+              <ExternalLink className="h-3.5 w-3.5 text-muted-foreground" />
+            </a>
+          </div>
+
+          {heuristicIds.length > 0 && (
+            <div className="mt-4">
+              <p className="text-xs font-medium text-muted-foreground mb-2">
+                Detected Heuristics
+              </p>
+              <div className="grid gap-2 sm:grid-cols-2">
+                {heuristicIds.map((h) => (
+                  <div
+                    key={h}
+                    className="rounded-lg bg-muted/40 p-3"
+                  >
+                    <p className="text-xs font-semibold">
+                      {HEURISTIC_LABELS[h as HeuristicId] ?? h}
+                    </p>
+                    <p className="mt-1 text-xs text-muted-foreground">
+                      {HEURISTIC_DESCRIPTIONS[h as HeuristicId] ?? "Heuristic detected."}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {onViewGraph && (
+            <button
+              onClick={() => onViewGraph(tx.txid)}
+              className="mt-3 rounded-md bg-primary px-4 py-2.5 text-xs font-medium text-primary-foreground hover:bg-primary/90 transition-colors"
+            >
+              View Transaction Graph
+            </button>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
